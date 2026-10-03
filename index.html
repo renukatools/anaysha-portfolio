@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Amaira's Digital Portfolio</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDNP7Rc50smJ3QeAOZozQ7220CrjkEiEcY",
+            authDomain: "amaira--digital-portfolio.firebaseapp.com",
+            projectId: "amaira--digital-portfolio",
+            storageBucket: "amaira--digital-portfolio.firebasestorage.app",
+            messagingSenderId: "1057573972585",
+            appId: "1:1057573972585:web:757e24c3dafd8d27b450f8"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        const IMGBB_API_KEY = "a6c8e02c15899509447d65b571eefb92";
+    </script>
+
+    <style>
+        :root {
+            --theme-primary: #2563eb;
+            --theme-hover: #1d4ed8;
+            --theme-light: #eff6ff;
+            --theme-border: #bfdbfe;
+            --theme-gradient: linear-gradient(to right, #2563eb, #4f46e5);
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            height: 100vh; 
+            height: 100dvh; 
+        }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--theme-border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--theme-primary); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .edit-controls-flex { display: none !important; }
+        .edit-controls-block { display: none !important; }
+        body.edit-mode .edit-controls-flex { display: flex !important; }
+        body.edit-mode .edit-controls-block { display: block !important; }
+        
+        body:not(.edit-mode) .editable-border { border: 1px solid transparent !important; pointer-events: none; }
+        body.edit-mode .editable-border { border: 1px dashed #94a3b8 !important; border-radius: 0.5rem; transition: all 0.2s; }
+        body.edit-mode .editable-border:focus { border-color: var(--theme-primary) !important; background: #f8fafc; outline: none; box-shadow: 0 0 0 3px var(--theme-light); }
+
+        body:not(.edit-mode) textarea[data-field]:placeholder-shown,
+        body:not(.edit-mode) input[data-field]:placeholder-shown,
+        body:not(.edit-mode) .hide-if-empty:empty,
+        body:not(.edit-mode) .hide-if-no-media:not(:has(img)):not(:has(iframe)) { display: none !important; }
+
+        body.edit-mode .edit-mode-hidden-item { opacity: 0.6; filter: grayscale(40%); border: 1px dashed #cbd5e1; }
+
+        .protected-media { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-user-drag: none; pointer-events: auto; }
+
+        #app-sidebar { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        #app-sidebar.collapsed { width: 5.5rem; }
+        #app-sidebar.collapsed .hide-on-collapse { display: none; opacity: 0; }
+        #app-sidebar.collapsed .center-on-collapse { justify-content: center; padding-left: 0; padding-right: 0; }
+        
+        /* Perfect centering of the toggle button and sliding profile pic when collapsed */
+        #app-sidebar.collapsed #sidebar-toggle-btn { right: 50%; transform: translateX(50%); top: calc(1rem + env(safe-area-inset-top)); }
+        #app-sidebar:not(.collapsed) #sidebar-toggle-btn { transform: translateX(0); }
+        #app-sidebar.collapsed .profile-pic-container { margin-top: 2.5rem; }
+        #app-sidebar:not(.collapsed) .profile-pic-container { margin-top: 0; }
+        
+        /* Square active block styling for collapsed state */
+        #app-sidebar.collapsed .menu-item { justify-content: center !important; padding: 0.75rem !important; aspect-ratio: 1/1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; }
+        #app-sidebar.collapsed .menu-item .icon-container { width: 100% !important; height: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important; background: transparent !important; box-shadow: none !important; }
+        #app-sidebar.collapsed .menu-item .icon-container i { font-size: 1.25rem !important; }
+
+        @media (max-width: 767px) {
+            #app-sidebar { position: absolute; left: 0; top: 0; transform: translateX(-100%); width: 85vw !important; max-width: 320px; z-index: 50; height: 100%; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+            #app-sidebar.mobile-open { transform: translateX(0); }
+            #app-sidebar .hide-on-collapse { display: block; opacity: 1; }
+            #app-sidebar.collapsed { width: 85vw !important; }
+            .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.4); z-index: 40; backdrop-filter: blur(3px); }
+            .mobile-overlay.show { display: block; }
+        }
+
+        #toast-notification { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s; transform: translateY(100px); opacity: 0; z-index: 99999; }
+        #toast-notification.show { transform: translateY(0); opacity: 1; }
+
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .wave-emoji { display: inline-block; animation: wave 2.5s infinite; transform-origin: 70% 70%; }
+        @keyframes wave { 0% { transform: rotate( 0.0deg) } 10% { transform: rotate(14.0deg) } 20% { transform: rotate(-8.0deg) } 30% { transform: rotate(14.0deg) } 40% { transform: rotate(-4.0deg) } 50% { transform: rotate(10.0deg) } 60% { transform: rotate( 0.0deg) } 100% { transform: rotate( 0.0deg) } }
+
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .tree-line { position: relative; }
+        .tree-line::before { content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; border-radius: 2px; z-index: 0; }
+        .tree-item { position: relative; z-index: 1; }
+    </style>
+</head>
+
+<body class="text-slate-800 flex overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100 via-slate-50 to-white selection:bg-blue-200 w-full">
+
+    <div id="global-loader" class="fixed inset-0 bg-slate-50 z-[99999] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="w-16 h-16 border-4 border-slate-200 rounded-full animate-spin shadow-sm" style="border-top-color: var(--theme-primary);"></div>
+        <p class="mt-4 font-bold text-slate-600 tracking-wide text-sm animate-pulse">Loading Portfolio...</p>
+    </div>
+
+    <div id="mobile-sidebar-overlay" class="mobile-overlay" onclick="toggleMobileMenu()"></div>
+
+    <div id="media-modal" class="fixed inset-0 z-[999999] hidden bg-slate-900/95 backdrop-blur-md flex items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeModal()">
+        <button onclick="closeModal()" class="absolute right-6 text-white/70 hover:text-white text-4xl z-50 transition transform hover:scale-110" style="top: max(env(safe-area-inset-top), 1.5rem);"><i class="fa-solid fa-xmark"></i></button>
+        <div class="relative w-full h-full max-w-6xl max-h-screen p-4 md:p-12 flex items-center justify-center" id="modal-content" onclick="event.stopPropagation()"></div>
+        <button onclick="event.stopPropagation(); modalChangeSlide(-1)" class="absolute left-2 md:left-10 top-1/2 -translate-y-1/2 text-white/50 hover:text-white text-3xl md:text-5xl z-50 p-4 transition transform hover:scale-110"><i class="fa-solid fa-chevron-left"></i></button>
+        <button onclick="event.stopPropagation(); modalChangeSlide(1)" class="absolute right-2 md:right-10 top-1/2 -translate-y-1/2 text-white/50 hover:text-white text-3xl md:text-5xl z-50 p-4 transition transform hover:scale-110"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+
+    <div id="action-modal" class="fixed inset-0 z-[999999] hidden bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-[2rem] p-8 shadow-2xl max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="action-modal-panel">
+            <h3 id="action-modal-title" class="text-xl font-extrabold text-slate-800 mb-2"></h3>
+            <p id="action-modal-desc" class="text-sm text-slate-500 mb-6 hidden"></p>
+            <input type="text" id="action-modal-input-1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 text-sm focus:outline-none focus:border-blue-500 hidden" autocomplete="off">
+            <input type="password" id="action-modal-input-2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-6 text-sm focus:outline-none focus:border-blue-500 hidden" autocomplete="off">
+            <div class="flex space-x-3 justify-end mt-4">
+                <button id="action-modal-cancel" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition">Cancel</button>
+                <button id="action-modal-submit" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-md transition" style="background: var(--theme-gradient);">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-notification" class="fixed right-6 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-sm font-medium border border-slate-700" style="bottom: max(env(safe-area-inset-bottom), 1.5rem);">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg">Action successful</span>
+    </div>
+
+    <aside id="app-sidebar" class="glass-card border-r border-slate-200/50 flex flex-col w-[20rem] flex-shrink-0 relative shadow-[4px_0_24px_rgba(37,99,235,0.05)] z-40 overflow-y-auto overflow-x-hidden">
+        
+        <div class="pb-4 flex flex-col items-center border-b border-slate-100/50 relative group flex-shrink-0" style="padding-top: calc(1.5rem + env(safe-area-inset-top)); padding-left: 1.5rem; padding-right: 1.5rem;">
+            <!-- Button cleanly aligned right-4 to match footer lock icon vertically -->
+            <button onclick="toggleSidebarCollapse()" id="sidebar-toggle-btn" class="hidden md:flex absolute right-4 bg-white border border-slate-200 text-slate-500 hover:text-slate-900 w-7 h-7 rounded-full items-center justify-center shadow-md z-10 transition-all" style="top: calc(1.5rem + env(safe-area-inset-top));">
+                <i class="fa-solid fa-chevron-left text-[10px]" id="collapse-icon"></i>
+            </button>
+            
+            <div class="profile-pic-container relative cursor-pointer hover:scale-105 transition-all duration-300" onclick="handleThumbnailClick()">
+                <img id="sidebar-profile-pic" src="https://ui-avatars.com/api/?name=User&background=bfdbfe&color=1e3a8a" class="w-16 h-16 rounded-2xl object-cover shadow-lg border-2 border-white protected-media" oncontextmenu="return false;" ondragstart="return false;" alt="Profile">
+                <div class="edit-controls-flex absolute inset-0 bg-black/40 rounded-2xl items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                    <i class="fa-solid fa-camera text-white text-sm"></i>
+                </div>
+            </div>
+            <input type="file" id="profile_pic_input" class="hidden" accept="image/*" onchange="handleProfilePicUpload(event)">
+            
+            <div class="mt-3 text-center hide-on-collapse w-full min-w-0 cursor-pointer" onclick="if(!auth.currentUser) switchView('about')">
+                <textarea rows="1" data-field="profile.name" class="w-full text-center text-lg font-extrabold text-slate-900 bg-transparent editable-border p-1 resize-none overflow-hidden" placeholder="Name" onclick="event.stopPropagation()">Amaira Mulay</textarea>
+                <textarea rows="1" data-field="profile.grade" class="w-full text-center text-[10px] font-bold uppercase tracking-widest bg-transparent editable-border p-0.5 resize-none overflow-hidden mt-0.5" style="color: var(--theme-primary);" placeholder="Grade" onclick="event.stopPropagation()">Class 6 • NVS</textarea>
+            </div>
+        </div>
+
+        <nav class="p-4 space-y-3 flex-1" id="sidebar-nav"></nav>
+
+        <div class="p-4 border-t border-slate-100/50 bg-slate-50/50 flex flex-col space-y-3 mt-auto flex-shrink-0" style="padding-bottom: max(env(safe-area-inset-bottom), 1rem);">
+            <div class="flex justify-between items-center hide-on-collapse">
+                <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest edit-controls-block">Color Theme</span>
+                <button onclick="handleAdminLoginToggle()" id="admin-lock-btn" class="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all ml-auto" title="Admin Login">
+                    <i class="fa-solid fa-lock text-sm"></i>
+                </button>
+            </div>
+            
+            <div class="edit-controls-flex items-center justify-between hide-on-collapse pb-1">
+                <button onclick="setTheme('blue')" title="Ocean Blue" class="w-6 h-6 rounded-full bg-blue-600 hover:scale-110 transition shadow-sm" id="theme-btn-blue"></button>
+                <button onclick="setTheme('pink')" title="Rose Pink" class="w-6 h-6 rounded-full bg-pink-600 hover:scale-110 transition shadow-sm" id="theme-btn-pink"></button>
+                <button onclick="setTheme('emerald')" title="Emerald Green" class="w-6 h-6 rounded-full bg-emerald-600 hover:scale-110 transition shadow-sm" id="theme-btn-emerald"></button>
+                <button onclick="setTheme('violet')" title="Royal Violet" class="w-6 h-6 rounded-full bg-violet-600 hover:scale-110 transition shadow-sm" id="theme-btn-violet"></button>
+                <button onclick="setTheme('amber')" title="Sunset Amber" class="w-6 h-6 rounded-full bg-amber-600 hover:scale-110 transition shadow-sm" id="theme-btn-amber"></button>
+            </div>
+            
+            <!-- Mobile / Collapsed Admin Lock Button -->
+            <div class="flex justify-center center-on-collapse w-full" id="admin-lock-btn-mobile" style="display: none;">
+                <button onclick="handleAdminLoginToggle()" class="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"><i class="fa-solid fa-lock text-sm" id="mobile-lock-icon"></i></button>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative min-w-0">
+        <header class="glass-card border-b border-slate-200/50 px-4 md:px-6 flex items-center justify-between flex-shrink-0 z-10 relative w-full" style="padding-top: max(env(safe-area-inset-top), 12px); height: calc(4rem + max(env(safe-area-inset-top), 12px)); box-sizing: border-box;">
+            <div class="flex items-center space-x-3 min-w-0 flex-1">
+                <button onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-10 h-10 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition flex-shrink-0">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <div class="flex items-center space-x-2 text-xs md:text-sm font-semibold text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-hide flex-1 py-2" id="breadcrumb-container" style="-webkit-overflow-scrolling: touch;">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 edit-controls-flex flex-shrink-0 ml-4">
+                <span class="text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full border flex items-center space-x-1.5 shadow-sm" style="color: var(--theme-primary); background-color: var(--theme-light); border-color: var(--theme-border);">
+                    <i class="fa-solid fa-cloud-arrow-up"></i><span class="hidden sm:inline">Synced</span>
+                </span>
+            </div>
+        </header>
+
+        <div id="main-content-viewport" class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 lg:p-10 fade-in scroll-smooth" style="padding-bottom: max(env(safe-area-inset-bottom), 2rem);">
+            <!-- Content Injected via JS -->
+        </div>
+    </main>
+
+    <script>
+        const themes = {
+            blue: { name: 'Ocean Blue', primary: '#2563eb', hover: '#1d4ed8', light: '#eff6ff', border: '#bfdbfe', gradient: 'linear-gradient(to right, #2563eb, #4f46e5)' },
+            pink: { name: 'Rose Pink', primary: '#db2777', hover: '#be185d', light: '#fdf2f8', border: '#fbcfe8', gradient: 'linear-gradient(to right, #db2777, #e11d48)' },
+            emerald: { name: 'Emerald Green', primary: '#059669', hover: '#047857', light: '#ecfdf5', border: '#a7f3d0', gradient: 'linear-gradient(to right, #059669, #0d9488)' },
+            violet: { name: 'Royal Violet', primary: '#7c3aed', hover: '#6d28d9', light: '#f5f3ff', border: '#ddd6fe', gradient: 'linear-gradient(to right, #7c3aed, #9333ea)' },
+            amber: { name: 'Sunset Amber', primary: '#d97706', hover: '#b45309', light: '#fffbeb', border: '#fde68a', gradient: 'linear-gradient(to right, #d97706, #ea580c)' }
+        };
+
+        let state = {
+            isEditMode: false,
+            isSidebarCollapsed: false,
+            currentView: 'about',
+            activeIds: { sectionId: null, classId: null, subjectId: null, category: null },
+            collapsedMenus: { sections: {}, categories: {}, classes: {}, shortcutAcademicsClasses: {} },
+            theme: 'blue',
+            modalContext: null,
+            modalIndex: 0,
+            
+            profile: { name: 'Amaira Mulay', grade: 'Class 6 • NVS', pic: '' },
+            about: { 
+                title: 'Hello! I am Amaira.', 
+                subtitle: 'Welcome to my digital portfolio!', 
+                bio: 'I am an enthusiastic student exploring the wonders of science, participating in school activities, and learning new skills every day!',
+                media: [] 
+            },
+            
+            sections: [
+                { id: 'sec_acad', title: 'Academics', isAcademic: true },
+                { id: 'sec_beyond', title: 'Beyond Academics', isAcademic: false, categories: ['extracurriculars', 'hobbies'] }
+            ],
+            
+            classes: [
+                { id: 'class_6', name: 'Class 6', year: '', subjects: [] }
+            ],
+            categoryNames: {
+                extracurriculars: 'Extracurriculars',
+                hobbies: 'Hobbies & Skills'
+            },
+            
+            contact: {
+                isVisible: true,
+                title: 'Contact Me',
+                subtitle: "Let's connect and stay in touch!",
+                details: [
+                    { id: 'prof_1', label: 'Profession', value: 'Student', isVisible: true, icon: 'fa-user-graduate' },
+                    { id: 'prof_2', label: 'Profession 2', value: 'Content Creator', isVisible: false, icon: 'fa-briefcase' },
+                    { id: 'prof_3', label: 'Profession 3', value: 'Developer', isVisible: false, icon: 'fa-laptop-code' },
+                    { id: 'inst_1', label: 'Institute', value: 'Nath Valley School', isVisible: true, icon: 'fa-school' },
+                    { id: 'inst_2', label: 'Institute 2', value: 'Online Academy', isVisible: false, icon: 'fa-building-columns' },
+                    { id: 'inst_3', label: 'Institute 3', value: 'Summer Camp', isVisible: false, icon: 'fa-graduation-cap' },
+                    { id: 'addr_1', label: 'Home Address', value: 'Chhatrapati Sambhajinagar, Maharashtra, India', isVisible: true, icon: 'fa-location-dot' },
+                    { id: 'addr_2', label: 'Address 2', value: 'Office Address', isVisible: false, icon: 'fa-house' },
+                    { id: 'addr_3', label: 'Address 3', value: 'PO Box', isVisible: false, icon: 'fa-map-pin' },
+                    { id: 'mail_1', label: 'Email', value: 'hello@example.com', isVisible: true, icon: 'fa-envelope' },
+                    { id: 'mail_2', label: 'Alt Email', value: 'alt@example.com', isVisible: false, icon: 'fa-at' },
+                    { id: 'mail_3', label: 'Work Email', value: 'work@example.com', isVisible: false, icon: 'fa-paper-plane' },
+                    { id: 'phone_1', label: 'Contact Number', value: '+91 98765 43210', isVisible: true, icon: 'fa-phone' },
+                    { id: 'phone_2', label: 'Mobile 2', value: '+91 XXXXX XXXXX', isVisible: false, icon: 'fa-mobile-screen' },
+                    { id: 'phone_3', label: 'WhatsApp', value: '+91 XXXXX XXXXX', isVisible: false, icon: 'fa-whatsapp' },
+                    { id: 'web_1', label: 'Website', value: 'www.myportfolio.com', isVisible: false, icon: 'fa-globe' },
+                    { id: 'web_2', label: 'Blog', value: 'www.myblog.com', isVisible: false, icon: 'fa-link' },
+                    { id: 'web_3', label: 'Portfolio', value: 'www.mywork.com', isVisible: false, icon: 'fa-desktop' }
+                ],
+                socials: [
+                    { id: 'yt_1', label: 'YouTube', link: '', isVisible: true, icon: 'fa-youtube', color: 'text-rose-500' },
+                    { id: 'yt_2', label: 'YouTube 2', link: '', isVisible: false, icon: 'fa-youtube', color: 'text-rose-500' },
+                    { id: 'in_1', label: 'LinkedIn', link: '', isVisible: true, icon: 'fa-linkedin', color: 'text-blue-600' },
+                    { id: 'in_2', label: 'LinkedIn 2', link: '', isVisible: false, icon: 'fa-linkedin', color: 'text-blue-600' },
+                    { id: 'ig_1', label: 'Instagram', link: '', isVisible: true, icon: 'fa-instagram', color: 'text-pink-600' },
+                    { id: 'ig_2', label: 'Instagram 2', link: '', isVisible: false, icon: 'fa-instagram', color: 'text-pink-600' },
+                    { id: 'fb_1', label: 'Facebook', link: '', isVisible: true, icon: 'fa-facebook', color: 'text-blue-500' },
+                    { id: 'fb_2', label: 'Facebook 2', link: '', isVisible: false, icon: 'fa-facebook', color: 'text-blue-500' },
+                    { id: 'wa_1', label: 'WhatsApp', link: '', isVisible: true, icon: 'fa-whatsapp', color: 'text-emerald-500' },
+                    { id: 'wa_2', label: 'WhatsApp 2', link: '', isVisible: false, icon: 'fa-whatsapp', color: 'text-emerald-500' },
+                    { id: 'snap_1', label: 'Snapchat', link: '', isVisible: true, icon: 'fa-snapchat', color: 'text-yellow-400' },
+                    { id: 'snap_2', label: 'Snapchat 2', link: '', isVisible: false, icon: 'fa-snapchat', color: 'text-yellow-400' },
+                    { id: 'msg_1', label: 'Messenger', link: '', isVisible: true, icon: 'fa-facebook-messenger', color: 'text-blue-500' },
+                    { id: 'msg_2', label: 'Messenger 2', link: '', isVisible: false, icon: 'fa-facebook-messenger', color: 'text-blue-500' },
+                    { id: 'x_1', label: 'X (Twitter)', link: '', isVisible: true, icon: 'fa-x-twitter', color: 'text-slate-800' },
+                    { id: 'x_2', label: 'X (Twitter) 2', link: '', isVisible: false, icon: 'fa-x-twitter', color: 'text-slate-800' },
+                    { id: 'rd_1', label: 'Reddit', link: '', isVisible: true, icon: 'fa-reddit-alien', color: 'text-orange-600' },
+                    { id: 'rd_2', label: 'Reddit 2', link: '', isVisible: false, icon: 'fa-reddit-alien', color: 'text-orange-600' },
+                    { id: 'th_1', label: 'Threads', link: '', isVisible: true, icon: 'fa-threads', color: 'text-slate-900' },
+                    { id: 'th_2', label: 'Threads 2', link: '', isVisible: false, icon: 'fa-threads', color: 'text-slate-900' },
+                    { id: 'gh_1', label: 'GitHub', link: '', isVisible: false, icon: 'fa-github', color: 'text-slate-800' },
+                    { id: 'gh_2', label: 'GitHub 2', link: '', isVisible: false, icon: 'fa-github', color: 'text-slate-800' },
+                    { id: 'pi_1', label: 'Pinterest', link: '', isVisible: false, icon: 'fa-pinterest', color: 'text-red-600' },
+                    { id: 'pi_2', label: 'Pinterest 2', link: '', isVisible: false, icon: 'fa-pinterest', color: 'text-red-600' }
+                ]
+            }
+        };
+
+        const DOC_ID = "ANAYSHA_PORTFOLIO_MASTER_DATA_V1";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!state.currentView || state.currentView === 'subject' || state.currentView === 'category') {
+                state.currentView = 'about';
+            }
+            
+            if (typeof auth !== 'undefined') {
+                auth.onAuthStateChanged(user => {
+                    const prevMode = state.isEditMode;
+                    state.isEditMode = !!user;
+                    updateEditModeUI();
+                    
+                    if (prevMode !== state.isEditMode && state.sections) {
+                        renderApp();
+                    }
+                });
+            }
+            
+            loadFromFirebase();
+        });
+
+        setTimeout(() => hideLoader(), 4000);
+
+        function hideLoader() {
+            const loader = document.getElementById('global-loader');
+            if(loader && loader.style.display !== 'none') {
+                loader.style.opacity = '0';
+                setTimeout(() => { if(loader) loader.style.display = 'none'; }, 400);
+            }
+        }
+
+        async function loadFromFirebase() {
+            try {
+                const docRef = db.collection('portfolioData').doc(DOC_ID);
+                const docSnap = await docRef.get();
+                if (docSnap.exists) {
+                    let dbData = docSnap.data();
+                    delete dbData.currentView;
+                    delete dbData.activeIds;
+                    delete dbData.isEditMode;
+                    delete dbData.isSidebarCollapsed;
+                    delete dbData.modalContext;
+                    delete dbData.modalIndex;
+
+                    if (!dbData.sections) {
+                        dbData.sections = [
+                            { id: 'sec_acad', title: 'Academics', isAcademic: true },
+                            { id: 'sec_beyond', title: 'Beyond Academics', isAcademic: false, categories: ['extracurriculars', 'hobbies', 'achievements', 'photoFeed'] }
+                        ];
+                    }
+                    if (!dbData.contact) {
+                        dbData.contact = state.contact;
+                    } else {
+                        if (!dbData.contact.details || dbData.contact.details.length <= 5) {
+                            dbData.contact.details = state.contact.details;
+                        }
+                        if (!dbData.contact.socials || dbData.contact.socials.length <= 5) {
+                            dbData.contact.socials = state.contact.socials;
+                        }
+                    }
+                    
+                    state = { ...state, ...dbData };
+                }
+            } catch (e) {
+                console.warn("Using default pre-filled state:", e);
+            } finally {
+                // Ensure initial menu state is clean (Main expanded, Subs collapsed)
+                state.collapsedMenus.sections = {};
+                state.collapsedMenus.classes = {};
+                state.collapsedMenus.categories = {};
+                
+                state.sections.forEach(sec => state.collapsedMenus.sections[sec.id] = false); // Expand Main
+                state.classes.forEach(cls => state.collapsedMenus.classes[cls.id] = true); // Collapse Grades
+                state.sections.forEach(sec => {
+                    if (sec.categories) sec.categories.forEach(cat => state.collapsedMenus.categories[cat] = true); // Collapse Hobbies
+                });
+                
+                state.currentView = 'about';
+                applyTheme(state.theme || 'blue');
+                renderApp();
+                hideLoader();
+            }
+        }
+
+        let saveTimeout;
+        function triggerSave() {
+            if (!auth.currentUser) return; 
+            clearTimeout(saveTimeout);
+            
+            const syncBadge = document.querySelector('header .edit-controls-flex span');
+            if(syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span class="hidden sm:inline">Saving...</span>`;
+
+            saveTimeout = setTimeout(async () => { 
+                try { 
+                    await db.collection('portfolioData').doc(DOC_ID).set(state); 
+                    if(syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i><span class="hidden sm:inline">Synced</span>`;
+                } catch (e) { 
+                    if(syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i><span class="hidden sm:inline text-rose-500">Failed</span>`;
+                }
+            }, 500);
+        }
+
+        function applyTheme(themeName) {
+            state.theme = themeName || 'blue';
+            const th = themes[state.theme] || themes.blue;
+            const root = document.documentElement;
+            root.style.setProperty('--theme-primary', th.primary);
+            root.style.setProperty('--theme-hover', th.hover);
+            root.style.setProperty('--theme-light', th.light);
+            root.style.setProperty('--theme-border', th.border);
+            root.style.setProperty('--theme-gradient', th.gradient);
+        }
+
+        function setTheme(themeName) {
+            applyTheme(themeName);
+            triggerSave();
+            renderApp();
+            showToast(`Theme changed to ${themes[themeName].name}!`);
+        }
+
+        function askUser(options) {
+            const modal = document.getElementById('action-modal');
+            const panel = document.getElementById('action-modal-panel');
+            const title = document.getElementById('action-modal-title');
+            const input1 = document.getElementById('action-modal-input-1');
+            const input2 = document.getElementById('action-modal-input-2');
+            const cancelBtn = document.getElementById('action-modal-cancel');
+            const submitBtn = document.getElementById('action-modal-submit');
+            
+            title.innerText = options.title || 'Are you sure?';
+            
+            input1.value = ''; input2.value = '';
+            input1.classList.add('hidden'); input2.classList.add('hidden');
+            
+            if (options.type === 'prompt') {
+                input1.classList.remove('hidden');
+                input1.placeholder = options.placeholder || 'Enter value...';
+                input1.type = 'text';
+            } else if (options.type === 'login') {
+                input1.classList.remove('hidden');
+                input2.classList.remove('hidden');
+                input1.placeholder = 'Admin Email';
+                input1.type = 'email';
+                input2.placeholder = 'Admin Password';
+                input2.type = 'password';
+            }
+            
+            submitBtn.innerText = options.submitText || 'Submit';
+            
+            const handleEnter = (e) => { if (e.key === 'Enter') submitBtn.click(); };
+            input1.addEventListener('keypress', handleEnter);
+            input2.addEventListener('keypress', handleEnter);
+
+            const cleanup = () => {
+                modal.classList.add('opacity-0');
+                panel.classList.remove('scale-100');
+                panel.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+                submitBtn.onclick = null;
+                cancelBtn.onclick = null;
+                input1.removeEventListener('keypress', handleEnter);
+                input2.removeEventListener('keypress', handleEnter);
+            };
+            
+            cancelBtn.onclick = cleanup;
+            
+            submitBtn.onclick = () => {
+                let val1 = input1.value.trim();
+                let val2 = input2.value.trim();
+                if (options.type === 'prompt' && !val1) return;
+                if (options.type === 'login' && (!val1 || !val2)) return;
+                
+                cleanup();
+                if (options.onSubmit) options.onSubmit(val1, val2);
+            };
+            
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            panel.classList.remove('scale-95');
+            panel.classList.add('scale-100');
+            
+            if (options.type === 'prompt' || options.type === 'login') {
+                setTimeout(() => input1.focus(), 100);
+            }
+        }
+
+        async function handleAdminLoginToggle() {
+            if (auth.currentUser) {
+                await auth.signOut();
+                state.isEditMode = false;
+                showToast("Logged out successfully");
+                renderApp();
+            } else {
+                askUser({
+                    type: 'login',
+                    title: 'Admin Access',
+                    submitText: 'Login',
+                    onSubmit: async (email, pass) => {
+                        try {
+                            await auth.signInWithEmailAndPassword(email, pass);
+                            showToast("Admin access granted");
+                        } catch (e) {
+                            showToast("Login failed: Check credentials.");
+                        }
+                    }
+                });
+            }
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('app-sidebar');
+            const overlay = document.getElementById('mobile-sidebar-overlay');
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('show');
+        }
+
+        function toggleSidebarCollapse() {
+            state.isSidebarCollapsed = !state.isSidebarCollapsed;
+            const sidebar = document.getElementById('app-sidebar');
+            const icon = document.getElementById('collapse-icon');
+            
+            sidebar.classList.toggle('collapsed', state.isSidebarCollapsed);
+            icon.className = state.isSidebarCollapsed ? "fa-solid fa-chevron-right text-[10px]" : "fa-solid fa-chevron-left text-[10px]";
+            
+            const mobileLock = document.getElementById('admin-lock-btn-mobile');
+            if (mobileLock) {
+                mobileLock.style.display = state.isSidebarCollapsed ? 'flex' : 'none';
+            }
+            
+            renderSidebarNav();
+        }
+
+        function handleThumbnailClick() {
+            if (state.isSidebarCollapsed && window.innerWidth >= 768) toggleSidebarCollapse(); 
+            else if (auth.currentUser) document.getElementById('profile_pic_input').click();
+            else switchView('about');
+        }
+
+        function handleIconClick(e, actionFn) {
+            if (state.isSidebarCollapsed && window.innerWidth >= 768) toggleSidebarCollapse();
+            actionFn();
+        }
+
+        function openSidebarMenu(type, id) {
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('app-sidebar');
+                const overlay = document.getElementById('mobile-sidebar-overlay');
+                sidebar.classList.add('mobile-open');
+                overlay.classList.add('show');
+            }
+            state.collapsedMenus[type][id] = false; 
+            renderSidebarNav();
+        }
+
+        function toggleMenuSection(type, id) {
+            if (state.isSidebarCollapsed && window.innerWidth >= 768) toggleSidebarCollapse();
+            
+            if (type === 'classes' || type === 'categories') {
+                if (state.collapsedMenus[type][id] === undefined) {
+                    state.collapsedMenus[type][id] = false;
+                } else {
+                    state.collapsedMenus[type][id] = !state.collapsedMenus[type][id];
+                }
+            } else {
+                state.collapsedMenus[type][id] = !state.collapsedMenus[type][id];
+            }
+            
+            renderSidebarNav();
+        }
+
+        function switchView(viewName, sectionId = null, classId = null, subjectId = null, category = null) {
+            state.currentView = viewName;
+            state.activeIds = { sectionId, classId, subjectId, category };
+            if (window.innerWidth < 768) {
+                document.getElementById('app-sidebar').classList.remove('mobile-open');
+                document.getElementById('mobile-sidebar-overlay').classList.remove('show');
+            }
+            
+            const vp = document.getElementById('main-content-viewport');
+            if (vp) {
+                vp.classList.remove('scroll-smooth');
+                vp.style.scrollBehavior = 'auto';
+                vp.scrollTop = 0;
+            }
+            window.scrollTo(0, 0);
+
+            renderApp();
+            
+            if (vp) {
+                let attempts = 0;
+                const scrollInterval = setInterval(() => {
+                    vp.scrollTop = 0;
+                    window.scrollTo(0, 0);
+                    attempts++;
+                    if (attempts > 6) {
+                        clearInterval(scrollInterval);
+                        vp.classList.add('scroll-smooth');
+                        vp.style.scrollBehavior = 'smooth';
+                    }
+                }, 30);
+            }
+        }
+
+        function updateEditModeUI() {
+            document.body.classList.toggle('edit-mode', state.isEditMode);
+            const lockBtn = document.getElementById('admin-lock-btn');
+            const mobileLockIcon = document.getElementById('mobile-lock-icon');
+            
+            const iconClass = auth.currentUser ? "fa-solid fa-lock-open" : "fa-solid fa-lock";
+            const iconColor = auth.currentUser ? "text-emerald-500" : "text-slate-400";
+            
+            if(lockBtn) lockBtn.innerHTML = `<i class="${iconClass} ${iconColor} text-sm"></i>`;
+            if(mobileLockIcon) mobileLockIcon.className = `${iconClass} ${iconColor} text-sm`;
+
+            Object.keys(themes).forEach(t => {
+                const btn = document.getElementById(`theme-btn-${t}`);
+                if(btn) {
+                    if(state.theme === t) btn.style.boxShadow = `0 0 0 3px #fff, 0 0 0 6px var(--theme-primary)`;
+                    else btn.style.boxShadow = 'none';
+                }
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function resizeAllTextareas() {
+            document.querySelectorAll('textarea[data-field]').forEach(el => {
+                el.style.height = 'auto';
+                el.style.height = el.scrollHeight + 'px';
+            });
+        }
+
+        function attachInputListeners() {
+            document.querySelectorAll('textarea[data-field], input[data-field]').forEach(input => {
+                if(input.tagName === 'TEXTAREA') {
+                    input.addEventListener('input', function() { 
+                        this.style.height = 'auto';
+                        this.style.height = this.scrollHeight + 'px'; 
+                    });
+                }
+                input.addEventListener('input', (e) => {
+                    if (!auth.currentUser) return;
+                    const field = e.target.dataset.field;
+                    const val = e.target.value;
+                    const ids = e.target.dataset.ids ? e.target.dataset.ids.split(',') : [];
+
+                    if (field.startsWith('profile.')) state.profile[field.split('.')[1]] = val;
+                    else if (field.startsWith('about.')) state.about[field.split('.')[1]] = val;
+                    else if (field === 'section.title') state.sections.find(s => s.id === ids[0]).title = val;
+                    else if (field === 'class.name') state.classes.find(c => c.id === ids[0]).name = val;
+                    else if (field === 'subject.name') state.classes.find(c => c.id === ids[0]).subjects.find(s => s.id === ids[1]).name = val;
+                    else if (field === 'subject.desc') state.classes.find(c => c.id === ids[0]).subjects.find(s => s.id === ids[1]).description = val;
+                    else if (field === 'project.title') state.classes.find(c => c.id === ids[0]).subjects.find(s => s.id === ids[1]).projects[ids[2]].title = val;
+                    else if (field === 'project.desc') state.classes.find(c => c.id === ids[0]).subjects.find(s => s.id === ids[1]).projects[ids[2]].desc = val;
+                    else if (field === 'category.name') state.categoryNames[ids[0]] = val;
+                    else if (field === 'generic.title') state[ids[0]][ids[1]][ids[2]].title = val;
+                    else if (field === 'generic.desc') state[ids[0]][ids[1]][ids[2]].desc = val;
+                    
+                    else if (field === 'contact.title') state.contact.title = val;
+                    else if (field === 'contact.subtitle') state.contact.subtitle = val;
+                    else if (field === 'contactDetail.label') state.contact.details[ids[0]].label = val;
+                    else if (field === 'contactDetail.value') state.contact.details[ids[0]].value = val;
+                    else if (field === 'contactSocial.label') state.contact.socials[ids[0]].label = val;
+                    else if (field === 'contactSocial.link') state.contact.socials[ids[0]].link = val;
+
+                    document.querySelectorAll(`[data-sync="${field}_${ids.join('_')}"]`).forEach(el => el.innerText = val);
+                    triggerSave();
+                });
+            });
+        }
+
+        function getContactLink(value) {
+            if (!value) return '';
+            const cleaned = value.trim();
+            if (cleaned.toLowerCase().startsWith('http://') || cleaned.toLowerCase().startsWith('https://')) return cleaned;
+            if (cleaned.includes('@') && !cleaned.includes(' ')) return `mailto:${cleaned}`;
+            if (/^[\+\d\s\-\(\)]+$/.test(cleaned) && cleaned.match(/\d/g)?.length >= 7) return `tel:${cleaned.replace(/[^\d\+]/g, '')}`;
+            if (cleaned.toLowerCase().startsWith('www.')) return `https://${cleaned}`;
+            return '';
+        }
+
+        function handleBreadcrumbNavigation(type, args) {
+            openSidebarMenu(args[0], args[1]); 
+            if(type === 'section') switchView('section', args[1]);
+            else if(type === 'subject') switchView('subject', args[1], args[2], args[3]);
+            else if(type === 'category') switchView('category', args[1], args[2], null, args[3]);
+        }
+
+        function renderBreadcrumbs() {
+            const bc = document.getElementById('breadcrumb-container');
+            const firstName = state.profile.name.split(' ')[0] || 'Amaira';
+            let html = `<span class="cursor-pointer hover:text-slate-900 transition flex-shrink-0" onclick="switchView('about')"><i class="fa-solid fa-house text-[10px] mr-1"></i>${firstName}</span>`;
+            
+            if (state.currentView === 'section') {
+                const sec = state.sections.find(s => s.id === state.activeIds.sectionId) || {title: 'Academics'};
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="text-slate-900 font-bold flex-shrink-0">${sec.title}</span>`;
+            } else if (state.currentView === 'subject') {
+                const sec = state.sections.find(s => s.id === state.activeIds.sectionId) || {title: 'Academics'};
+                const cls = state.classes.find(c => c.id === state.activeIds.classId);
+                const sub = cls.subjects.find(s => s.id === state.activeIds.subjectId);
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="cursor-pointer hover:text-slate-900 transition flex-shrink-0" onclick="handleBreadcrumbNavigation('section', ['sections', '${sec.id}'])">${sec.title}</span>`;
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="cursor-pointer hover:text-slate-900 transition flex-shrink-0" onclick="openSidebarMenu('classes', '${cls.id}')">${cls.name}</span>`;
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="text-slate-900 font-bold flex-shrink-0">${sub.name}</span>`;
+            } else if (state.currentView === 'category') {
+                const sec = state.sections.find(s => s.id === state.activeIds.sectionId) || {title: 'Beyond Academics'};
+                const catName = state.categoryNames[state.activeIds.category];
+                const cls = state.classes.find(c => c.id === state.activeIds.classId);
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="cursor-pointer hover:text-slate-900 transition flex-shrink-0" onclick="handleBreadcrumbNavigation('section', ['sections', '${sec.id}'])">${sec.title}</span>`;
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="cursor-pointer hover:text-slate-900 transition flex-shrink-0" onclick="openSidebarMenu('categories', '${state.activeIds.category}')">${catName}</span>`;
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="text-slate-900 font-bold flex-shrink-0">${cls.name}</span>`;
+            } else if (state.currentView === 'contact') {
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="text-slate-900 font-bold flex-shrink-0">${state.contact.title}</span>`;
+            } else {
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="text-slate-900 font-bold flex-shrink-0">About Me</span>`;
+            }
+            bc.innerHTML = html;
+        }
+
+        function renderSidebarNav() {
+            const nav = document.getElementById('sidebar-nav');
+            
+            const activeStyle = 'bg-[var(--theme-primary)] text-white shadow-md font-bold';
+            const inactiveStyle = 'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold';
+            const iconActiveStyle = 'text-white';
+            const iconInactiveStyle = 'bg-white shadow-sm text-slate-500';
+
+            let html = `
+                <div class="menu-item mt-2 mb-1 group relative">
+                    <div onclick="handleIconClick(event, () => switchView('about'))" class="flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition ${state.currentView === 'about' ? activeStyle : inactiveStyle} center-on-collapse">
+                        <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${state.currentView === 'about' ? iconActiveStyle : iconInactiveStyle}"><i class="fa-solid fa-user text-sm"></i></div>
+                        <span class="text-sm truncate hide-on-collapse flex-1">About Me</span>
+                    </div>
+                </div>
+            `;
+
+            state.sections.forEach(sec => {
+                const isSecCollapsed = !!state.collapsedMenus['sections'][sec.id];
+                const isActiveMain = state.currentView === 'section' && state.activeIds.sectionId === sec.id;
+                const secIcon = sec.isAcademic ? 'fa-graduation-cap' : 'fa-star';
+                
+                html += `
+                    <div class="menu-item mt-3 mb-1 group relative">
+                        <div class="flex items-center justify-between p-3 rounded-xl cursor-pointer transition ${isActiveMain ? activeStyle : inactiveStyle} center-on-collapse" onclick="handleIconClick(event, () => switchView('section', '${sec.id}'))">
+                            <div class="flex items-center space-x-3 min-w-0 flex-1">
+                                <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${isActiveMain ? iconActiveStyle : iconInactiveStyle}"><i class="fa-solid ${secIcon} text-sm"></i></div>
+                                <textarea rows="1" data-field="section.title" data-ids="${sec.id}" class="w-full text-sm font-semibold bg-transparent editable-border p-0 resize-none overflow-hidden cursor-pointer truncate hide-on-collapse" onclick="event.stopPropagation()">${sec.title}</textarea>
+                            </div>
+                            <div class="flex items-center space-x-1 p-1 hide-on-collapse" onclick="handleIconClick(event, () => toggleMenuSection('sections', '${sec.id}'))">
+                                <i class="fa-solid fa-chevron-${isSecCollapsed ? 'down' : 'up'} text-[10px] ${isActiveMain ? 'text-white/80' : 'text-slate-400'} transition"></i>
+                                <button onclick="removeSection(event, '${sec.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1" title="Delete Section"><i class="fa-solid fa-times text-[10px]"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="tree-line mt-2 ${isSecCollapsed ? 'hidden' : 'block'} hide-on-collapse">
+                `;
+
+                if (sec.isAcademic) {
+                    state.classes.forEach((cls) => {
+                        const isClsCollapsed = state.collapsedMenus['classes'][cls.id] !== false;
+                        
+                        html += `
+                            <div class="tree-item min-w-0 mb-1">
+                                <div class="flex items-center justify-between py-1.5 pl-6 pr-2 cursor-pointer group hover:bg-slate-50 rounded-lg transition" onclick="handleIconClick(event, () => toggleMenuSection('classes', '${cls.id}'))">
+                                    <div class="flex items-center space-x-2 w-full min-w-0">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                                        <textarea rows="1" data-field="class.name" data-ids="${cls.id}" class="w-full text-xs font-bold text-slate-700 bg-transparent editable-border p-0.5 resize-none overflow-hidden" onclick="event.stopPropagation()">${cls.name}</textarea>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <i class="fa-solid fa-chevron-${isClsCollapsed ? 'down' : 'up'} text-[8px] text-slate-400 transition"></i>
+                                        <button onclick="removeClass(event, '${cls.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1" title="Delete Class"><i class="fa-solid fa-times text-[10px]"></i></button>
+                                    </div>
+                                </div>
+                                <div class="space-y-0.5 mt-0.5 ${isClsCollapsed ? 'hidden' : 'block'} pl-8 border-l-2 border-slate-100 ml-7">
+                        `;
+                        cls.subjects.forEach(sub => {
+                            const isActive = state.activeIds.subjectId === sub.id;
+                            html += `
+                                <div onclick="switchView('subject', '${sec.id}', '${cls.id}', '${sub.id}')" class="flex items-center justify-between py-1.5 px-2 rounded-lg cursor-pointer transition ${isActive ? 'font-bold' : 'text-slate-500 hover:text-slate-800'} min-w-0" ${isActive ? 'style="background-color: var(--theme-light); color: var(--theme-primary);"' : ''}>
+                                    <div class="flex items-center space-x-2 min-w-0">
+                                        <i class="fa-solid fa-book-open text-[9px] text-slate-300 flex-shrink-0"></i>
+                                        <span class="text-xs truncate min-w-0" data-sync="subject.name_${cls.id}_${sub.id}">${sub.name}</span>
+                                    </div>
+                                    <button onclick="removeSubject(event, '${cls.id}', '${sub.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1" title="Delete Subject"><i class="fa-solid fa-times text-[9px]"></i></button>
+                                </div>
+                            `;
+                        });
+                        html += `
+                            <button onclick="addSubject('${cls.id}')" class="edit-controls-flex items-center space-x-2 text-[10px] font-bold py-1.5 px-2" style="color: var(--theme-primary);">
+                                <i class="fa-solid fa-plus"></i><span>Add Subject</span>
+                            </button>
+                        </div></div>`;
+                    });
+                    html += `<button onclick="addClass()" class="edit-controls-flex w-full items-center pl-6 py-2 space-x-2 text-[10px] font-bold text-emerald-600 hover:text-emerald-700 transition"><i class="fa-solid fa-plus"></i><span>Add Grade / Class</span></button>`;
+                } 
+                else {
+                    (sec.categories || []).forEach(cat => {
+                        const icon = cat === 'photoFeed' ? 'fa-images' : (cat === 'achievements' ? 'fa-trophy' : (cat === 'hobbies' ? 'fa-palette' : 'fa-medal'));
+                        const iconColor = cat === 'photoFeed' ? 'text-pink-500' : (cat === 'achievements' ? 'text-amber-500' : (cat === 'hobbies' ? 'text-purple-500' : 'text-emerald-500'));
+                        
+                        const isCatCollapsed = state.collapsedMenus['categories'][cat] !== false;
+                        
+                        html += `
+                            <div class="tree-item min-w-0 mb-1">
+                                <div class="flex items-center justify-between py-1.5 pl-6 pr-2 cursor-pointer group hover:bg-slate-50 rounded-lg transition" onclick="handleIconClick(event, () => toggleMenuSection('categories', '${cat}'))">
+                                    <div class="flex items-center space-x-2 w-full min-w-0">
+                                        <i class="fa-solid ${icon} text-[10px] ${iconColor}"></i>
+                                        <textarea rows="1" data-field="category.name" data-ids="${cat}" class="w-full text-xs font-bold text-slate-700 bg-transparent editable-border p-0.5 resize-none overflow-hidden" onclick="event.stopPropagation()">${state.categoryNames[cat] || cat}</textarea>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <i class="fa-solid fa-chevron-${isCatCollapsed ? 'down' : 'up'} text-[8px] text-slate-400 transition"></i>
+                                        <button onclick="removeCategory(event, '${sec.id}', '${cat}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-times text-[10px]"></i></button>
+                                    </div>
+                                </div>
+                                <div class="space-y-0.5 mt-0.5 ${isCatCollapsed ? 'hidden' : 'block'} pl-8 border-l-2 border-slate-100 ml-7">
+                        `;
+                        state.classes.forEach(cls => {
+                            const isActive = state.currentView === 'category' && state.activeIds.category === cat && state.activeIds.classId === cls.id;
+                            html += `
+                                <div onclick="switchView('category', '${sec.id}', '${cls.id}', null, '${cat}')" class="flex items-center space-x-2 py-1.5 px-2 rounded-lg cursor-pointer transition ${isActive ? 'font-bold' : 'text-slate-500 hover:text-slate-800'} min-w-0" ${isActive ? 'style="background-color: var(--theme-light); color: var(--theme-primary);"' : ''}>
+                                    <i class="fa-regular fa-folder text-[9px] text-slate-300 flex-shrink-0"></i>
+                                    <span class="text-xs truncate min-w-0">${cls.name}</span>
+                                </div>
+                            `;
+                        });
+                        html += `</div></div>`;
+                    });
+                    html += `<button onclick="addCategory('${sec.id}')" class="edit-controls-flex w-full items-center pl-6 py-2 space-x-2 text-[10px] font-bold text-emerald-600 hover:text-emerald-700 transition"><i class="fa-solid fa-plus"></i><span>Add Category</span></button>`;
+                }
+                html += `</div></div>`;
+            });
+            
+            html += `<button onclick="addSection()" class="edit-controls-flex w-full items-center justify-center space-x-2 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 py-3 mt-6 rounded-xl hide-on-collapse transition border border-indigo-100"><i class="fa-solid fa-plus"></i><span>New Main Section</span></button>`;
+
+            if (state.contact.isVisible || state.isEditMode) {
+                const hiddenClass = !state.contact.isVisible ? 'opacity-60 grayscale' : '';
+                const hideIcon = !state.contact.isVisible ? '<i class="fa-solid fa-eye-slash text-[10px] text-rose-500 edit-controls-block ml-2 hide-on-collapse"></i>' : '';
+                const isContactActive = state.currentView === 'contact';
+                
+                html += `
+                    <div class="menu-item mt-3 mb-1 group relative ${hiddenClass}">
+                        <div onclick="handleIconClick(event, () => switchView('contact'))" class="flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition ${isContactActive ? activeStyle : inactiveStyle} center-on-collapse">
+                            <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${isContactActive ? iconActiveStyle : iconInactiveStyle}"><i class="fa-solid fa-address-card text-sm"></i></div>
+                            <textarea rows="1" data-field="contact.title" class="w-full text-sm font-semibold bg-transparent editable-border p-0 resize-none overflow-hidden cursor-pointer truncate hide-on-collapse" onclick="event.stopPropagation()">${state.contact.title}</textarea>
+                            ${hideIcon}
+                        </div>
+                    </div>
+                `;
+            }
+
+            nav.innerHTML = html;
+        }
+
+        function renderApp() {
+            if(state.profile.pic) document.getElementById('sidebar-profile-pic').src = state.profile.pic;
+            
+            document.querySelectorAll('textarea[data-field="profile.name"]').forEach(el => el.value = state.profile.name);
+            document.querySelectorAll('textarea[data-field="profile.grade"]').forEach(el => el.value = state.profile.grade);
+
+            renderSidebarNav();
+            renderBreadcrumbs();
+            
+            const vp = document.getElementById('main-content-viewport');
+
+            vp.classList.remove('fade-in');
+            void vp.offsetWidth; 
+            vp.classList.add('fade-in');
+
+            let contentHtml = '';
+            if (state.currentView === 'about') {
+                contentHtml = renderAboutMe();
+            } else if (state.currentView === 'section') {
+                const sec = state.sections.find(s => s.id === state.activeIds.sectionId);
+                contentHtml = renderSectionLanding(sec);
+            } else if (state.currentView === 'subject') {
+                const cls = state.classes.find(c => c.id === state.activeIds.classId);
+                const sub = cls.subjects.find(s => s.id === state.activeIds.subjectId);
+                contentHtml = renderSubjectView(cls, sub);
+            } else if (state.currentView === 'category') {
+                const cat = state.activeIds.category;
+                const cls = state.classes.find(c => c.id === state.activeIds.classId);
+                contentHtml = renderCommonCategoryView(cat, cls.id);
+            } else if (state.currentView === 'contact') {
+                contentHtml = renderContact();
+            }
+
+            vp.innerHTML = contentHtml + renderGlobalContactFooter();
+
+            attachInputListeners();
+            updateEditModeUI();
+            
+            setTimeout(resizeAllTextareas, 50);
+            setTimeout(resizeAllTextareas, 200);
+        }
+
+        function renderGlobalContactFooter() {
+            if (!state.contact.isVisible && !state.isEditMode) return '';
+            if (state.currentView === 'about' || state.currentView === 'contact') return '';
+            const hiddenClass = !state.contact.isVisible ? 'opacity-60 grayscale border-dashed' : '';
+            const hideIcon = !state.contact.isVisible ? '<i class="fa-solid fa-eye-slash text-rose-500 ml-2 text-xs"></i>' : '';
+            
+            return `
+                <div class="max-w-4xl mx-auto mt-12 mb-4 min-w-0 ${hiddenClass}">
+                    <div onclick="event.stopPropagation(); switchView('contact')" class="glass-card rounded-[2rem] p-6 shadow-md hover:shadow-lg transition-all duration-300 bg-white border border-slate-100 flex items-center justify-between cursor-pointer group">
+                        <div class="flex items-center space-x-4 min-w-0">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform flex-shrink-0" style="color: var(--theme-primary);">
+                                <i class="fa-solid fa-address-card text-xl"></i>
+                            </div>
+                            <div class="truncate">
+                                <h3 class="font-extrabold text-lg text-slate-800 group-hover:text-[var(--theme-primary)] transition-colors truncate">${state.contact.title}${hideIcon}</h3>
+                                <p class="text-xs md:text-sm font-medium text-slate-500 truncate">${state.contact.subtitle}</p>
+                            </div>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[var(--theme-primary)] group-hover:text-white transition-colors flex-shrink-0 ml-4">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContact() {
+            return `
+                <div class="max-w-5xl mx-auto space-y-8 min-w-0 pb-10">
+                    <div class="glass-card p-8 md:p-10 rounded-[2.5rem] shadow-sm relative flex flex-col md:flex-row md:items-center justify-between gap-4" style="background: var(--theme-gradient); color: white;">
+                        <div class="flex-1 min-w-0">
+                            <textarea rows="1" data-field="contact.title" class="w-full text-4xl md:text-5xl font-extrabold bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight text-white placeholder-white/50">${state.contact.title}</textarea>
+                            <textarea rows="1" data-field="contact.subtitle" class="w-full text-lg md:text-xl font-medium mt-2 bg-transparent editable-border py-1 resize-none overflow-hidden text-blue-100 placeholder-white/50">${state.contact.subtitle}</textarea>
+                        </div>
+                        <button onclick="toggleContactVisibility()" class="edit-controls-flex text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-lg transition-all items-center space-x-2 flex-shrink-0 bg-black/20 hover:bg-black/30 backdrop-blur-md">
+                            <i class="fa-solid ${state.contact.isVisible ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                            <span>${state.contact.isVisible ? 'Page Visible' : 'Page Hidden'}</span>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between px-2">
+                            <h3 class="text-xl font-extrabold text-slate-800">Direct Contact</h3>
+                            <button onclick="addContactDetail()" class="edit-controls-flex items-center space-x-1.5 text-xs font-bold text-[var(--theme-primary)] hover:bg-[var(--theme-light)] px-3 py-1.5 rounded-lg transition border border-transparent hover:border-[var(--theme-border)]"><i class="fa-solid fa-plus"></i><span>Add Detail</span></button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            ${state.contact.details.map((detail, idx) => {
+                                let linkHref = getContactLink(detail.value);
+                                return `
+                                <div class="glass-card rounded-[2rem] p-6 shadow-sm bg-white border border-slate-100 relative group ${!detail.isVisible ? 'edit-mode-hidden-item' : ''}" style="${!detail.isVisible && !state.isEditMode ? 'display:none;' : ''}">
+                                    <div class="edit-controls-flex absolute top-4 right-4 space-x-2 z-10">
+                                        <button onclick="toggleContactItem('details', ${idx})" class="text-slate-400 hover:text-slate-600 bg-slate-50 p-2 rounded-xl transition" title="Toggle Visibility">
+                                            <i class="fa-solid ${detail.isVisible ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i>
+                                        </button>
+                                        <button onclick="removeContactItem('details', ${idx})" class="text-rose-400 hover:text-rose-600 bg-rose-50 p-2 rounded-xl transition" title="Delete Field">
+                                            <i class="fa-solid fa-trash text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="flex items-start space-x-4">
+                                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0 relative" style="color: var(--theme-primary);">
+                                            <i class="fa-solid ${detail.icon || 'fa-circle-dot'} text-xl"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0 pr-16">
+                                            <textarea rows="1" data-field="contactDetail.label" data-ids="${idx}" class="w-full text-xs font-bold text-slate-400 uppercase tracking-wider bg-transparent editable-border p-0 resize-none overflow-hidden">${detail.label}</textarea>
+                                            
+                                            ${state.isEditMode ? 
+                                                `<textarea rows="2" data-field="contactDetail.value" data-ids="${idx}" class="w-full text-base font-semibold text-slate-800 bg-transparent editable-border py-1 mt-1 resize-none overflow-hidden leading-snug">${detail.value}</textarea>` : 
+                                                (linkHref ? `<a href="${linkHref}" target="_blank" class="block w-full text-base font-semibold text-[var(--theme-primary)] hover:underline py-1 mt-1 leading-snug break-words transition-colors">${detail.value}</a>` : `<div class="w-full text-base font-semibold text-slate-800 py-1 mt-1 leading-snug break-words">${detail.value}</div>`)
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            `}).join('')}
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 pt-6">
+                        <div class="flex items-center justify-between px-2">
+                            <h3 class="text-xl font-extrabold text-slate-800">Connect Online</h3>
+                            <button onclick="addContactSocial()" class="edit-controls-flex items-center space-x-1.5 text-xs font-bold text-[var(--theme-primary)] hover:bg-[var(--theme-light)] px-3 py-1.5 rounded-lg transition border border-transparent hover:border-[var(--theme-border)]"><i class="fa-solid fa-plus"></i><span>Add Social Link</span></button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            ${state.contact.socials.map((social, idx) => `
+                                <div class="glass-card rounded-[1.5rem] p-5 shadow-sm bg-white border border-slate-100 relative group flex flex-col items-center text-center ${!social.isVisible ? 'edit-mode-hidden-item' : ''}" style="${!social.isVisible && !state.isEditMode ? 'display:none;' : ''}">
+                                    <div class="edit-controls-flex absolute top-3 right-3 space-x-1 z-10">
+                                        <button onclick="toggleContactItem('socials', ${idx})" class="text-slate-400 hover:text-slate-600 bg-slate-50 p-2 rounded-xl transition" title="Toggle Visibility">
+                                            <i class="fa-solid ${social.isVisible ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i>
+                                        </button>
+                                        <button onclick="removeContactItem('socials', ${idx})" class="text-rose-400 hover:text-rose-600 bg-rose-50 p-2 rounded-xl transition" title="Delete Field">
+                                            <i class="fa-solid fa-trash text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                    <i class="fa-brands ${social.icon || 'fa-globe'} text-3xl ${social.color || 'text-slate-700'} mb-3 mt-2"></i>
+                                    <textarea rows="1" data-field="contactSocial.label" data-ids="${idx}" class="w-full text-sm font-extrabold text-slate-800 text-center bg-transparent editable-border p-0 resize-none overflow-hidden">${social.label}</textarea>
+                                    
+                                    ${state.isEditMode ? `
+                                        <input type="text" data-field="contactSocial.link" data-ids="${idx}" class="w-full text-[10px] text-slate-500 text-center bg-slate-50 editable-border py-1.5 px-2 rounded mt-2 border border-slate-200" placeholder="Paste URL here..." value="${social.link}">
+                                    ` : `
+                                        ${social.link ? `<a href="${getContactLink(social.link)}" target="_blank" class="mt-2 text-xs font-bold px-5 py-1.5 rounded-full shadow-sm hover:shadow-md hover:scale-105 transition inline-block text-white" style="background: var(--theme-gradient);">Visit <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-1"></i></a>` : `<span class="mt-2 text-[10px] text-slate-400">No link added</span>`}
+                                    `}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleContactVisibility() {
+            state.contact.isVisible = !state.contact.isVisible;
+            triggerSave(); renderApp();
+        }
+
+        function toggleContactItem(type, idx) {
+            state.contact[type][idx].isVisible = !state.contact[type][idx].isVisible;
+            triggerSave(); renderApp();
+        }
+        
+        function removeContactItem(type, idx) {
+            askUser({
+                title: 'Delete this field?',
+                submitText: 'Delete',
+                onSubmit: () => {
+                    state.contact[type].splice(idx, 1);
+                    triggerSave(); renderApp();
+                }
+            });
+        }
+        
+        function addContactDetail() {
+            state.contact.details.push({ id: 'detail_' + Date.now(), label: 'New Field', value: 'Value', isVisible: true, icon: 'fa-circle-dot' });
+            triggerSave(); renderApp();
+        }
+
+        function addContactSocial() {
+            state.contact.socials.push({ id: 'social_' + Date.now(), label: 'New Link', link: '', isVisible: true, icon: 'fa-link', color: 'text-slate-600' });
+            triggerSave(); renderApp();
+        }
+
+        function renderAboutMe() {
+            const mediaHtml = renderCarousel(state.about.media, "about.media", "about_media_input");
+            
+            let quickLinksCardsHtml = '';
+            
+            state.sections.forEach(sec => {
+                if (sec.isAcademic) {
+                    quickLinksCardsHtml += `
+                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden">
+                            <div onclick="toggleShortcut(event, '${sec.id}')" class="cursor-pointer p-4 md:p-5 flex flex-col items-center justify-center text-center aspect-square group relative hover:bg-slate-50 transition-colors">
+                                <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform shadow-inner flex-shrink-0">
+                                    <i class="fa-solid fa-graduation-cap text-2xl md:text-3xl" style="color: var(--theme-primary);"></i>
+                                </div>
+                                <div class="flex items-center justify-center space-x-1.5 w-full px-1">
+                                    <span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug break-words text-center">${sec.title}</span>
+                                    <i id="shortcut-icon-${sec.id}" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-300 flex-shrink-0 mt-0.5"></i>
+                                </div>
+                            </div>
+                            <div id="shortcut-content-${sec.id}" class="max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50/50 border-t border-transparent">
+                                <div class="p-3 flex flex-col space-y-2 pb-3">
+                                    ${state.classes.map(cls => `
+                                        <div class="bg-white/90 rounded-xl p-2 border border-slate-100 shadow-sm mb-1">
+                                            <div onclick="toggleShortcutClass(event, '${sec.id}_${cls.id}')" class="flex items-center justify-between cursor-pointer text-xs font-bold text-slate-700 hover:text-slate-900 transition">
+                                                <span class="truncate pr-1">${cls.name}</span>
+                                                <i id="shortcut-class-icon-${sec.id}_${cls.id}" class="fa-solid fa-chevron-down text-[9px] text-slate-400 transition-transform duration-300 flex-shrink-0"></i>
+                                            </div>
+                                            <div id="shortcut-class-content-${sec.id}_${cls.id}" class="max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out pl-2 mt-1 space-y-1">
+                                                ${cls.subjects && cls.subjects.length > 0 ? cls.subjects.map(sub => `
+                                                    <button onclick="switchView('subject', '${sec.id}', '${cls.id}', '${sub.id}')" class="text-left w-full px-2 py-1.5 text-[11px] font-semibold text-slate-600 hover:bg-blue-50 rounded-lg transition flex items-center">
+                                                        <i class="fa-solid fa-book-open mr-1.5 text-slate-300 flex-shrink-0 text-[9px]"></i>
+                                                        <span class="break-words leading-tight">${sub.name}</span>
+                                                    </button>
+                                                `).join('') : '<span class="text-[10px] text-slate-400 p-1">No subjects yet</span>'}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    (sec.categories || []).forEach(cat => {
+                        let icon = cat === 'photoFeed' ? 'fa-images' : (cat === 'achievements' ? 'fa-trophy' : (cat === 'hobbies' ? 'fa-palette' : 'fa-medal'));
+                        let color = cat === 'photoFeed' ? 'text-pink-500' : (cat === 'achievements' ? 'text-amber-500' : (cat === 'hobbies' ? 'text-purple-500' : 'text-emerald-500'));
+                        let catName = state.categoryNames[cat] || cat;
+
+                        quickLinksCardsHtml += `
+                            <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden">
+                                <div onclick="toggleShortcut(event, '${cat}')" class="cursor-pointer p-4 md:p-5 flex flex-col items-center justify-center text-center aspect-square group relative hover:bg-slate-50 transition-colors">
+                                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform shadow-inner flex-shrink-0">
+                                        <i class="fa-solid ${icon} ${color} text-2xl md:text-3xl"></i>
+                                    </div>
+                                    <div class="flex items-center justify-center space-x-1.5 w-full px-1">
+                                        <span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug break-words text-center">${catName}</span>
+                                        <i id="shortcut-icon-${cat}" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-300 flex-shrink-0 mt-0.5"></i>
+                                    </div>
+                                </div>
+                                <div id="shortcut-content-${cat}" class="max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50/50 border-t border-transparent">
+                                    <div class="p-3 flex flex-col space-y-1 pb-3">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-2 mb-1">Select Grade</span>
+                                        ${state.classes.map(cls => `
+                                            <button onclick="switchView('category', '${sec.id}', '${cls.id}', null, '${cat}')" class="text-left w-full px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition flex items-center mb-0.5">
+                                                <i class="fa-regular fa-folder mr-2 text-slate-400 flex-shrink-0 text-[10px]"></i>
+                                                <span class="break-words leading-tight">${cls.name}</span>
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+
+            if (state.contact.isVisible || state.isEditMode) {
+                const hiddenClass = !state.contact.isVisible ? 'edit-mode-hidden-item' : '';
+                quickLinksCardsHtml += `
+                    <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden ${hiddenClass}" style="${!state.contact.isVisible && !state.isEditMode ? 'display:none;' : ''}">
+                        <div onclick="event.stopPropagation(); switchView('contact')" class="cursor-pointer p-4 md:p-5 flex flex-col items-center justify-center text-center aspect-square group relative hover:bg-blue-50 transition-colors">
+                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-blue-100/50 flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform shadow-inner flex-shrink-0" style="color: var(--theme-primary);">
+                                <i class="fa-solid fa-address-card text-2xl md:text-3xl"></i>
+                            </div>
+                            <div class="flex items-center justify-center space-x-1.5 w-full px-1">
+                                <span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug break-words text-center">${state.contact.title}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="max-w-6xl mx-auto space-y-10 min-w-0 pb-10">
+                    <div class="flex flex-col md:flex-row glass-card rounded-[2.5rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.06)] min-h-[450px]">
+                        <div class="w-full md:w-[45%] bg-slate-100 relative min-w-0 hide-if-no-media">
+                            ${mediaHtml}
+                            <input type="file" id="about_media_input" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'about.media')">
+                        </div>
+                        
+                        <div class="w-full md:flex-1 p-8 md:p-12 flex flex-col justify-center min-w-0 bg-white/60">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <textarea rows="2" data-field="about.title" class="w-full text-4xl md:text-5xl font-extrabold text-slate-900 bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0 placeholder-slate-300" placeholder="Main Title">${state.about.title}</textarea>
+                                <span class="text-4xl md:text-5xl wave-emoji pb-2">👋</span>
+                            </div>
+                            <textarea rows="2" data-field="about.subtitle" class="w-full text-xl md:text-2xl font-bold bg-transparent editable-border py-1 mt-1 resize-none overflow-hidden min-w-0 placeholder-blue-200" style="color: var(--theme-primary);" placeholder="Subtitle">${state.about.subtitle}</textarea>
+                            <div class="w-16 h-1.5 rounded-full my-8 shadow-sm" style="background: var(--theme-gradient);"></div>
+                            <textarea rows="6" data-field="about.bio" class="w-full text-base md:text-lg text-slate-600 leading-relaxed bg-transparent editable-border py-2 resize-none min-w-0 font-medium placeholder-slate-300" placeholder="Write your biography here...">${state.about.bio}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4 px-2">
+                            <h3 class="text-xl font-extrabold text-slate-800">Explore My Portfolio</h3>
+                            <div class="flex-1 h-px bg-slate-200"></div>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 items-start">
+                            ${quickLinksCardsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSectionLanding(sec) {
+            let cardsHtml = '';
+            if (sec.isAcademic) {
+                state.classes.forEach(cls => {
+                    cardsHtml += `
+                        <div class="glass-card rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition-all duration-300 bg-white border border-slate-100 flex flex-col cursor-pointer group" onclick="toggleShortcut(event, 'landing_class_${cls.id}')">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-extrabold text-xl text-slate-800 group-hover:text-[var(--theme-primary)] transition-colors">${cls.name}</h3>
+                                <i id="shortcut-icon-landing_class_${cls.id}" class="fa-solid fa-chevron-down text-slate-300 transition-transform duration-300"></i>
+                            </div>
+                            <div id="shortcut-content-landing_class_${cls.id}" class="w-full mt-2 max-h-0 opacity-0 overflow-hidden transition-all duration-300">
+                                <div class="space-y-2 pt-3 border-t border-slate-100 mt-2">
+                                    ${cls.subjects.map(sub => `
+                                        <button onclick="event.stopPropagation(); switchView('subject', '${sec.id}', '${cls.id}', '${sub.id}')" class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[var(--theme-primary)] transition flex items-center shadow-sm font-bold text-sm">
+                                            <i class="fa-solid fa-book-open text-slate-400 mr-3"></i>
+                                            <span>${sub.name}</span>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                (sec.categories || []).forEach(cat => {
+                    let catName = state.categoryNames[cat] || cat;
+                    let icon = cat === 'photoFeed' ? 'fa-images' : (cat === 'achievements' ? 'fa-trophy' : (cat === 'hobbies' ? 'fa-palette' : 'fa-medal'));
+                    let color = cat === 'photoFeed' ? 'text-pink-500' : (cat === 'achievements' ? 'text-amber-500' : (cat === 'hobbies' ? 'text-purple-500' : 'text-emerald-500'));
+                    
+                    cardsHtml += `
+                        <div class="glass-card rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition-all duration-300 bg-white border border-slate-100 flex flex-col items-center text-center cursor-pointer group" onclick="toggleShortcut(event, 'landing_${cat}')">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition-transform">
+                                <i class="fa-solid ${icon} ${color} text-3xl"></i>
+                            </div>
+                            <h3 class="font-extrabold text-lg text-slate-800 mb-2">${catName}</h3>
+                            <div id="shortcut-content-landing_${cat}" class="w-full space-y-2 mt-2 max-h-0 opacity-0 overflow-hidden transition-all duration-300">
+                                ${state.classes.map(cls => `
+                                    <button onclick="event.stopPropagation(); switchView('category', '${sec.id}', '${cls.id}', null, '${cat}')" class="w-full text-left p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-[var(--theme-primary)] transition flex items-center text-xs font-semibold shadow-sm">
+                                        <i class="fa-regular fa-folder text-slate-400 mr-2"></i>
+                                        <span>${cls.name}</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <i id="shortcut-icon-landing_${cat}" class="fa-solid fa-chevron-down text-slate-300 mt-2 transition-transform duration-300"></i>
+                        </div>
+                    `;
+                });
+            }
+
+            return `
+                <div class="max-w-5xl mx-auto space-y-8 min-w-0 pb-10">
+                    <div class="glass-card p-8 md:p-10 rounded-[2.5rem] shadow-md flex items-center gap-4" style="background: var(--theme-gradient); color: white;">
+                        <textarea rows="1" data-field="section.title" data-ids="${sec.id}" class="w-full text-4xl md:text-5xl font-extrabold bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight text-white placeholder-white/50">${sec.title}</textarea>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${cardsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSubjectView(cls, sub) {
+            const projects = sub.projects || [];
+            return `
+                <div class="max-w-6xl mx-auto space-y-8 min-w-0 pb-10">
+                    <div class="glass-card rounded-[2rem] shadow-sm overflow-hidden bg-white">
+                        <div class="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100" style="background-color: var(--theme-light);">
+                            <div class="flex-1 min-w-0">
+                                <textarea rows="2" data-field="subject.name" data-ids="${cls.id},${sub.id}" class="w-full text-3xl md:text-4xl font-extrabold text-slate-900 bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0" placeholder="Subject Name">${sub.name}</textarea>
+                                <textarea rows="2" data-field="subject.desc" data-ids="${cls.id},${sub.id}" class="w-full text-sm md:text-base font-semibold text-slate-500 bg-transparent editable-border py-1 mt-1 resize-none overflow-hidden min-w-0" placeholder="Subject description...">${sub.description || ''}</textarea>
+                            </div>
+                            <button onclick="addProjectCard('${cls.id}', '${sub.id}')" class="edit-controls-flex text-white px-6 py-3 rounded-2xl text-sm font-bold shadow-lg hover:shadow-xl transition-all items-center space-x-2 flex-shrink-0" style="background: var(--theme-gradient);">
+                                <i class="fa-solid fa-plus"></i><span>Add Project</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col space-y-10">
+                        ${projects.map((proj, idx) => {
+                            const cKey = `${cls.id}|${sub.id}|${idx}`;
+                            const mediaHtml = renderCarousel(proj.media || [], `project.${cKey}`, `proj_media_${cKey.replace(/\|/g, '_')}`);
+                            const reverseClass = idx % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row';
+                            
+                            return `
+                                <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-md transition-shadow relative flex flex-col ${reverseClass} group min-w-0 bg-white border border-slate-100">
+                                    <div class="relative hide-if-no-media bg-slate-50 w-full md:w-[45%] min-h-[300px] flex-shrink-0">
+                                        ${mediaHtml}
+                                        <input type="file" id="proj_media_${cKey.replace(/\|/g, '_')}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'project', '${cls.id}', '${sub.id}', ${idx})">
+                                    </div>
+                                    <div class="p-8 md:p-10 flex flex-col justify-center min-w-0 w-full">
+                                        <div class="flex items-start justify-between gap-4 min-w-0 mb-4">
+                                            <textarea rows="2" data-field="project.title" data-ids="${cls.id},${sub.id},${idx}" class="w-full font-extrabold text-slate-800 text-2xl md:text-3xl bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0" placeholder="Project Title">${proj.title}</textarea>
+                                            <div class="flex items-center space-x-2">
+                                                <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl transition items-center justify-center flex-shrink-0" title="Add YouTube Video"><i class="fa-brands fa-youtube"></i></button>
+                                                <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl transition items-center justify-center flex-shrink-0" title="Remove"><i class="fa-solid fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <textarea rows="5" data-field="project.desc" data-ids="${cls.id},${sub.id},${idx}" class="w-full text-base font-medium text-slate-600 leading-relaxed bg-transparent editable-border py-1 resize-none hide-if-empty min-w-0" placeholder="Project description...">${proj.desc || ''}</textarea>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCommonCategoryView(category, classId) {
+            if (!state[category]) state[category] = {};
+            if (!state[category][classId]) state[category][classId] = [];
+            
+            const items = state[category][classId] || [];
+            const catName = state.categoryNames[category] || category;
+
+            if (category === 'photoFeed') {
+                return `
+                    <div class="max-w-2xl mx-auto space-y-8 min-w-0 pb-10">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between glass-card p-6 rounded-[2.5rem] shadow-sm gap-4 min-w-0 bg-white">
+                            <textarea rows="1" data-field="category.name" data-ids="${category}" class="w-full text-3xl font-extrabold text-slate-900 bg-transparent editable-border py-1 resize-none overflow-hidden min-w-0" placeholder="Category Name">${catName}</textarea>
+                            <div class="edit-controls-flex items-center space-x-3 flex-shrink-0">
+                                <button onclick="document.getElementById('feed_img_upload').click()" class="text-white px-5 py-3 rounded-xl text-sm font-bold shadow-md transition items-center space-x-2" style="background: var(--theme-gradient);">
+                                    <i class="fa-solid fa-camera"></i><span>Photo</span>
+                                </button>
+                                <button onclick="addFeedVideo('${category}', '${classId}')" class="bg-rose-500 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-md transition items-center space-x-2">
+                                    <i class="fa-brands fa-youtube"></i><span>Video</span>
+                                </button>
+                            </div>
+                            <input type="file" id="feed_img_upload" class="hidden" accept="image/*" multiple onchange="handleFeedUpload(event, '${category}', '${classId}')">
+                        </div>
+                        
+                        <div class="space-y-8">
+                            ${items.map((item, idx) => `
+                                <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.06)] bg-white">
+                                    <div class="p-5 flex items-center space-x-4 border-b border-slate-100">
+                                        <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=Amaira'}" class="w-10 h-10 rounded-full border border-slate-200 object-cover shadow-sm protected-media" oncontextmenu="return false;" ondragstart="return false;">
+                                        <div class="flex flex-col">
+                                            <span class="font-extrabold text-sm text-slate-900">${state.profile.name}</span>
+                                            <span class="font-semibold text-[10px] text-slate-400 uppercase tracking-wide">Nath Valley School</span>
+                                        </div>
+                                        <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex ml-auto text-rose-500 text-sm p-3 bg-rose-50 hover:bg-rose-100 rounded-xl transition"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                    <div class="bg-slate-50 relative flex justify-center w-full">
+                                        ${item.type === 'video' ? 
+                                            `<iframe class="w-full aspect-video" src="${item.url}" frameborder="0" allowfullscreen></iframe>` : 
+                                            `<img src="${item.url}" class="w-full object-contain max-h-[700px] protected-media" oncontextmenu="return false;" ondragstart="return false;">`
+                                        }
+                                    </div>
+                                    <div class="p-6">
+                                        <div class="flex space-x-5 mb-4 text-2xl text-slate-800">
+                                            <i class="fa-regular fa-heart hover:text-rose-500 cursor-pointer transition transform hover:scale-110"></i>
+                                            <i class="fa-regular fa-comment hover:text-slate-600 cursor-pointer transition transform hover:scale-110"></i>
+                                            <i class="fa-regular fa-paper-plane hover:text-slate-600 cursor-pointer transition transform hover:scale-110"></i>
+                                        </div>
+                                        <div class="flex items-start space-x-2">
+                                            <span class="font-bold text-sm text-slate-900 pt-1">${state.profile.name.split(' ')[0]}</span>
+                                            <textarea rows="2" data-field="generic.desc" data-ids="${category},${classId},${idx}" class="w-full text-sm font-medium text-slate-700 bg-transparent editable-border py-1 resize-none hide-if-empty min-w-0" placeholder="Write a caption...">${item.desc || ''}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="max-w-6xl mx-auto space-y-8 min-w-0 pb-10">
+                    <div class="glass-card rounded-[2rem] shadow-sm overflow-hidden bg-white">
+                        <div class="p-6 md:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100" style="background-color: var(--theme-light);">
+                            <textarea rows="1" data-field="category.name" data-ids="${category}" class="w-full text-3xl font-extrabold text-slate-900 bg-transparent editable-border py-1 resize-none overflow-hidden min-w-0">${catName}</textarea>
+                            <button onclick="addGenericItem('${category}', '${classId}')" class="edit-controls-flex text-white px-6 py-3 rounded-2xl text-sm font-bold flex-shrink-0 shadow-lg hover:shadow-xl transition-all" style="background: var(--theme-gradient);"><i class="fa-solid fa-plus mr-2"></i>Add Item</button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col space-y-10">
+                        ${items.map((item, idx) => {
+                            const cKey = `${category}|${classId}|${idx}`;
+                            const mediaHtml = renderCarousel(item.media || [], `generic.${cKey}`, `gen_media_${cKey.replace(/\|/g, '_')}`);
+                            const reverseClass = idx % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row';
+                            
+                            return `
+                            <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-md transition-shadow relative flex flex-col ${reverseClass} group min-w-0 bg-white border border-slate-100">
+                                <div class="relative hide-if-no-media bg-slate-50 w-full md:w-[45%] min-h-[300px] flex-shrink-0">
+                                    ${mediaHtml}
+                                    <input type="file" id="gen_media_${cKey.replace(/\|/g, '_')}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'generic', '${category}', '${classId}', ${idx})">
+                                </div>
+                                <div class="p-8 md:p-10 flex flex-col justify-center min-w-0 w-full">
+                                    <div class="flex items-start justify-between gap-4 min-w-0 mb-4">
+                                        <textarea rows="2" data-field="generic.title" data-ids="${category},${classId},${idx}" class="w-full font-extrabold text-slate-800 text-2xl md:text-3xl bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0" placeholder="Title">${item.title || 'New Item'}</textarea>
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl transition items-center justify-center flex-shrink-0" title="Add YouTube Video"><i class="fa-brands fa-youtube"></i></button>
+                                            <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl flex-shrink-0 transition"><i class="fa-solid fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                    <textarea rows="5" data-field="generic.desc" data-ids="${category},${classId},${idx}" class="w-full text-base font-medium text-slate-600 leading-relaxed bg-transparent editable-border py-1 mt-3 resize-none hide-if-empty min-w-0" placeholder="Description...">${item.desc || ''}</textarea>
+                                </div>
+                            </div>
+                        `}).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCarousel(mediaArr, context, inputId) {
+            if (!mediaArr || mediaArr.length === 0) {
+                return `
+                    <div class="edit-controls-flex w-full h-full min-h-[250px] border-2 border-dashed rounded-[2rem] md:rounded-l-[2.5rem] md:rounded-tr-none flex-col items-center justify-center bg-slate-50 cursor-pointer hover:bg-slate-100 transition m-4 mx-auto max-w-[90%]" style="border-color: var(--theme-border);" onclick="document.getElementById('${inputId}').click()">
+                        <div class="text-center" style="color: var(--theme-primary);"><i class="fa-solid fa-cloud-arrow-up text-4xl mb-3"></i><p class="text-sm font-bold">Upload Media</p></div>
+                        <div class="flex space-x-2 mt-4 z-10">
+                            <button onclick="event.stopPropagation(); document.getElementById('${inputId}').click()" class="px-4 py-2 text-white rounded-xl text-xs font-bold hover:scale-105 transition shadow-sm" style="background: var(--theme-gradient);">Photo</button>
+                            <button onclick="event.stopPropagation(); addProjectVideoFromCarousel('${context}')" class="px-4 py-2 bg-rose-500 text-white rounded-xl text-xs font-bold hover:scale-105 transition shadow-sm"><i class="fa-brands fa-youtube mr-1"></i>Video</button>
+                        </div>
+                    </div>`;
+            }
+
+            const currentIdx = state[`idx_${context}`] || 0;
+            const currentItem = mediaArr[currentIdx];
+            const safeImages = JSON.stringify(mediaArr).replace(/"/g, "&quot;");
+            
+            let mediaDisplayHtml = '';
+            if (typeof currentItem === 'object' && currentItem.type === 'video') {
+                mediaDisplayHtml = `<iframe class="absolute inset-0 w-full h-full object-cover" src="${currentItem.url}" frameborder="0" allowfullscreen></iframe>`;
+            } else {
+                const imgSrc = typeof currentItem === 'string' ? currentItem : currentItem.url;
+                mediaDisplayHtml = `
+                    <div class="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden bg-slate-900 cursor-pointer" onclick="openModal('${context}', ${currentIdx})">
+                        <div class="absolute inset-0 bg-cover bg-center blur-2xl opacity-40 scale-125" style="background-image: url('${imgSrc}')"></div>
+                        <img src="${imgSrc}" class="carousel-img relative max-w-full max-h-full object-contain z-10 p-3 transition-all duration-700 ease-in-out protected-media" oncontextmenu="return false;" ondragstart="return false;">
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="carousel-container relative w-full h-full min-h-[300px] md:min-h-full group rounded-t-[2.5rem] md:rounded-l-[2.5rem] md:rounded-tr-none overflow-hidden bg-slate-900" data-context="${context}" data-images="${safeImages}" data-index="${currentIdx}" data-input="${inputId}">
+                    ${mediaDisplayHtml}
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    
+                    <div class="edit-controls-flex absolute top-4 right-4 space-x-2 z-10">
+                        <button onclick="document.getElementById('${inputId}').click()" class="bg-white w-10 h-10 rounded-xl shadow-lg flex items-center justify-center hover:scale-105 transition" style="color: var(--theme-primary);" title="Add Photo"><i class="fa-solid fa-camera text-sm"></i></button>
+                        <button onclick="addProjectVideoFromCarousel('${context}')" class="bg-white w-10 h-10 rounded-xl shadow-lg flex items-center justify-center hover:scale-105 transition text-rose-500" title="Add Video"><i class="fa-brands fa-youtube text-sm"></i></button>
+                        <button onclick="removeMedia('${context}')" class="bg-white text-rose-500 w-10 h-10 rounded-xl shadow-lg flex items-center justify-center hover:scale-105 transition" title="Remove"><i class="fa-solid fa-trash text-sm"></i></button>
+                    </div>
+                    
+                    ${mediaArr.length > 1 ? `
+                        <button onclick="event.stopPropagation(); manualChangeSlide('${context}', -1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-md hover:bg-black/60 z-10"><i class="fa-solid fa-chevron-left text-sm"></i></button>
+                        <button onclick="event.stopPropagation(); manualChangeSlide('${context}', 1)" class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-md hover:bg-black/60 z-10"><i class="fa-solid fa-chevron-right text-sm"></i></button>
+                        <div class="carousel-dots absolute bottom-6 left-0 right-0 flex justify-center space-x-2 z-10 pointer-events-none">
+                            ${mediaArr.map((_, i) => `<div class="carousel-dot w-2 h-2 rounded-full transition-all duration-300 ${i === currentIdx ? 'bg-white scale-125' : 'bg-white/40'}" data-index="${i}"></div>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function openModal(context, index) {
+            if (state.isEditMode) return;
+            state.modalContext = context;
+            state.modalIndex = index;
+            renderModal();
+            const modal = document.getElementById('media-modal');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; 
+            modal.classList.remove('opacity-0');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('media-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('modal-content').innerHTML = '';
+            }, 300);
+        }
+
+        function renderModal() {
+            const container = document.querySelector(`[data-context="${state.modalContext}"]`);
+            if(!container) return;
+            
+            const images = JSON.parse(container.getAttribute('data-images').replace(/&quot;/g, '"'));
+            const currentItem = images[state.modalIndex];
+            const content = document.getElementById('modal-content');
+            
+            if (typeof currentItem === 'object' && currentItem.type === 'video') {
+                content.innerHTML = `<iframe class="w-full h-full aspect-video rounded-2xl shadow-2xl" src="${currentItem.url}" frameborder="0" allowfullscreen></iframe>`;
+            } else {
+                const imgSrc = typeof currentItem === 'string' ? currentItem : currentItem.url;
+                content.innerHTML = `<img src="${imgSrc}" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl protected-media transition-opacity duration-300" oncontextmenu="return false;" ondragstart="return false;">`;
+            }
+        }
+
+        function modalChangeSlide(dir) {
+            const container = document.querySelector(`[data-context="${state.modalContext}"]`);
+            if(!container) return;
+            const images = JSON.parse(container.getAttribute('data-images').replace(/&quot;/g, '"'));
+            
+            state.modalIndex = (state.modalIndex + dir + images.length) % images.length;
+            renderModal();
+        }
+
+        setInterval(() => {
+            if(state.isEditMode) return;
+            document.querySelectorAll('.carousel-container').forEach(container => {
+                try {
+                    const imagesStr = container.getAttribute('data-images');
+                    if(!imagesStr) return;
+                    
+                    const images = JSON.parse(imagesStr.replace(/&quot;/g, '"'));
+                    if (images.length > 1) {
+                        let idx = parseInt(container.getAttribute('data-index'));
+                        idx = (idx + 1) % images.length;
+                        
+                        container.setAttribute('data-index', idx);
+                        const currentItem = images[idx];
+                        const inputId = container.getAttribute('data-input') || 'temp_input';
+                        const context = container.getAttribute('data-context');
+                        
+                        if (typeof currentItem === 'object' && currentItem.type === 'video') {
+                            container.outerHTML = renderCarousel(images, context, inputId);
+                        } else {
+                            const imgEl = container.querySelector('.carousel-img');
+                            if(imgEl) {
+                                imgEl.style.opacity = '0.7';
+                                setTimeout(() => {
+                                    imgEl.src = typeof currentItem === 'string' ? currentItem : currentItem.url;
+                                    imgEl.style.opacity = '1';
+                                    
+                                    const blurBg = container.querySelector('.bg-cover');
+                                    if(blurBg) blurBg.style.backgroundImage = `url('${imgEl.src}')`;
+                                    
+                                    // Update parent click handler to new index
+                                    imgEl.parentElement.setAttribute('onclick', `openModal('${context}', ${idx})`);
+                                }, 150);
+                            } else {
+                                container.outerHTML = renderCarousel(images, context, inputId);
+                            }
+                        }
+                        
+                        const dots = container.querySelectorAll('.carousel-dot');
+                        dots.forEach((dot, i) => {
+                            dot.className = `carousel-dot w-2 h-2 rounded-full transition-all duration-300 ${i === idx ? 'bg-white scale-125' : 'bg-white/40'}`;
+                        });
+                        
+                        state[`idx_${context}`] = idx;
+                    }
+                } catch(e) {}
+            });
+        }, 5000);
+
+        function manualChangeSlide(context, dir) {
+            const el = document.querySelector(`[data-context="${context}"]`);
+            if(!el) return;
+            const images = JSON.parse(el.getAttribute('data-images').replace(/&quot;/g, '"'));
+            const inputId = el.getAttribute('data-input') || 'temp_input';
+            
+            let curr = state[`idx_${context}`] || 0;
+            curr = (curr + dir + images.length) % images.length;
+            state[`idx_${context}`] = curr;
+            
+            el.outerHTML = renderCarousel(images, context, inputId);
+        }
+
+        function removeMedia(context) {
+            const idx = state[`idx_${context}`] || 0;
+            if (context === 'about.media') {
+                state.about.media.splice(idx, 1);
+                state['idx_about.media'] = 0;
+            } else if (context.startsWith('project.')) {
+                const parts = context.replace('project.', '').split('|');
+                const classId = parts[0];
+                const subjectId = parts[1];
+                const pIdx = parseInt(parts[2]);
+                
+                const cls = state.classes.find(c => c.id === classId);
+                if (cls) {
+                    const sub = cls.subjects.find(s => s.id === subjectId);
+                    if (sub && sub.projects && sub.projects[pIdx]) {
+                        sub.projects[pIdx].media.splice(idx, 1);
+                        state[`idx_${context}`] = 0;
+                    }
+                }
+            } else if (context.startsWith('generic.')) {
+                const parts = context.replace('generic.', '').split('|');
+                const catId = parts[0];
+                const classId = parts[1];
+                const pIdx = parseInt(parts[2]);
+                
+                if (state[catId] && state[catId][classId] && state[catId][classId][pIdx]) {
+                    state[catId][classId][pIdx].media.splice(idx, 1);
+                    state[`idx_${context}`] = 0;
+                }
+            }
+            triggerSave();
+            renderApp();
+        }
+
+        function toggleShortcut(e, key) {
+            e.stopPropagation();
+            const content = document.getElementById('shortcut-content-' + key);
+            const icon = document.getElementById('shortcut-icon-' + key);
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                content.style.maxHeight = '0px';
+                icon.style.transform = 'rotate(0deg)';
+                content.style.opacity = '0';
+                content.classList.remove('border-slate-100');
+                content.classList.add('border-transparent');
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.style.transform = 'rotate(180deg)';
+                content.style.opacity = '1';
+                content.classList.remove('border-transparent');
+                content.classList.add('border-slate-100');
+            }
+        }
+
+        function toggleShortcutClass(e, key) {
+            e.stopPropagation();
+            const content = document.getElementById('shortcut-class-content-' + key);
+            const icon = document.getElementById('shortcut-class-icon-' + key);
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                content.style.maxHeight = '0px';
+                icon.style.transform = 'rotate(0deg)';
+                content.style.opacity = '0';
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.style.transform = 'rotate(180deg)';
+                content.style.opacity = '1';
+                const parentCard = content.closest('[id^="shortcut-content-"]');
+                if (parentCard) {
+                    parentCard.style.maxHeight = (parentCard.scrollHeight + content.scrollHeight) + 'px';
+                }
+            }
+        }
+
+        function uploadImageToWeb(file, callback) {
+            if (!IMGBB_API_KEY || IMGBB_API_KEY === "PASTE_YOUR_IMGBB_KEY_HERE") {
+                showToast("Please add your ImgBB API Key first!");
+                return;
+            }
+
+            const syncBadge = document.querySelector('header .edit-controls-flex span');
+            if(syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span class="hidden sm:inline">Uploading...</span>`;
+            
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = e => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 1200;
+                    let width = img.width, height = img.height;
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const base64Image = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+                    const formData = new FormData();
+                    formData.append('image', base64Image);
+                    
+                    fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.success) {
+                            showToast("Image Uploaded!");
+                            callback(data.data.url);
+                        } else throw new Error("ImgBB API rejected");
+                    })
+                    .catch(err => {
+                        showToast("Upload Failed. Check ImgBB Key.");
+                        if(syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i><span class="hidden sm:inline text-rose-500">Failed</span>`;
+                    });
+                };
+            };
+        }
+
+        function handleProfilePicUpload(e) {
+            if(e.target.files[0]) uploadImageToWeb(e.target.files[0], res => { state.profile.pic = res; triggerSave(); renderApp(); });
+        }
+
+        function handleMediaUpload(e, type, arg1, arg2, arg3) {
+            const files = Array.from(e.target.files);
+            if(files.length === 0) return;
+            files.forEach(file => {
+                uploadImageToWeb(file, res => {
+                    if (type === 'about.media') {
+                        state.about.media.push(res);
+                    } else if (type === 'project') {
+                        const p = state.classes.find(c => c.id === arg1).subjects.find(s => s.id === arg2).projects[arg3];
+                        if(!p.media) p.media = [];
+                        p.media.push(res);
+                    } else if (type === 'generic') {
+                        const items = state[arg1][arg2];
+                        if(!items[arg3].media) items[arg3].media = [];
+                        items[arg3].media.push(res);
+                    }
+                    triggerSave();
+                    renderApp();
+                });
+            });
+        }
+
+        function handleFeedUpload(e, category, classId) {
+            Array.from(e.target.files).forEach(file => {
+                uploadImageToWeb(file, res => {
+                    if(!state[category]) state[category] = {};
+                    if(!state[category][classId]) state[category][classId] = [];
+                    state[category][classId].unshift({ type: 'img', url: res, desc: '' });
+                    triggerSave();
+                    renderApp();
+                });
+            });
+        }
+
+        function addAboutVideo() {
+            askUser({
+                type: 'prompt',
+                title: 'Add Video',
+                placeholder: 'Paste YouTube URL or Shorts Link',
+                onSubmit: (url) => {
+                    let embedUrl = url;
+                    if(url.includes('watch?v=')) embedUrl = url.replace('watch?v=', 'embed/');
+                    else if(url.includes('youtu.be/')) embedUrl = url.replace('youtu.be/', 'youtube.com/embed/');
+                    else if(url.includes('shorts/')) embedUrl = url.replace('shorts/', 'embed/');
+                    
+                    if(!state.about.media) state.about.media = [];
+                    state.about.media.push({ type: 'video', url: embedUrl });
+                    triggerSave(); 
+                    renderApp();
+                }
+            });
+        }
+
+        function addProjectVideo(cId, sId, pIdx) {
+            askUser({
+                type: 'prompt',
+                title: 'Add Project Video',
+                placeholder: 'Paste YouTube URL or Shorts Link',
+                onSubmit: (url) => {
+                    let embedUrl = url;
+                    if(url.includes('watch?v=')) embedUrl = url.replace('watch?v=', 'embed/');
+                    else if(url.includes('youtu.be/')) embedUrl = url.replace('youtu.be/', 'youtube.com/embed/');
+                    else if(url.includes('shorts/')) embedUrl = url.replace('shorts/', 'embed/');
+
+                    const sub = state.classes.find(c => c.id === cId).subjects.find(s => s.id === sId);
+                    if(!sub.projects[pIdx].media) sub.projects[pIdx].media = [];
+                    
+                    sub.projects[pIdx].media.push({ type: 'video', url: embedUrl });
+                    triggerSave();
+                    renderApp();
+                }
+            });
+        }
+
+        function addGenericVideo(catId, clsId, pIdx) {
+            askUser({
+                type: 'prompt',
+                title: 'Add Item Video',
+                placeholder: 'Paste YouTube URL or Shorts Link',
+                onSubmit: (url) => {
+                    let embedUrl = url;
+                    if(url.includes('watch?v=')) embedUrl = url.replace('watch?v=', 'embed/');
+                    else if(url.includes('youtu.be/')) embedUrl = url.replace('youtu.be/', 'youtube.com/embed/');
+                    else if(url.includes('shorts/')) embedUrl = url.replace('shorts/', 'embed/');
+
+                    const items = state[catId][clsId];
+                    if(!items[pIdx].media) items[pIdx].media = [];
+                    
+                    items[pIdx].media.push({ type: 'video', url: embedUrl });
+                    triggerSave();
+                    renderApp();
+                }
+            });
+        }
+
+        function addProjectVideoFromCarousel(context) {
+            if (context === 'about.media') {
+                addAboutVideo();
+            } else if (context.startsWith('project.')) {
+                const parts = context.replace('project.', '').split('|');
+                addProjectVideo(parts[0], parts[1], parseInt(parts[2]));
+            } else if (context.startsWith('generic.')) {
+                const parts = context.replace('generic.', '').split('|');
+                addGenericVideo(parts[0], parts[1], parseInt(parts[2]));
+            }
+        }
+
+        function addFeedVideo(category, classId) {
+            askUser({
+                type: 'prompt',
+                title: 'Add Feed Video',
+                placeholder: 'Paste YouTube URL or Shorts Link',
+                onSubmit: (url) => {
+                    let embedUrl = url;
+                    if(url.includes('watch?v=')) embedUrl = url.replace('watch?v=', 'embed/');
+                    else if(url.includes('youtu.be/')) embedUrl = url.replace('youtu.be/', 'youtube.com/embed/');
+                    else if(url.includes('shorts/')) embedUrl = url.replace('shorts/', 'embed/');
+                    
+                    if(!state[category]) state[category] = {};
+                    if(!state[category][classId]) state[category][classId] = [];
+                    state[category][classId].unshift({ type: 'video', url: embedUrl, desc: '' });
+                    triggerSave();
+                    renderApp();
+                }
+            });
+        }
+
+        function addSection() {
+            askUser({
+                type: 'prompt',
+                title: 'New Main Section',
+                placeholder: "e.g., 'Certificates', 'Travel'",
+                onSubmit: (name) => {
+                    const newId = 'sec_' + Date.now();
+                    state.sections.push({ id: newId, title: name, isAcademic: false, categories: [] });
+                    
+                    // Enforce the new standard visibility logic when adding
+                    state.collapsedMenus.sections[newId] = false; // Expand main
+                    if (state.sections.length > 0 && !state.sections[state.sections.length-1].isAcademic && state.sections[state.sections.length-1].categories) {
+                         state.sections[state.sections.length-1].categories.forEach(cat => state.collapsedMenus.categories[cat] = false); // Expand 1st level
+                    }
+
+                    triggerSave(); renderApp();
+                    showToast("New Main Section Added!");
+                }
+            });
+        }
+
+        function removeSection(e, secId) {
+            e.stopPropagation();
+            askUser({
+                title: 'Delete this entire section?',
+                submitText: 'Delete',
+                onSubmit: () => {
+                    state.sections = state.sections.filter(s => s.id !== secId);
+                    triggerSave(); renderApp();
+                    showToast("Section removed");
+                }
+            });
+        }
+
+        function addCategory(secId) {
+            askUser({
+                type: 'prompt',
+                title: 'New Category',
+                placeholder: "e.g., 'Robotics Club'",
+                onSubmit: (name) => {
+                    const newCatId = 'cat_' + Date.now();
+                    state.categoryNames[newCatId] = name;
+                    state[newCatId] = {};
+                    state.classes.forEach(cls => state[newCatId][cls.id] = []);
+                    
+                    const sec = state.sections.find(s => s.id === secId);
+                    if(!sec.categories) sec.categories = [];
+                    sec.categories.push(newCatId);
+
+                    state.collapsedMenus.categories[newCatId] = false; // Make 1st level expanded by default
+                    triggerSave(); renderApp();
+                }
+            });
+        }
+
+        function removeCategory(e, secId, catId) {
+            e.stopPropagation();
+            askUser({
+                title: 'Remove this category?',
+                submitText: 'Remove',
+                onSubmit: () => {
+                    const sec = state.sections.find(s => s.id === secId);
+                    if(sec && sec.categories) sec.categories = sec.categories.filter(c => c !== catId);
+                    triggerSave(); renderApp();
+                    showToast("Category removed");
+                }
+            });
+        }
+
+        function addClass() {
+            askUser({
+                type: 'prompt',
+                title: 'Add Grade / Class',
+                placeholder: "e.g., Grade 7 (2027-28)",
+                onSubmit: (name) => {
+                    const newId = 'class_' + Date.now();
+                    state.classes.unshift({ id: newId, name: name, year: '', subjects: [] });
+                    
+                    state.sections.forEach(s => {
+                        if(!s.isAcademic && s.categories) {
+                            s.categories.forEach(cat => {
+                                if (!state[cat]) state[cat] = {};
+                                state[cat][newId] = [];
+                            });
+                        }
+                    });
+                    
+                    state.collapsedMenus.classes[newId] = false; // Make 1st level expanded by default
+
+                    triggerSave(); renderApp();
+                    showToast("New Grade Added Successfully!");
+                }
+            });
+        }
+
+        function removeClass(e, classId) {
+            e.stopPropagation();
+            askUser({
+                title: 'Delete this Grade/Class?',
+                submitText: 'Delete',
+                onSubmit: () => {
+                    state.classes = state.classes.filter(c => c.id !== classId);
+                    triggerSave(); renderApp();
+                    showToast("Grade removed");
+                }
+            });
+        }
+
+        function addSubject(classId) {
+            const cls = state.classes.find(c => c.id === classId);
+            cls.subjects.push({ id: 'sub_' + Date.now(), name: 'New Subject', description: '', projects: [] });
+            triggerSave(); renderApp();
+        }
+
+        function removeSubject(e, classId, subjectId) {
+            e.stopPropagation();
+            askUser({
+                title: 'Delete this Subject?',
+                submitText: 'Delete',
+                onSubmit: () => {
+                    const cls = state.classes.find(c => c.id === classId);
+                    if(cls) {
+                        cls.subjects = cls.subjects.filter(s => s.id !== subjectId);
+                        triggerSave(); renderApp();
+                        showToast("Subject removed");
+                    }
+                }
+            });
+        }
+
+        function addProjectCard(cId, sId) {
+            const sub = state.classes.find(c => c.id === cId).subjects.find(s => s.id === sId);
+            if(!sub.projects) sub.projects = [];
+            sub.projects.unshift({ title: 'New Project', desc: '', media: [] });
+            triggerSave(); renderApp();
+        }
+
+        function removeProjectCard(cId, sId, idx) {
+            askUser({
+                title: 'Remove this Project?',
+                submitText: 'Remove',
+                onSubmit: () => {
+                    state.classes.find(c => c.id === cId).subjects.find(s => s.id === sId).projects.splice(idx, 1);
+                    triggerSave(); renderApp();
+                    showToast("Project removed");
+                }
+            });
+        }
+
+        function addGenericItem(category, classId) {
+            if(!state[category]) state[category] = {};
+            if(!state[category][classId]) state[category][classId] = [];
+            state[category][classId].unshift({ title: 'New Item', desc: '', media: [] });
+            triggerSave(); renderApp();
+        }
+
+        function removeGenericItem(category, classId, idx) {
+            askUser({
+                title: 'Remove this item?',
+                submitText: 'Remove',
+                onSubmit: () => {
+                    state[category][classId].splice(idx, 1);
+                    triggerSave(); renderApp();
+                    showToast("Item removed");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
