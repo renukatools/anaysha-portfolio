@@ -2,18 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- UPGRADED VIEWPORT: viewport-fit=cover enables safe-area-insets to fix the notch/status bar overlap on mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Anaysha's Digital Portfolio</title>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <script>
+        // Pre-configured Firebase Keys
         const firebaseConfig = {
             apiKey: "AIzaSyDNP7Rc50smJ3QeAOZozQ7220CrjkEiEcY",
             authDomain: "amaira--digital-portfolio.firebaseapp.com",
@@ -27,6 +35,7 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
+        // Pre-configured ImgBB API Key
         const IMGBB_API_KEY = "a6c8e02c15899509447d65b571eefb92";
     </script>
 
@@ -39,11 +48,12 @@
             --theme-gradient: linear-gradient(to right, #2563eb, #4f46e5);
         }
 
+        /* MOBILE FIX: Ensure the body handles dynamic browser bars gracefully */
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             -webkit-tap-highlight-color: transparent; 
-            height: 100vh; 
-            height: 100dvh; 
+            height: 100vh; /* Fallback for older browsers */
+            height: 100dvh; /* Modern dynamic viewport height fixes mobile bottom bar jumps */
         }
         
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -62,6 +72,7 @@
         body.edit-mode .editable-border { border: 1px dashed #94a3b8 !important; border-radius: 0.5rem; transition: all 0.2s; }
         body.edit-mode .editable-border:focus { border-color: var(--theme-primary) !important; background: #f8fafc; outline: none; box-shadow: 0 0 0 3px var(--theme-light); }
 
+        /* FIXED: Only hide empty portfolio data fields, not login inputs! */
         body:not(.edit-mode) textarea[data-field]:placeholder-shown,
         body:not(.edit-mode) input[data-field]:placeholder-shown,
         body:not(.edit-mode) .hide-if-empty:empty,
@@ -69,6 +80,7 @@
 
         body.edit-mode .edit-mode-hidden-item { opacity: 0.6; filter: grayscale(40%); border: 1px dashed #cbd5e1; }
 
+        /* Media Protection */
         .protected-media { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-user-drag: none; pointer-events: auto; }
 
         #app-sidebar { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -76,7 +88,7 @@
         #app-sidebar.collapsed .hide-on-collapse { display: none; opacity: 0; }
         #app-sidebar.collapsed .center-on-collapse { justify-content: center; padding-left: 0; padding-right: 0; }
         
-        /* Perfect centering of the toggle button and sliding profile pic when collapsed */
+        /* Smooth re-centering of toggle button when sidebar collapses */
         #app-sidebar.collapsed #sidebar-toggle-btn { right: 50%; transform: translateX(50%); top: calc(1rem + env(safe-area-inset-top)); }
         #app-sidebar:not(.collapsed) #sidebar-toggle-btn { transform: translateX(0); }
         #app-sidebar.collapsed .profile-pic-container { margin-top: 2.5rem; }
@@ -119,15 +131,36 @@
         <p class="mt-4 font-bold text-slate-600 tracking-wide text-sm animate-pulse">Loading Portfolio...</p>
     </div>
 
+    <!-- Mobile Overlay -->
     <div id="mobile-sidebar-overlay" class="mobile-overlay" onclick="toggleMobileMenu()"></div>
 
+    <!-- Fullscreen Media Modal -->
     <div id="media-modal" class="fixed inset-0 z-[999999] hidden bg-slate-900/95 backdrop-blur-md flex items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeModal()">
+        <!-- MOBILE FIX: Modal close button pushed down by safe area inset to avoid notch -->
         <button onclick="closeModal()" class="absolute right-6 text-white/70 hover:text-white text-4xl z-50 transition transform hover:scale-110" style="top: max(env(safe-area-inset-top), 1.5rem);"><i class="fa-solid fa-xmark"></i></button>
-        <div class="relative w-full h-full max-w-6xl max-h-screen p-4 md:p-12 flex items-center justify-center" id="modal-content" onclick="event.stopPropagation()"></div>
+        
+        <div class="relative w-full h-full max-w-6xl max-h-screen p-4 md:p-12 flex items-center justify-center" id="modal-content" onclick="event.stopPropagation()">
+            <!-- Rendered via JS -->
+        </div>
+        
         <button onclick="event.stopPropagation(); modalChangeSlide(-1)" class="absolute left-2 md:left-10 top-1/2 -translate-y-1/2 text-white/50 hover:text-white text-3xl md:text-5xl z-50 p-4 transition transform hover:scale-110"><i class="fa-solid fa-chevron-left"></i></button>
         <button onclick="event.stopPropagation(); modalChangeSlide(1)" class="absolute right-2 md:right-10 top-1/2 -translate-y-1/2 text-white/50 hover:text-white text-3xl md:text-5xl z-50 p-4 transition transform hover:scale-110"><i class="fa-solid fa-chevron-right"></i></button>
     </div>
 
+    <!-- Icon Picker Modal -->
+    <div id="icon-picker-modal" class="fixed inset-0 z-[999999] hidden bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeIconPicker()">
+        <div class="bg-white rounded-[2rem] p-6 shadow-2xl max-w-lg w-full mx-4 transform scale-95 transition-transform duration-300 flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-lg font-extrabold text-slate-800">Select an Icon</h3>
+                <button onclick="closeIconPicker()" class="text-slate-400 hover:text-rose-500 transition w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="overflow-y-auto grid grid-cols-5 sm:grid-cols-6 gap-3 p-1 scrollbar-hide" id="icon-picker-grid">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Action Modal (Replaces native alerts/prompts/confirms) -->
     <div id="action-modal" class="fixed inset-0 z-[999999] hidden bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-[2rem] p-8 shadow-2xl max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="action-modal-panel">
             <h3 id="action-modal-title" class="text-xl font-extrabold text-slate-800 mb-2"></h3>
@@ -141,6 +174,7 @@
         </div>
     </div>
 
+    <!-- Toast Notification (With safe-area bottom padding) -->
     <div id="toast-notification" class="fixed right-6 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-sm font-medium border border-slate-700" style="bottom: max(env(safe-area-inset-bottom), 1.5rem);">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toast-msg">Action successful</span>
@@ -148,8 +182,11 @@
 
     <aside id="app-sidebar" class="glass-card border-r border-slate-200/50 flex flex-col w-[20rem] flex-shrink-0 relative shadow-[4px_0_24px_rgba(37,99,235,0.05)] z-40 overflow-y-auto overflow-x-hidden">
         
+        <!-- Profile Section -->
+        <!-- MOBILE FIX: Padding-top calc adds safe-area-inset-top so the notch does not cover the avatar -->
         <div class="pb-4 flex flex-col items-center border-b border-slate-100/50 relative group flex-shrink-0" style="padding-top: calc(1.5rem + env(safe-area-inset-top)); padding-left: 1.5rem; padding-right: 1.5rem;">
-            <!-- Button cleanly aligned right-4 to match footer lock icon vertically -->
+            
+            <!-- UPDATE: Sidebar toggle button perfectly aligned with lock icon inside the padding -->
             <button onclick="toggleSidebarCollapse()" id="sidebar-toggle-btn" class="hidden md:flex absolute right-4 bg-white border border-slate-200 text-slate-500 hover:text-slate-900 w-7 h-7 rounded-full items-center justify-center shadow-md z-10 transition-all" style="top: calc(1.5rem + env(safe-area-inset-top));">
                 <i class="fa-solid fa-chevron-left text-[10px]" id="collapse-icon"></i>
             </button>
@@ -168,8 +205,11 @@
             </div>
         </div>
 
+        <!-- Navigation Menu (Dynamic Tree) -->
         <nav class="p-4 space-y-3 flex-1" id="sidebar-nav"></nav>
 
+        <!-- Footer with Minimal Lock Icon & Theme Picker -->
+        <!-- Safe-area bottom padding to ensure it's not hidden by iOS home indicator -->
         <div class="p-4 border-t border-slate-100/50 bg-slate-50/50 flex flex-col space-y-3 mt-auto flex-shrink-0" style="padding-bottom: max(env(safe-area-inset-bottom), 1rem);">
             <div class="flex justify-between items-center hide-on-collapse">
                 <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest edit-controls-block">Color Theme</span>
@@ -178,6 +218,7 @@
                 </button>
             </div>
             
+            <!-- Color Theme Selector (Admin Mode Only) -->
             <div class="edit-controls-flex items-center justify-between hide-on-collapse pb-1">
                 <button onclick="setTheme('blue')" title="Ocean Blue" class="w-6 h-6 rounded-full bg-blue-600 hover:scale-110 transition shadow-sm" id="theme-btn-blue"></button>
                 <button onclick="setTheme('pink')" title="Rose Pink" class="w-6 h-6 rounded-full bg-pink-600 hover:scale-110 transition shadow-sm" id="theme-btn-pink"></button>
@@ -194,15 +235,21 @@
     </aside>
 
     <main class="flex-1 flex flex-col h-full overflow-hidden relative min-w-0">
+        
+        <!-- Breadcrumb Header -->
+        <!-- MOBILE FIX: Padding-top properly shifts the header down for the notch/status bar -->
         <header class="glass-card border-b border-slate-200/50 px-4 md:px-6 flex items-center justify-between flex-shrink-0 z-10 relative w-full" style="padding-top: max(env(safe-area-inset-top), 12px); height: calc(4rem + max(env(safe-area-inset-top), 12px)); box-sizing: border-box;">
             <div class="flex items-center space-x-3 min-w-0 flex-1">
                 <button onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-10 h-10 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition flex-shrink-0">
                     <i class="fa-solid fa-bars text-lg"></i>
                 </button>
+                
+                <!-- Website Map Breadcrumbs -->
                 <div class="flex items-center space-x-2 text-xs md:text-sm font-semibold text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-hide flex-1 py-2" id="breadcrumb-container" style="-webkit-overflow-scrolling: touch;">
                     <!-- Injected by JS -->
                 </div>
             </div>
+            
             <div class="flex items-center space-x-3 edit-controls-flex flex-shrink-0 ml-4">
                 <span class="text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full border flex items-center space-x-1.5 shadow-sm" style="color: var(--theme-primary); background-color: var(--theme-light); border-color: var(--theme-border);">
                     <i class="fa-solid fa-cloud-arrow-up"></i><span class="hidden sm:inline">Synced</span>
@@ -210,6 +257,7 @@
             </div>
         </header>
 
+        <!-- Dynamic Viewport -->
         <div id="main-content-viewport" class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 lg:p-10 fade-in scroll-smooth" style="padding-bottom: max(env(safe-area-inset-bottom), 2rem);">
             <!-- Content Injected via JS -->
         </div>
@@ -224,6 +272,26 @@
             amber: { name: 'Sunset Amber', primary: '#d97706', hover: '#b45309', light: '#fffbeb', border: '#fde68a', gradient: 'linear-gradient(to right, #d97706, #ea580c)' }
         };
 
+        // Standard FontAwesome Icon Library for Picker
+        const iconLibrary = [
+            'fa-solid fa-star', 'fa-solid fa-graduation-cap', 'fa-solid fa-medal', 'fa-solid fa-trophy', 
+            'fa-solid fa-palette', 'fa-solid fa-images', 'fa-solid fa-book-open', 'fa-solid fa-school', 
+            'fa-solid fa-flask', 'fa-solid fa-microscope', 'fa-solid fa-calculator', 'fa-solid fa-laptop-code',
+            'fa-solid fa-music', 'fa-solid fa-camera', 'fa-solid fa-video', 'fa-solid fa-clapperboard',
+            'fa-solid fa-paintbrush', 'fa-solid fa-pen-nib', 'fa-solid fa-masks-theater', 'fa-solid fa-guitar',
+            'fa-solid fa-microphone', 'fa-solid fa-futbol', 'fa-solid fa-basketball', 'fa-solid fa-person-running',
+            'fa-solid fa-person-swimming', 'fa-solid fa-chess', 'fa-solid fa-robot', 'fa-solid fa-puzzle-piece',
+            'fa-solid fa-leaf', 'fa-solid fa-seedling', 'fa-solid fa-tree', 'fa-solid fa-globe', 
+            'fa-solid fa-earth-americas', 'fa-solid fa-plane', 'fa-solid fa-rocket', 'fa-solid fa-heart',
+            'fa-solid fa-lightbulb', 'fa-solid fa-brain', 'fa-solid fa-hands-holding-child', 'fa-solid fa-award',
+            'fa-solid fa-certificate', 'fa-solid fa-briefcase', 'fa-solid fa-user-graduate', 'fa-solid fa-location-dot',
+            'fa-solid fa-envelope', 'fa-solid fa-phone', 'fa-solid fa-link', 'fa-solid fa-address-card',
+            'fa-brands fa-youtube', 'fa-brands fa-linkedin', 'fa-brands fa-instagram', 'fa-brands fa-facebook', 
+            'fa-brands fa-whatsapp', 'fa-brands fa-snapchat', 'fa-brands fa-x-twitter', 'fa-brands fa-reddit-alien', 
+            'fa-brands fa-threads', 'fa-brands fa-github', 'fa-brands fa-pinterest', 'fa-brands fa-tiktok',
+            'fa-solid fa-face-smile', 'fa-solid fa-face-laugh-beam'
+        ];
+
         let state = {
             isEditMode: false,
             isSidebarCollapsed: false,
@@ -233,77 +301,83 @@
             theme: 'blue',
             modalContext: null,
             modalIndex: 0,
+            customIcons: {}, // Stores user-selected icons
             
-            profile: { name: 'Amaira Mulay', grade: 'Class 6 • NVS', pic: '' },
+            profile: { name: 'Anaysha Mulay', grade: 'Class 3 • NVS', pic: '' },
             about: { 
-                title: 'Hello! I am Amaira.', 
+                title: 'Hello! I am Anaysha.', 
                 subtitle: 'Welcome to my digital portfolio!', 
                 bio: 'I am an enthusiastic student exploring the wonders of science, participating in school activities, and learning new skills every day!',
                 media: [] 
             },
             
             sections: [
-                { id: 'sec_acad', title: 'Academics', isAcademic: true },
-                { id: 'sec_beyond', title: 'Beyond Academics', isAcademic: false, categories: ['extracurriculars', 'hobbies'] }
+                { id: 'sec_acad', title: 'Academics', isAcademic: true, isVisible: true },
+                { id: 'sec_beyond', title: 'Beyond Academics', isAcademic: false, categories: ['extracurriculars', 'hobbies'], isVisible: true }
             ],
             
             classes: [
-                { id: 'class_6', name: 'Class 6', year: '', subjects: [] }
+                { id: 'class_6', name: 'Class 6', year: '', isVisible: true, subjects: [] }
             ],
             categoryNames: {
                 extracurriculars: 'Extracurriculars',
                 hobbies: 'Hobbies & Skills'
             },
+            categoryVisibility: {
+                extracurriculars: true,
+                hobbies: true
+            },
             
+            // Standard Massive Contact Offering with 3x Details & 2x Socials
             contact: {
                 isVisible: true,
                 title: 'Contact Me',
                 subtitle: "Let's connect and stay in touch!",
                 details: [
-                    { id: 'prof_1', label: 'Profession', value: 'Student', isVisible: true, icon: 'fa-user-graduate' },
-                    { id: 'prof_2', label: 'Profession 2', value: 'Content Creator', isVisible: false, icon: 'fa-briefcase' },
-                    { id: 'prof_3', label: 'Profession 3', value: 'Developer', isVisible: false, icon: 'fa-laptop-code' },
-                    { id: 'inst_1', label: 'Institute', value: 'Nath Valley School', isVisible: true, icon: 'fa-school' },
-                    { id: 'inst_2', label: 'Institute 2', value: 'Online Academy', isVisible: false, icon: 'fa-building-columns' },
-                    { id: 'inst_3', label: 'Institute 3', value: 'Summer Camp', isVisible: false, icon: 'fa-graduation-cap' },
-                    { id: 'addr_1', label: 'Home Address', value: 'Chhatrapati Sambhajinagar, Maharashtra, India', isVisible: true, icon: 'fa-location-dot' },
-                    { id: 'addr_2', label: 'Address 2', value: 'Office Address', isVisible: false, icon: 'fa-house' },
-                    { id: 'addr_3', label: 'Address 3', value: 'PO Box', isVisible: false, icon: 'fa-map-pin' },
-                    { id: 'mail_1', label: 'Email', value: 'hello@example.com', isVisible: true, icon: 'fa-envelope' },
-                    { id: 'mail_2', label: 'Alt Email', value: 'alt@example.com', isVisible: false, icon: 'fa-at' },
-                    { id: 'mail_3', label: 'Work Email', value: 'work@example.com', isVisible: false, icon: 'fa-paper-plane' },
-                    { id: 'phone_1', label: 'Contact Number', value: '+91 98765 43210', isVisible: true, icon: 'fa-phone' },
-                    { id: 'phone_2', label: 'Mobile 2', value: '+91 XXXXX XXXXX', isVisible: false, icon: 'fa-mobile-screen' },
-                    { id: 'phone_3', label: 'WhatsApp', value: '+91 XXXXX XXXXX', isVisible: false, icon: 'fa-whatsapp' },
-                    { id: 'web_1', label: 'Website', value: 'www.myportfolio.com', isVisible: false, icon: 'fa-globe' },
-                    { id: 'web_2', label: 'Blog', value: 'www.myblog.com', isVisible: false, icon: 'fa-link' },
-                    { id: 'web_3', label: 'Portfolio', value: 'www.mywork.com', isVisible: false, icon: 'fa-desktop' }
+                    { id: 'prof_1', label: 'Profession', value: 'Student', isVisible: true, icon: 'fa-solid fa-user-graduate' },
+                    { id: 'prof_2', label: 'Profession 2', value: 'Content Creator', isVisible: false, icon: 'fa-solid fa-briefcase' },
+                    { id: 'prof_3', label: 'Profession 3', value: 'Developer', isVisible: false, icon: 'fa-solid fa-laptop-code' },
+                    { id: 'inst_1', label: 'Institute', value: 'Nath Valley School', isVisible: true, icon: 'fa-solid fa-school' },
+                    { id: 'inst_2', label: 'Institute 2', value: 'Online Academy', isVisible: false, icon: 'fa-solid fa-building-columns' },
+                    { id: 'inst_3', label: 'Institute 3', value: 'Summer Camp', isVisible: false, icon: 'fa-solid fa-graduation-cap' },
+                    { id: 'addr_1', label: 'Home Address', value: 'Chhatrapati Sambhajinagar, Maharashtra, India', isVisible: true, icon: 'fa-solid fa-location-dot' },
+                    { id: 'addr_2', label: 'Address 2', value: 'Office Address', isVisible: false, icon: 'fa-solid fa-house' },
+                    { id: 'addr_3', label: 'Address 3', value: 'PO Box', isVisible: false, icon: 'fa-solid fa-map-pin' },
+                    { id: 'mail_1', label: 'Email', value: 'hello@example.com', isVisible: true, icon: 'fa-solid fa-envelope' },
+                    { id: 'mail_2', label: 'Alt Email', value: 'alt@example.com', isVisible: false, icon: 'fa-solid fa-at' },
+                    { id: 'mail_3', label: 'Work Email', value: 'work@example.com', isVisible: false, icon: 'fa-solid fa-paper-plane' },
+                    { id: 'phone_1', label: 'Contact Number', value: '+91 98765 43210', isVisible: true, icon: 'fa-solid fa-phone' },
+                    { id: 'phone_2', label: 'Mobile 2', value: '+91 XXXXX XXXXX', isVisible: false, icon: 'fa-solid fa-mobile-screen' },
+                    { id: 'phone_3', label: 'WhatsApp', value: '+91 XXXXX XXXXX', isVisible: false, icon: 'fa-brands fa-whatsapp' },
+                    { id: 'web_1', label: 'Website', value: 'www.myportfolio.com', isVisible: false, icon: 'fa-solid fa-globe' },
+                    { id: 'web_2', label: 'Blog', value: 'www.myblog.com', isVisible: false, icon: 'fa-solid fa-link' },
+                    { id: 'web_3', label: 'Portfolio', value: 'www.mywork.com', isVisible: false, icon: 'fa-solid fa-desktop' }
                 ],
                 socials: [
-                    { id: 'yt_1', label: 'YouTube', link: '', isVisible: true, icon: 'fa-youtube', color: 'text-rose-500' },
-                    { id: 'yt_2', label: 'YouTube 2', link: '', isVisible: false, icon: 'fa-youtube', color: 'text-rose-500' },
-                    { id: 'in_1', label: 'LinkedIn', link: '', isVisible: true, icon: 'fa-linkedin', color: 'text-blue-600' },
-                    { id: 'in_2', label: 'LinkedIn 2', link: '', isVisible: false, icon: 'fa-linkedin', color: 'text-blue-600' },
-                    { id: 'ig_1', label: 'Instagram', link: '', isVisible: true, icon: 'fa-instagram', color: 'text-pink-600' },
-                    { id: 'ig_2', label: 'Instagram 2', link: '', isVisible: false, icon: 'fa-instagram', color: 'text-pink-600' },
-                    { id: 'fb_1', label: 'Facebook', link: '', isVisible: true, icon: 'fa-facebook', color: 'text-blue-500' },
-                    { id: 'fb_2', label: 'Facebook 2', link: '', isVisible: false, icon: 'fa-facebook', color: 'text-blue-500' },
-                    { id: 'wa_1', label: 'WhatsApp', link: '', isVisible: true, icon: 'fa-whatsapp', color: 'text-emerald-500' },
-                    { id: 'wa_2', label: 'WhatsApp 2', link: '', isVisible: false, icon: 'fa-whatsapp', color: 'text-emerald-500' },
-                    { id: 'snap_1', label: 'Snapchat', link: '', isVisible: true, icon: 'fa-snapchat', color: 'text-yellow-400' },
-                    { id: 'snap_2', label: 'Snapchat 2', link: '', isVisible: false, icon: 'fa-snapchat', color: 'text-yellow-400' },
-                    { id: 'msg_1', label: 'Messenger', link: '', isVisible: true, icon: 'fa-facebook-messenger', color: 'text-blue-500' },
-                    { id: 'msg_2', label: 'Messenger 2', link: '', isVisible: false, icon: 'fa-facebook-messenger', color: 'text-blue-500' },
-                    { id: 'x_1', label: 'X (Twitter)', link: '', isVisible: true, icon: 'fa-x-twitter', color: 'text-slate-800' },
-                    { id: 'x_2', label: 'X (Twitter) 2', link: '', isVisible: false, icon: 'fa-x-twitter', color: 'text-slate-800' },
-                    { id: 'rd_1', label: 'Reddit', link: '', isVisible: true, icon: 'fa-reddit-alien', color: 'text-orange-600' },
-                    { id: 'rd_2', label: 'Reddit 2', link: '', isVisible: false, icon: 'fa-reddit-alien', color: 'text-orange-600' },
-                    { id: 'th_1', label: 'Threads', link: '', isVisible: true, icon: 'fa-threads', color: 'text-slate-900' },
-                    { id: 'th_2', label: 'Threads 2', link: '', isVisible: false, icon: 'fa-threads', color: 'text-slate-900' },
-                    { id: 'gh_1', label: 'GitHub', link: '', isVisible: false, icon: 'fa-github', color: 'text-slate-800' },
-                    { id: 'gh_2', label: 'GitHub 2', link: '', isVisible: false, icon: 'fa-github', color: 'text-slate-800' },
-                    { id: 'pi_1', label: 'Pinterest', link: '', isVisible: false, icon: 'fa-pinterest', color: 'text-red-600' },
-                    { id: 'pi_2', label: 'Pinterest 2', link: '', isVisible: false, icon: 'fa-pinterest', color: 'text-red-600' }
+                    { id: 'yt_1', label: 'YouTube', link: '', isVisible: true, icon: 'fa-brands fa-youtube', color: 'text-rose-500' },
+                    { id: 'yt_2', label: 'YouTube 2', link: '', isVisible: false, icon: 'fa-brands fa-youtube', color: 'text-rose-500' },
+                    { id: 'in_1', label: 'LinkedIn', link: '', isVisible: true, icon: 'fa-brands fa-linkedin', color: 'text-blue-600' },
+                    { id: 'in_2', label: 'LinkedIn 2', link: '', isVisible: false, icon: 'fa-brands fa-linkedin', color: 'text-blue-600' },
+                    { id: 'ig_1', label: 'Instagram', link: '', isVisible: true, icon: 'fa-brands fa-instagram', color: 'text-pink-600' },
+                    { id: 'ig_2', label: 'Instagram 2', link: '', isVisible: false, icon: 'fa-brands fa-instagram', color: 'text-pink-600' },
+                    { id: 'fb_1', label: 'Facebook', link: '', isVisible: true, icon: 'fa-brands fa-facebook', color: 'text-blue-500' },
+                    { id: 'fb_2', label: 'Facebook 2', link: '', isVisible: false, icon: 'fa-brands fa-facebook', color: 'text-blue-500' },
+                    { id: 'wa_1', label: 'WhatsApp', link: '', isVisible: true, icon: 'fa-brands fa-whatsapp', color: 'text-emerald-500' },
+                    { id: 'wa_2', label: 'WhatsApp 2', link: '', isVisible: false, icon: 'fa-brands fa-whatsapp', color: 'text-emerald-500' },
+                    { id: 'snap_1', label: 'Snapchat', link: '', isVisible: true, icon: 'fa-brands fa-snapchat', color: 'text-yellow-400' },
+                    { id: 'snap_2', label: 'Snapchat 2', link: '', isVisible: false, icon: 'fa-brands fa-snapchat', color: 'text-yellow-400' },
+                    { id: 'msg_1', label: 'Messenger', link: '', isVisible: true, icon: 'fa-brands fa-facebook-messenger', color: 'text-blue-500' },
+                    { id: 'msg_2', label: 'Messenger 2', link: '', isVisible: false, icon: 'fa-brands fa-facebook-messenger', color: 'text-blue-500' },
+                    { id: 'x_1', label: 'X (Twitter)', link: '', isVisible: true, icon: 'fa-brands fa-x-twitter', color: 'text-slate-800' },
+                    { id: 'x_2', label: 'X (Twitter) 2', link: '', isVisible: false, icon: 'fa-brands fa-x-twitter', color: 'text-slate-800' },
+                    { id: 'rd_1', label: 'Reddit', link: '', isVisible: true, icon: 'fa-brands fa-reddit-alien', color: 'text-orange-600' },
+                    { id: 'rd_2', label: 'Reddit 2', link: '', isVisible: false, icon: 'fa-brands fa-reddit-alien', color: 'text-orange-600' },
+                    { id: 'th_1', label: 'Threads', link: '', isVisible: true, icon: 'fa-brands fa-threads', color: 'text-slate-900' },
+                    { id: 'th_2', label: 'Threads 2', link: '', isVisible: false, icon: 'fa-brands fa-threads', color: 'text-slate-900' },
+                    { id: 'gh_1', label: 'GitHub', link: '', isVisible: false, icon: 'fa-brands fa-github', color: 'text-slate-800' },
+                    { id: 'gh_2', label: 'GitHub 2', link: '', isVisible: false, icon: 'fa-brands fa-github', color: 'text-slate-800' },
+                    { id: 'pi_1', label: 'Pinterest', link: '', isVisible: false, icon: 'fa-brands fa-pinterest', color: 'text-red-600' },
+                    { id: 'pi_2', label: 'Pinterest 2', link: '', isVisible: false, icon: 'fa-brands fa-pinterest', color: 'text-red-600' }
                 ]
             }
         };
@@ -355,10 +429,11 @@
 
                     if (!dbData.sections) {
                         dbData.sections = [
-                            { id: 'sec_acad', title: 'Academics', isAcademic: true },
-                            { id: 'sec_beyond', title: 'Beyond Academics', isAcademic: false, categories: ['extracurriculars', 'hobbies', 'achievements', 'photoFeed'] }
+                            { id: 'sec_acad', title: 'Academics', isAcademic: true, isVisible: true },
+                            { id: 'sec_beyond', title: 'Beyond Academics', isAcademic: false, categories: ['extracurriculars', 'hobbies', 'achievements', 'photoFeed'], isVisible: true }
                         ];
                     }
+                    if (!dbData.categoryVisibility) dbData.categoryVisibility = {};
                     if (!dbData.contact) {
                         dbData.contact = state.contact;
                     } else {
@@ -369,6 +444,7 @@
                             dbData.contact.socials = state.contact.socials;
                         }
                     }
+                    if (!dbData.customIcons) dbData.customIcons = {};
                     
                     state = { ...state, ...dbData };
                 }
@@ -427,6 +503,59 @@
             triggerSave();
             renderApp();
             showToast(`Theme changed to ${themes[themeName].name}!`);
+        }
+
+        // Helper to format Icon classes securely
+        function getIconClass(iconStr, defaultPrefix) {
+            if (!iconStr) return defaultPrefix + ' fa-circle-dot';
+            if (iconStr.includes(' ')) return iconStr; 
+            return defaultPrefix + ' ' + iconStr; 
+        }
+
+        let currentIconContext = null;
+        let currentIconId = null;
+
+        function openIconPicker(context, id) {
+            if (!state.isEditMode) return;
+            currentIconContext = context;
+            currentIconId = id;
+            
+            const grid = document.getElementById('icon-picker-grid');
+            grid.innerHTML = iconLibrary.map(icon => `
+                <div onclick="selectIcon('${icon}')" class="aspect-square rounded-xl bg-slate-50 hover:bg-blue-50 flex items-center justify-center cursor-pointer transition shadow-sm border border-slate-100 hover:border-blue-300 text-slate-600 hover:text-blue-600 group">
+                    <i class="${icon} text-xl group-hover:scale-110 transition-transform"></i>
+                </div>
+            `).join('');
+
+            const modal = document.getElementById('icon-picker-modal');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+            modal.querySelector('div').classList.add('scale-100');
+        }
+
+        function closeIconPicker() {
+            const modal = document.getElementById('icon-picker-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.remove('scale-100');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function selectIcon(iconClass) {
+            if (currentIconContext === 'section' || currentIconContext === 'category') {
+                if (!state.customIcons) state.customIcons = {};
+                state.customIcons[currentIconId] = iconClass;
+            } else if (currentIconContext === 'contactDetail') {
+                state.contact.details[currentIconId].icon = iconClass;
+            } else if (currentIconContext === 'contactSocial') {
+                state.contact.socials[currentIconId].icon = iconClass;
+            }
+            
+            closeIconPicker();
+            triggerSave();
+            renderApp();
         }
 
         function askUser(options) {
@@ -551,6 +680,34 @@
         function handleIconClick(e, actionFn) {
             if (state.isSidebarCollapsed && window.innerWidth >= 768) toggleSidebarCollapse();
             actionFn();
+        }
+
+        function toggleSectionVisibility(e, secId) {
+            e.stopPropagation();
+            const sec = state.sections.find(s => s.id === secId);
+            if (sec) {
+                sec.isVisible = sec.isVisible === false ? true : false;
+                triggerSave();
+                renderApp();
+            }
+        }
+
+        function toggleClassVisibility(e, classId) {
+            e.stopPropagation();
+            const cls = state.classes.find(c => c.id === classId);
+            if (cls) {
+                cls.isVisible = cls.isVisible === false ? true : false;
+                triggerSave();
+                renderApp();
+            }
+        }
+
+        function toggleCategoryVisibility(e, catId) {
+            e.stopPropagation();
+            if (!state.categoryVisibility) state.categoryVisibility = {};
+            state.categoryVisibility[catId] = state.categoryVisibility[catId] === false ? true : false;
+            triggerSave();
+            renderApp();
         }
 
         function openSidebarMenu(type, id) {
@@ -739,7 +896,7 @@
             const activeStyle = 'bg-[var(--theme-primary)] text-white shadow-md font-bold';
             const inactiveStyle = 'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold';
             const iconActiveStyle = 'text-white';
-            const iconInactiveStyle = 'bg-white shadow-sm text-slate-500';
+            const iconInactiveStyle = 'bg-white shadow-sm text-[var(--theme-primary)] border border-[var(--theme-border)] hover:brightness-95';
 
             let html = `
                 <div class="menu-item mt-2 mb-1 group relative">
@@ -751,19 +908,28 @@
             `;
 
             state.sections.forEach(sec => {
+                const isVisible = sec.isVisible !== false;
+                if (!isVisible && !state.isEditMode) return;
+                
+                const hiddenClass = !isVisible ? 'opacity-50 grayscale' : '';
                 const isSecCollapsed = !!state.collapsedMenus['sections'][sec.id];
                 const isActiveMain = state.currentView === 'section' && state.activeIds.sectionId === sec.id;
                 const secIcon = sec.isAcademic ? 'fa-graduation-cap' : 'fa-star';
+                const displayIcon = getIconClass(state.customIcons?.[sec.id] || secIcon, 'fa-solid');
                 
                 html += `
-                    <div class="menu-item mt-3 mb-1 group relative">
+                    <div class="menu-item mt-3 mb-1 group relative ${hiddenClass}">
                         <div class="flex items-center justify-between p-3 rounded-xl cursor-pointer transition ${isActiveMain ? activeStyle : inactiveStyle} center-on-collapse" onclick="handleIconClick(event, () => switchView('section', '${sec.id}'))">
                             <div class="flex items-center space-x-3 min-w-0 flex-1">
-                                <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${isActiveMain ? iconActiveStyle : iconInactiveStyle}"><i class="fa-solid ${secIcon} text-sm"></i></div>
+                                <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors relative ${isActiveMain ? iconActiveStyle : iconInactiveStyle} ${state.isEditMode ? 'cursor-pointer hover:ring-2 hover:ring-[var(--theme-border)]' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('section', '${sec.id}')"` : ''} title="${state.isEditMode ? 'Change Icon' : ''}">
+                                    <i class="${displayIcon} text-sm"></i>
+                                    ${state.isEditMode ? `<div class="absolute -top-1.5 -right-1.5 bg-white text-[var(--theme-primary)] rounded-full w-4 h-4 flex items-center justify-center text-[8px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
+                                </div>
                                 <textarea rows="1" data-field="section.title" data-ids="${sec.id}" class="w-full text-sm font-semibold bg-transparent editable-border p-0 resize-none overflow-hidden cursor-pointer truncate hide-on-collapse" onclick="event.stopPropagation()">${sec.title}</textarea>
                             </div>
                             <div class="flex items-center space-x-1 p-1 hide-on-collapse" onclick="handleIconClick(event, () => toggleMenuSection('sections', '${sec.id}'))">
                                 <i class="fa-solid fa-chevron-${isSecCollapsed ? 'down' : 'up'} text-[10px] ${isActiveMain ? 'text-white/80' : 'text-slate-400'} transition"></i>
+                                <button onclick="toggleSectionVisibility(event, '${sec.id}')" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1" title="Toggle Visibility"><i class="fa-solid ${isVisible ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i></button>
                                 <button onclick="removeSection(event, '${sec.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1" title="Delete Section"><i class="fa-solid fa-times text-[10px]"></i></button>
                             </div>
                         </div>
@@ -773,10 +939,14 @@
 
                 if (sec.isAcademic) {
                     state.classes.forEach((cls) => {
+                        const isVisibleCls = cls.isVisible !== false;
+                        if (!isVisibleCls && !state.isEditMode) return;
+                        
+                        const hiddenClassCls = !isVisibleCls ? 'opacity-50 grayscale' : '';
                         const isClsCollapsed = state.collapsedMenus['classes'][cls.id] !== false;
                         
                         html += `
-                            <div class="tree-item min-w-0 mb-1">
+                            <div class="tree-item min-w-0 mb-1 ${hiddenClassCls}">
                                 <div class="flex items-center justify-between py-1.5 pl-6 pr-2 cursor-pointer group hover:bg-slate-50 rounded-lg transition" onclick="handleIconClick(event, () => toggleMenuSection('classes', '${cls.id}'))">
                                     <div class="flex items-center space-x-2 w-full min-w-0">
                                         <div class="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
@@ -784,6 +954,7 @@
                                     </div>
                                     <div class="flex items-center space-x-1">
                                         <i class="fa-solid fa-chevron-${isClsCollapsed ? 'down' : 'up'} text-[8px] text-slate-400 transition"></i>
+                                        <button onclick="toggleClassVisibility(event, '${cls.id}')" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1" title="Toggle Visibility"><i class="fa-solid ${isVisibleCls ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i></button>
                                         <button onclick="removeClass(event, '${cls.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1" title="Delete Class"><i class="fa-solid fa-times text-[10px]"></i></button>
                                     </div>
                                 </div>
@@ -811,29 +982,39 @@
                 } 
                 else {
                     (sec.categories || []).forEach(cat => {
+                        const isVisibleCat = state.categoryVisibility && state.categoryVisibility[cat] !== false;
+                        if (!isVisibleCat && !state.isEditMode) return;
+                        
+                        const hiddenClassCat = !isVisibleCat ? 'opacity-50 grayscale' : '';
+                        
                         const icon = cat === 'photoFeed' ? 'fa-images' : (cat === 'achievements' ? 'fa-trophy' : (cat === 'hobbies' ? 'fa-palette' : 'fa-medal'));
                         const iconColor = cat === 'photoFeed' ? 'text-pink-500' : (cat === 'achievements' ? 'text-amber-500' : (cat === 'hobbies' ? 'text-purple-500' : 'text-emerald-500'));
-                        
+                        const displayIconCat = getIconClass(state.customIcons?.[cat] || icon, 'fa-solid');
                         const isCatCollapsed = state.collapsedMenus['categories'][cat] !== false;
                         
                         html += `
-                            <div class="tree-item min-w-0 mb-1">
+                            <div class="tree-item min-w-0 mb-1 ${hiddenClassCat}">
                                 <div class="flex items-center justify-between py-1.5 pl-6 pr-2 cursor-pointer group hover:bg-slate-50 rounded-lg transition" onclick="handleIconClick(event, () => toggleMenuSection('categories', '${cat}'))">
                                     <div class="flex items-center space-x-2 w-full min-w-0">
-                                        <i class="fa-solid ${icon} text-[10px] ${iconColor}"></i>
+                                        <i class="${displayIconCat} text-[10px] ${iconColor} ${state.isEditMode ? 'cursor-pointer hover:scale-125 transition' : ''}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('category', '${cat}')"` : ''}></i>
                                         <textarea rows="1" data-field="category.name" data-ids="${cat}" class="w-full text-xs font-bold text-slate-700 bg-transparent editable-border p-0.5 resize-none overflow-hidden" onclick="event.stopPropagation()">${state.categoryNames[cat] || cat}</textarea>
                                     </div>
                                     <div class="flex items-center space-x-1">
                                         <i class="fa-solid fa-chevron-${isCatCollapsed ? 'down' : 'up'} text-[8px] text-slate-400 transition"></i>
+                                        <button onclick="toggleCategoryVisibility(event, '${cat}')" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1" title="Toggle Visibility"><i class="fa-solid ${isVisibleCat ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i></button>
                                         <button onclick="removeCategory(event, '${sec.id}', '${cat}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-times text-[10px]"></i></button>
                                     </div>
                                 </div>
                                 <div class="space-y-0.5 mt-0.5 ${isCatCollapsed ? 'hidden' : 'block'} pl-8 border-l-2 border-slate-100 ml-7">
                         `;
                         state.classes.forEach(cls => {
+                            const isVisibleCls = cls.isVisible !== false;
+                            if (!isVisibleCls && !state.isEditMode) return;
+                            const hiddenClassClsInner = !isVisibleCls ? 'opacity-50 grayscale' : '';
+
                             const isActive = state.currentView === 'category' && state.activeIds.category === cat && state.activeIds.classId === cls.id;
                             html += `
-                                <div onclick="switchView('category', '${sec.id}', '${cls.id}', null, '${cat}')" class="flex items-center space-x-2 py-1.5 px-2 rounded-lg cursor-pointer transition ${isActive ? 'font-bold' : 'text-slate-500 hover:text-slate-800'} min-w-0" ${isActive ? 'style="background-color: var(--theme-light); color: var(--theme-primary);"' : ''}>
+                                <div onclick="switchView('category', '${sec.id}', '${cls.id}', null, '${cat}')" class="flex items-center space-x-2 py-1.5 px-2 rounded-lg cursor-pointer transition ${isActive ? 'font-bold' : 'text-slate-500 hover:text-slate-800'} min-w-0 ${hiddenClassClsInner}" ${isActive ? 'style="background-color: var(--theme-light); color: var(--theme-primary);"' : ''}>
                                     <i class="fa-regular fa-folder text-[9px] text-slate-300 flex-shrink-0"></i>
                                     <span class="text-xs truncate min-w-0">${cls.name}</span>
                                 </div>
@@ -848,9 +1029,10 @@
             
             html += `<button onclick="addSection()" class="edit-controls-flex w-full items-center justify-center space-x-2 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 py-3 mt-6 rounded-xl hide-on-collapse transition border border-indigo-100"><i class="fa-solid fa-plus"></i><span>New Main Section</span></button>`;
 
+            // Contact Menu Link
             if (state.contact.isVisible || state.isEditMode) {
                 const hiddenClass = !state.contact.isVisible ? 'opacity-60 grayscale' : '';
-                const hideIcon = !state.contact.isVisible ? '<i class="fa-solid fa-eye-slash text-[10px] text-rose-500 edit-controls-block ml-2 hide-on-collapse"></i>' : '';
+                const hideIcon = !state.contact.isVisible ? '<i class="fa-solid fa-eye-slash text-[10px] text-rose-500 edit-controls-block ml-2"></i>' : '';
                 const isContactActive = state.currentView === 'contact';
                 
                 html += `
@@ -969,8 +1151,9 @@
                                     </div>
                                     
                                     <div class="flex items-start space-x-4">
-                                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0 relative" style="color: var(--theme-primary);">
-                                            <i class="fa-solid ${detail.icon || 'fa-circle-dot'} text-xl"></i>
+                                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0 relative ${state.isEditMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}" style="color: var(--theme-primary);" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('contactDetail', ${idx})"` : ''}>
+                                            <i class="${getIconClass(detail.icon, 'fa-solid')} text-xl"></i>
+                                            ${state.isEditMode ? `<div class="absolute -top-1 -right-1 bg-white text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[9px] shadow-sm border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
                                         </div>
                                         <div class="flex-1 min-w-0 pr-16">
                                             <textarea rows="1" data-field="contactDetail.label" data-ids="${idx}" class="w-full text-xs font-bold text-slate-400 uppercase tracking-wider bg-transparent editable-border p-0 resize-none overflow-hidden">${detail.label}</textarea>
@@ -1002,7 +1185,10 @@
                                             <i class="fa-solid fa-trash text-[10px]"></i>
                                         </button>
                                     </div>
-                                    <i class="fa-brands ${social.icon || 'fa-globe'} text-3xl ${social.color || 'text-slate-700'} mb-3 mt-2"></i>
+                                    <div class="relative group ${state.isEditMode ? 'cursor-pointer' : ''}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('contactSocial', ${idx})"` : ''}>
+                                        <i class="${getIconClass(social.icon, 'fa-brands')} text-3xl ${social.color || 'text-slate-700'} mb-3 mt-2 group-hover:scale-110 transition-transform block"></i>
+                                        ${state.isEditMode ? `<div class="absolute top-0 -right-3 bg-white text-slate-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
+                                    </div>
                                     <textarea rows="1" data-field="contactSocial.label" data-ids="${idx}" class="w-full text-sm font-extrabold text-slate-800 text-center bg-transparent editable-border p-0 resize-none overflow-hidden">${social.label}</textarea>
                                     
                                     ${state.isEditMode ? `
@@ -1040,12 +1226,12 @@
         }
         
         function addContactDetail() {
-            state.contact.details.push({ id: 'detail_' + Date.now(), label: 'New Field', value: 'Value', isVisible: true, icon: 'fa-circle-dot' });
+            state.contact.details.push({ id: 'detail_' + Date.now(), label: 'New Field', value: 'Value', isVisible: true, icon: 'fa-solid fa-circle-dot' });
             triggerSave(); renderApp();
         }
 
         function addContactSocial() {
-            state.contact.socials.push({ id: 'social_' + Date.now(), label: 'New Link', link: '', isVisible: true, icon: 'fa-link', color: 'text-slate-600' });
+            state.contact.socials.push({ id: 'social_' + Date.now(), label: 'New Link', link: '', isVisible: true, icon: 'fa-solid fa-link', color: 'text-slate-600' });
             triggerSave(); renderApp();
         }
 
@@ -1055,12 +1241,20 @@
             let quickLinksCardsHtml = '';
             
             state.sections.forEach(sec => {
+                const isVisibleSec = sec.isVisible !== false;
+                if (!isVisibleSec && !state.isEditMode) return;
+                
+                const hiddenClassSec = !isVisibleSec ? 'opacity-50 grayscale' : '';
+                const secIcon = sec.isAcademic ? 'fa-graduation-cap' : 'fa-star';
+                const displayIcon = getIconClass(state.customIcons?.[sec.id] || secIcon, 'fa-solid');
+
                 if (sec.isAcademic) {
                     quickLinksCardsHtml += `
-                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden">
+                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden ${hiddenClassSec}">
                             <div onclick="toggleShortcut(event, '${sec.id}')" class="cursor-pointer p-4 md:p-5 flex flex-col items-center justify-center text-center aspect-square group relative hover:bg-slate-50 transition-colors">
-                                <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform shadow-inner flex-shrink-0">
-                                    <i class="fa-solid fa-graduation-cap text-2xl md:text-3xl" style="color: var(--theme-primary);"></i>
+                                <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform shadow-inner flex-shrink-0 relative ${state.isEditMode ? 'cursor-pointer ring-2 ring-transparent hover:ring-[var(--theme-border)]' : ''}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('section', '${sec.id}')"` : ''}>
+                                    <i class="${displayIcon} text-2xl md:text-3xl" style="color: var(--theme-primary);"></i>
+                                    ${state.isEditMode ? `<div class="absolute -top-1.5 -right-1.5 bg-white text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
                                 </div>
                                 <div class="flex items-center justify-center space-x-1.5 w-full px-1">
                                     <span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug break-words text-center">${sec.title}</span>
@@ -1069,8 +1263,8 @@
                             </div>
                             <div id="shortcut-content-${sec.id}" class="max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50/50 border-t border-transparent">
                                 <div class="p-3 flex flex-col space-y-2 pb-3">
-                                    ${state.classes.map(cls => `
-                                        <div class="bg-white/90 rounded-xl p-2 border border-slate-100 shadow-sm mb-1">
+                                    ${state.classes.filter(c => c.isVisible !== false || state.isEditMode).map(cls => `
+                                        <div class="bg-white/90 rounded-xl p-2 border border-slate-100 shadow-sm mb-1 ${cls.isVisible === false ? 'opacity-50 grayscale' : ''}">
                                             <div onclick="toggleShortcutClass(event, '${sec.id}_${cls.id}')" class="flex items-center justify-between cursor-pointer text-xs font-bold text-slate-700 hover:text-slate-900 transition">
                                                 <span class="truncate pr-1">${cls.name}</span>
                                                 <i id="shortcut-class-icon-${sec.id}_${cls.id}" class="fa-solid fa-chevron-down text-[9px] text-slate-400 transition-transform duration-300 flex-shrink-0"></i>
@@ -1091,15 +1285,22 @@
                     `;
                 } else {
                     (sec.categories || []).forEach(cat => {
+                        const isVisibleCat = state.categoryVisibility && state.categoryVisibility[cat] !== false;
+                        if (!isVisibleCat && !state.isEditMode) return;
+                        
+                        const hiddenClassCat = !isVisibleCat ? 'opacity-50 grayscale' : '';
+                        
                         let icon = cat === 'photoFeed' ? 'fa-images' : (cat === 'achievements' ? 'fa-trophy' : (cat === 'hobbies' ? 'fa-palette' : 'fa-medal'));
                         let color = cat === 'photoFeed' ? 'text-pink-500' : (cat === 'achievements' ? 'text-amber-500' : (cat === 'hobbies' ? 'text-purple-500' : 'text-emerald-500'));
                         let catName = state.categoryNames[cat] || cat;
+                        const displayIconCat = getIconClass(state.customIcons?.[cat] || icon, 'fa-solid');
 
                         quickLinksCardsHtml += `
-                            <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden">
+                            <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden ${hiddenClassSec} ${hiddenClassCat}">
                                 <div onclick="toggleShortcut(event, '${cat}')" class="cursor-pointer p-4 md:p-5 flex flex-col items-center justify-center text-center aspect-square group relative hover:bg-slate-50 transition-colors">
-                                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform shadow-inner flex-shrink-0">
-                                        <i class="fa-solid ${icon} ${color} text-2xl md:text-3xl"></i>
+                                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 shadow-inner relative transition-transform ${state.isEditMode ? 'cursor-pointer ring-2 ring-transparent hover:ring-[var(--theme-border)] group-hover:scale-105' : 'group-hover:scale-110'}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('category', '${cat}')"` : ''}>
+                                        <i class="${displayIconCat} ${color} text-2xl md:text-3xl"></i>
+                                        ${state.isEditMode ? `<div class="absolute -top-1.5 -right-1.5 bg-white text-slate-500 rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
                                     </div>
                                     <div class="flex items-center justify-center space-x-1.5 w-full px-1">
                                         <span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug break-words text-center">${catName}</span>
@@ -1109,8 +1310,8 @@
                                 <div id="shortcut-content-${cat}" class="max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50/50 border-t border-transparent">
                                     <div class="p-3 flex flex-col space-y-1 pb-3">
                                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-2 mb-1">Select Grade</span>
-                                        ${state.classes.map(cls => `
-                                            <button onclick="switchView('category', '${sec.id}', '${cls.id}', null, '${cat}')" class="text-left w-full px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition flex items-center mb-0.5">
+                                        ${state.classes.filter(c => c.isVisible !== false || state.isEditMode).map(cls => `
+                                            <button onclick="switchView('category', '${sec.id}', '${cls.id}', null, '${cat}')" class="text-left w-full px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition flex items-center mb-0.5 ${cls.isVisible === false ? 'opacity-50 grayscale' : ''}">
                                                 <i class="fa-regular fa-folder mr-2 text-slate-400 flex-shrink-0 text-[10px]"></i>
                                                 <span class="break-words leading-tight">${cls.name}</span>
                                             </button>
@@ -1174,9 +1375,10 @@
         function renderSectionLanding(sec) {
             let cardsHtml = '';
             if (sec.isAcademic) {
-                state.classes.forEach(cls => {
+                state.classes.filter(c => c.isVisible !== false || state.isEditMode).forEach(cls => {
+                    const hiddenClass = cls.isVisible === false ? 'opacity-50 grayscale' : '';
                     cardsHtml += `
-                        <div class="glass-card rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition-all duration-300 bg-white border border-slate-100 flex flex-col cursor-pointer group" onclick="toggleShortcut(event, 'landing_class_${cls.id}')">
+                        <div class="glass-card rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition-all duration-300 bg-white border border-slate-100 flex flex-col cursor-pointer group ${hiddenClass}" onclick="toggleShortcut(event, 'landing_class_${cls.id}')">
                             <div class="flex items-center justify-between">
                                 <h3 class="font-extrabold text-xl text-slate-800 group-hover:text-[var(--theme-primary)] transition-colors">${cls.name}</h3>
                                 <i id="shortcut-icon-landing_class_${cls.id}" class="fa-solid fa-chevron-down text-slate-300 transition-transform duration-300"></i>
@@ -1196,19 +1398,26 @@
                 });
             } else {
                 (sec.categories || []).forEach(cat => {
+                    const isVisibleCat = state.categoryVisibility && state.categoryVisibility[cat] !== false;
+                    if (!isVisibleCat && !state.isEditMode) return;
+                    
+                    const hiddenClassCat = !isVisibleCat ? 'opacity-50 grayscale' : '';
+                    
                     let catName = state.categoryNames[cat] || cat;
                     let icon = cat === 'photoFeed' ? 'fa-images' : (cat === 'achievements' ? 'fa-trophy' : (cat === 'hobbies' ? 'fa-palette' : 'fa-medal'));
                     let color = cat === 'photoFeed' ? 'text-pink-500' : (cat === 'achievements' ? 'text-amber-500' : (cat === 'hobbies' ? 'text-purple-500' : 'text-emerald-500'));
-                    
+                    const displayIconCat = getIconClass(state.customIcons?.[cat] || icon, 'fa-solid');
+
                     cardsHtml += `
-                        <div class="glass-card rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition-all duration-300 bg-white border border-slate-100 flex flex-col items-center text-center cursor-pointer group" onclick="toggleShortcut(event, 'landing_${cat}')">
-                            <div class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition-transform">
-                                <i class="fa-solid ${icon} ${color} text-3xl"></i>
+                        <div class="glass-card rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition-all duration-300 bg-white border border-slate-100 flex flex-col items-center text-center cursor-pointer group ${hiddenClassCat}" onclick="toggleShortcut(event, 'landing_${cat}')">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-4 shadow-inner relative transition-transform ${state.isEditMode ? 'cursor-pointer ring-2 ring-transparent hover:ring-[var(--theme-border)] group-hover:scale-105' : 'group-hover:scale-110'}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('category', '${cat}')"` : ''}>
+                                <i class="${displayIconCat} ${color} text-3xl"></i>
+                                ${state.isEditMode ? `<div class="absolute -top-1.5 -right-1.5 bg-white text-slate-500 rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
                             </div>
                             <h3 class="font-extrabold text-lg text-slate-800 mb-2">${catName}</h3>
                             <div id="shortcut-content-landing_${cat}" class="w-full space-y-2 mt-2 max-h-0 opacity-0 overflow-hidden transition-all duration-300">
-                                ${state.classes.map(cls => `
-                                    <button onclick="event.stopPropagation(); switchView('category', '${sec.id}', '${cls.id}', null, '${cat}')" class="w-full text-left p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-[var(--theme-primary)] transition flex items-center text-xs font-semibold shadow-sm">
+                                ${state.classes.filter(c => c.isVisible !== false || state.isEditMode).map(cls => `
+                                    <button onclick="event.stopPropagation(); switchView('category', '${sec.id}', '${cls.id}', null, '${cat}')" class="w-full text-left p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-[var(--theme-primary)] transition flex items-center text-xs font-semibold shadow-sm ${cls.isVisible === false ? 'opacity-50 grayscale' : ''}">
                                         <i class="fa-regular fa-folder text-slate-400 mr-2"></i>
                                         <span>${cls.name}</span>
                                     </button>
@@ -1220,10 +1429,17 @@
                 });
             }
 
+            const secIcon = sec.isAcademic ? 'fa-graduation-cap' : 'fa-star';
+            const displayIcon = getIconClass(state.customIcons?.[sec.id] || secIcon, 'fa-solid');
+
             return `
                 <div class="max-w-5xl mx-auto space-y-8 min-w-0 pb-10">
-                    <div class="glass-card p-8 md:p-10 rounded-[2.5rem] shadow-md flex items-center gap-4" style="background: var(--theme-gradient); color: white;">
+                    <div class="glass-card p-8 md:p-10 rounded-[2.5rem] shadow-md flex items-center justify-between gap-4" style="background: var(--theme-gradient); color: white;">
                         <textarea rows="1" data-field="section.title" data-ids="${sec.id}" class="w-full text-4xl md:text-5xl font-extrabold bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight text-white placeholder-white/50">${sec.title}</textarea>
+                        <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0 ml-4 relative ${state.isEditMode ? 'cursor-pointer hover:bg-white/30 transition' : ''}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('section', '${sec.id}')"` : ''}>
+                            <i class="${displayIcon} text-3xl"></i>
+                            ${state.isEditMode ? `<div class="absolute -top-1 -right-1 bg-white text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
+                        </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         ${cardsHtml}
@@ -1305,7 +1521,7 @@
                             ${items.map((item, idx) => `
                                 <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.06)] bg-white">
                                     <div class="p-5 flex items-center space-x-4 border-b border-slate-100">
-                                        <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=Amaira'}" class="w-10 h-10 rounded-full border border-slate-200 object-cover shadow-sm protected-media" oncontextmenu="return false;" ondragstart="return false;">
+                                        <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=Anaysha'}" class="w-10 h-10 rounded-full border border-slate-200 object-cover shadow-sm protected-media" oncontextmenu="return false;" ondragstart="return false;">
                                         <div class="flex flex-col">
                                             <span class="font-extrabold text-sm text-slate-900">${state.profile.name}</span>
                                             <span class="font-semibold text-[10px] text-slate-400 uppercase tracking-wide">Nath Valley School</span>
@@ -1785,12 +2001,11 @@
                 placeholder: "e.g., 'Certificates', 'Travel'",
                 onSubmit: (name) => {
                     const newId = 'sec_' + Date.now();
-                    state.sections.push({ id: newId, title: name, isAcademic: false, categories: [] });
+                    state.sections.push({ id: newId, title: name, isAcademic: false, categories: [], isVisible: true });
                     
-                    // Enforce the new standard visibility logic when adding
-                    state.collapsedMenus.sections[newId] = false; // Expand main
+                    state.collapsedMenus.sections[newId] = false;
                     if (state.sections.length > 0 && !state.sections[state.sections.length-1].isAcademic && state.sections[state.sections.length-1].categories) {
-                         state.sections[state.sections.length-1].categories.forEach(cat => state.collapsedMenus.categories[cat] = false); // Expand 1st level
+                         state.sections[state.sections.length-1].categories.forEach(cat => state.collapsedMenus.categories[cat] = false);
                     }
 
                     triggerSave(); renderApp();
@@ -1822,12 +2037,14 @@
                     state.categoryNames[newCatId] = name;
                     state[newCatId] = {};
                     state.classes.forEach(cls => state[newCatId][cls.id] = []);
+                    if (!state.categoryVisibility) state.categoryVisibility = {};
+                    state.categoryVisibility[newCatId] = true;
                     
                     const sec = state.sections.find(s => s.id === secId);
                     if(!sec.categories) sec.categories = [];
                     sec.categories.push(newCatId);
 
-                    state.collapsedMenus.categories[newCatId] = false; // Make 1st level expanded by default
+                    state.collapsedMenus.categories[newCatId] = false;
                     triggerSave(); renderApp();
                 }
             });
@@ -1854,7 +2071,7 @@
                 placeholder: "e.g., Grade 7 (2027-28)",
                 onSubmit: (name) => {
                     const newId = 'class_' + Date.now();
-                    state.classes.unshift({ id: newId, name: name, year: '', subjects: [] });
+                    state.classes.unshift({ id: newId, name: name, year: '', isVisible: true, subjects: [] });
                     
                     state.sections.forEach(s => {
                         if(!s.isAcademic && s.categories) {
@@ -1865,7 +2082,7 @@
                         }
                     });
                     
-                    state.collapsedMenus.classes[newId] = false; // Make 1st level expanded by default
+                    state.collapsedMenus.classes[newId] = false;
 
                     triggerSave(); renderApp();
                     showToast("New Grade Added Successfully!");
