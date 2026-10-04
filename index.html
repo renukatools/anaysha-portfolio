@@ -124,6 +124,12 @@
         
         /* Multi-link selector checkmark animation */
         .check-anim { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* CRITICAL BUG FIX: Ensure carousel containers never collapse to 0px height in stacked layouts */
+        .carousel-container { min-height: 300px !important; height: 100% !important; }
+        @media (min-width: 768px) {
+            .carousel-container { min-height: 400px !important; }
+        }
     </style>
 </head>
 
@@ -139,6 +145,7 @@
 
     <!-- Fullscreen Media Modal -->
     <div id="media-modal" class="fixed inset-0 z-[999999] hidden bg-slate-900/95 backdrop-blur-md flex items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeModal()">
+        <!-- MOBILE FIX: Modal close button pushed down by safe area inset to avoid notch -->
         <button onclick="closeModal()" class="absolute right-6 text-white/70 hover:text-white text-4xl z-50 transition transform hover:scale-110" style="top: max(env(safe-area-inset-top), 1.5rem);"><i class="fa-solid fa-xmark"></i></button>
         
         <div class="relative w-full h-full max-w-6xl max-h-screen p-4 md:p-12 flex items-center justify-center" id="modal-content" onclick="event.stopPropagation()">
@@ -219,12 +226,14 @@
 
     <aside id="app-sidebar" class="glass-card border-r border-slate-200/50 flex flex-col w-[20rem] flex-shrink-0 relative shadow-[4px_0_24px_rgba(37,99,235,0.05)] z-40 overflow-y-auto overflow-x-hidden">
         
+        <!-- Profile Section -->
         <div class="pb-4 flex flex-col items-center border-b border-slate-100/50 relative group flex-shrink-0" style="padding-top: calc(1.5rem + env(safe-area-inset-top)); padding-left: 1.5rem; padding-right: 1.5rem;">
             
             <button onclick="toggleSidebarCollapse()" id="sidebar-toggle-btn" class="hidden md:flex absolute right-4 bg-white border border-slate-200 text-slate-500 hover:text-slate-900 w-7 h-7 rounded-full items-center justify-center shadow-md z-10 transition-all" style="top: calc(1.5rem + env(safe-area-inset-top));">
                 <i class="fa-solid fa-chevron-left text-[10px]" id="collapse-icon"></i>
             </button>
 
+            <!-- Hide Profile Pic Button -->
             <button onclick="toggleProfilePicVisibility()" class="edit-controls-flex absolute left-4 bg-white border border-slate-200 text-slate-500 hover:text-[var(--theme-primary)] w-7 h-7 rounded-full items-center justify-center shadow-sm z-10 transition-all" style="top: calc(1.5rem + env(safe-area-inset-top));" title="Toggle Profile Picture Visibility">
                 <i id="profile-vis-icon" class="fa-solid fa-eye text-[10px]"></i>
             </button>
@@ -243,8 +252,10 @@
             </div>
         </div>
 
+        <!-- Navigation Menu -->
         <nav class="p-4 space-y-3 flex-1" id="sidebar-nav"></nav>
 
+        <!-- Footer -->
         <div class="p-4 border-t border-slate-100/50 bg-slate-50/50 flex flex-col space-y-3 mt-auto flex-shrink-0" style="padding-bottom: max(env(safe-area-inset-bottom), 1rem);">
             <div class="flex justify-between items-center hide-on-collapse">
                 <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest edit-controls-block">Color Theme</span>
@@ -253,6 +264,7 @@
                 </button>
             </div>
             
+            <!-- Phase 2: Expanded Premium Color Themes (Admin Mode Only) -->
             <div class="edit-controls-block hide-on-collapse pb-1 space-y-2">
                 <div class="flex items-center justify-between w-full">
                     <button onclick="setTheme('blue')" title="Ocean Blue" class="w-5 h-5 rounded-full bg-blue-600 hover:scale-110 transition shadow-sm" id="theme-btn-blue"></button>
@@ -270,6 +282,7 @@
                 </div>
             </div>
             
+            <!-- Mobile / Collapsed Admin Lock Button -->
             <div class="flex justify-center center-on-collapse w-full" id="admin-lock-btn-mobile" style="display: none;">
                 <button onclick="handleAdminLoginToggle()" class="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"><i class="fa-solid fa-lock text-sm" id="mobile-lock-icon"></i></button>
             </div>
@@ -2954,4 +2967,3 @@
     </script>
 </body>
 </html>
-```eof
