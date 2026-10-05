@@ -125,7 +125,7 @@
         /* Multi-link selector checkmark animation */
         .check-anim { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* CRITICAL BUG FIX: Ensure carousel containers never collapse to 0px height in stacked layouts */
+        /* MASTER LAYOUT FIX: Ensures carousel containers never collapse to 0px height in stacked layouts */
         .carousel-container { min-height: 300px !important; height: 100% !important; }
         @media (min-width: 768px) {
             .carousel-container { min-height: 400px !important; }
@@ -145,6 +145,7 @@
 
     <!-- Fullscreen Media Modal -->
     <div id="media-modal" class="fixed inset-0 z-[999999] hidden bg-slate-900/95 backdrop-blur-md flex items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeModal()">
+        <!-- MOBILE FIX: Modal close button pushed down by safe area inset to avoid notch -->
         <button onclick="closeModal()" class="absolute right-6 text-white/70 hover:text-white text-4xl z-50 transition transform hover:scale-110" style="top: max(env(safe-area-inset-top), 1.5rem);"><i class="fa-solid fa-xmark"></i></button>
         
         <div class="relative w-full h-full max-w-6xl max-h-screen p-4 md:p-12 flex items-center justify-center" id="modal-content" onclick="event.stopPropagation()">
@@ -203,7 +204,7 @@
         </div>
     </div>
 
-    <!-- Custom Action Modal -->
+    <!-- Custom Action Modal (Replaces native alerts/prompts/confirms) -->
     <div id="action-modal" class="fixed inset-0 z-[999999] hidden bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-[2rem] p-8 shadow-2xl max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="action-modal-panel">
             <h3 id="action-modal-title" class="text-xl font-extrabold text-slate-800 mb-2"></h3>
@@ -217,7 +218,7 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast Notification (With safe-area bottom padding) -->
     <div id="toast-notification" class="fixed right-6 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-sm font-medium border border-slate-700" style="bottom: max(env(safe-area-inset-bottom), 1.5rem);">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toast-msg">Action successful</span>
@@ -226,8 +227,10 @@
     <aside id="app-sidebar" class="glass-card border-r border-slate-200/50 flex flex-col w-[20rem] flex-shrink-0 relative shadow-[4px_0_24px_rgba(37,99,235,0.05)] z-40 overflow-y-auto overflow-x-hidden">
         
         <!-- Profile Section -->
+        <!-- MOBILE FIX: Padding-top calc adds safe-area-inset-top so the notch does not cover the avatar -->
         <div class="pb-4 flex flex-col items-center border-b border-slate-100/50 relative group flex-shrink-0" style="padding-top: calc(1.5rem + env(safe-area-inset-top)); padding-left: 1.5rem; padding-right: 1.5rem;">
             
+            <!-- UPDATE: Sidebar toggle button perfectly aligned with lock icon inside the padding -->
             <button onclick="toggleSidebarCollapse()" id="sidebar-toggle-btn" class="hidden md:flex absolute right-4 bg-white border border-slate-200 text-slate-500 hover:text-slate-900 w-7 h-7 rounded-full items-center justify-center shadow-md z-10 transition-all" style="top: calc(1.5rem + env(safe-area-inset-top));">
                 <i class="fa-solid fa-chevron-left text-[10px]" id="collapse-icon"></i>
             </button>
@@ -251,10 +254,11 @@
             </div>
         </div>
 
-        <!-- Navigation Menu -->
+        <!-- Navigation Menu (Dynamic Tree) -->
         <nav class="p-4 space-y-3 flex-1" id="sidebar-nav"></nav>
 
-        <!-- Footer -->
+        <!-- Footer with Minimal Lock Icon & Theme Picker -->
+        <!-- Safe-area bottom padding to ensure it's not hidden by iOS home indicator -->
         <div class="p-4 border-t border-slate-100/50 bg-slate-50/50 flex flex-col space-y-3 mt-auto flex-shrink-0" style="padding-bottom: max(env(safe-area-inset-bottom), 1rem);">
             <div class="flex justify-between items-center hide-on-collapse">
                 <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest edit-controls-block">Color Theme</span>
@@ -263,6 +267,7 @@
                 </button>
             </div>
             
+            <!-- Phase 2: Expanded Premium Color Themes (Admin Mode Only) -->
             <div class="edit-controls-block hide-on-collapse pb-1 space-y-2">
                 <div class="flex items-center justify-between w-full">
                     <button onclick="setTheme('blue')" title="Ocean Blue" class="w-5 h-5 rounded-full bg-blue-600 hover:scale-110 transition shadow-sm" id="theme-btn-blue"></button>
@@ -280,6 +285,7 @@
                 </div>
             </div>
             
+            <!-- Mobile / Collapsed Admin Lock Button -->
             <div class="flex justify-center center-on-collapse w-full" id="admin-lock-btn-mobile" style="display: none;">
                 <button onclick="handleAdminLoginToggle()" class="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"><i class="fa-solid fa-lock text-sm" id="mobile-lock-icon"></i></button>
             </div>
@@ -288,12 +294,15 @@
 
     <main class="flex-1 flex flex-col h-full overflow-hidden relative min-w-0">
         
+        <!-- Breadcrumb Header -->
+        <!-- MOBILE FIX: Padding-top properly shifts the header down for the notch/status bar -->
         <header class="glass-card border-b border-slate-200/50 px-4 md:px-6 flex items-center justify-between flex-shrink-0 z-10 relative w-full" style="padding-top: max(env(safe-area-inset-top), 12px); height: calc(4rem + max(env(safe-area-inset-top), 12px)); box-sizing: border-box;">
             <div class="flex items-center space-x-3 min-w-0 flex-1">
                 <button onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-10 h-10 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition flex-shrink-0">
                     <i class="fa-solid fa-bars text-lg"></i>
                 </button>
                 
+                <!-- Website Map Breadcrumbs -->
                 <div class="flex items-center space-x-2 text-xs md:text-sm font-semibold text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-hide flex-1 py-2" id="breadcrumb-container" style="-webkit-overflow-scrolling: touch;">
                     <!-- Injected by JS -->
                 </div>
@@ -306,6 +315,7 @@
             </div>
         </header>
 
+        <!-- Dynamic Viewport -->
         <div id="main-content-viewport" class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 lg:p-10 fade-in scroll-smooth" style="padding-bottom: max(env(safe-area-inset-bottom), 2rem);">
             <!-- Content Injected via JS -->
         </div>
@@ -325,6 +335,7 @@
             royal: { name: 'Royal Purple', primary: '#4f46e5', hover: '#4338ca', light: '#eef2ff', border: '#c7d2fe', gradient: 'linear-gradient(to right, #4f46e5, #9333ea)' }
         };
 
+        // Standard FontAwesome Icon Library for Picker
         const iconLibrary = [
             'fa-solid fa-star', 'fa-solid fa-graduation-cap', 'fa-solid fa-medal', 'fa-solid fa-trophy', 
             'fa-solid fa-palette', 'fa-solid fa-images', 'fa-solid fa-book-open', 'fa-solid fa-school', 
@@ -378,8 +389,7 @@
                 media: [] 
             },
             
-            // Replaces 'sections', 'classes', 'categoryNames', 'categoryVisibility'
-            mainFolders: [],
+            mainFolders: [], // Populated automatically by the Auto-Translator if empty
             
             contact: {
                 isVisible: true,
@@ -467,7 +477,35 @@
                                     // Transfer existing layout settings
                                     let oldLayoutKey = `sub_${cls.id}_${sub.id}`;
                                     if (dbData.layouts && dbData.layouts[oldLayoutKey]) {
-                                        dbData.layouts[`top_${mf.id}_${sfAcad.id}_top_${sub.id}`] = dbData.layouts[oldLayoutKey];                                     }                                                                          sfAcad.topics.push({                                         id: 'top_' + sub.id,                                         name: sub.name,                                         desc: sub.description \vert{}\vert{} '',                                         isVisible: sub.isVisible !== false,                                         icon: dbData.customIcons?.[sub.id] \vert{}\vert{} 'fa-book-open',                                         items: sub.projects \vert{}\vert{} []                                     });                                 });                                 if (sfAcad.topics.length > 0) mf.subFolders.push(sfAcad);                                                                  // Beyond Academics SubFolder                                 let sfBeyond = { id: 'sf_beyond_' + cls.id, name: 'Beyond Academics', isVisible: true, topics: [] };                                 if (dbData.sections) {                                     let beyondSec = dbData.sections.find(s => !s.isAcademic);                                     if (beyondSec && beyondSec.categories) {                                         beyondSec.categories.forEach(cat => {                                             let itemsArray = (dbData[cat] && dbData[cat][cls.id]) ? dbData[cat][cls.id] : [];                                             if (itemsArray.length > 0 \vert{}\vert{} state.isEditMode) {                                                 let defIcon = cat === 'photoFeed' ? 'fa-images' : (cat === 'achievements' ? 'fa-trophy' : (cat === 'hobbies' ? 'fa-palette' : 'fa-medal'));                                                 let newTopicId = 'top_' + cat;                                                                                                  // Transfer existing layout settings                                                 let oldLayoutKey = `cat_${cat}_${cls.id}`;                                                 if (dbData.layouts && dbData.layouts[oldLayoutKey]) {                                                     dbData.layouts[`top_${mf.id}_${sfBeyond.id}_${newTopicId}`] = dbData.layouts[oldLayoutKey];
+                                        dbData.layouts[`top_${mf.id}_${sfAcad.id}_top_${sub.id}`] = dbData.layouts[oldLayoutKey];
+                                    }
+                                    
+                                    sfAcad.topics.push({
+                                        id: 'top_' + sub.id,
+                                        name: sub.name,
+                                        desc: sub.description || '',
+                                        isVisible: sub.isVisible !== false,
+                                        icon: dbData.customIcons?.[sub.id] || 'fa-book-open',
+                                        items: sub.projects || []
+                                    });
+                                });
+                                if (sfAcad.topics.length > 0) mf.subFolders.push(sfAcad);
+                                
+                                // Beyond Academics SubFolder
+                                let sfBeyond = { id: 'sf_beyond_' + cls.id, name: 'Beyond Academics', isVisible: true, topics: [] };
+                                if (dbData.sections) {
+                                    let beyondSec = dbData.sections.find(s => !s.isAcademic);
+                                    if (beyondSec && beyondSec.categories) {
+                                        beyondSec.categories.forEach(cat => {
+                                            let itemsArray = (dbData[cat] && dbData[cat][cls.id]) ? dbData[cat][cls.id] : [];
+                                            if (itemsArray.length > 0 || state.isEditMode) {
+                                                let defIcon = cat === 'photoFeed' ? 'fa-images' : (cat === 'achievements' ? 'fa-trophy' : (cat === 'hobbies' ? 'fa-palette' : 'fa-medal'));
+                                                let newTopicId = 'top_' + cat;
+                                                
+                                                // Transfer existing layout settings
+                                                let oldLayoutKey = `cat_${cat}_${cls.id}`;
+                                                if (dbData.layouts && dbData.layouts[oldLayoutKey]) {
+                                                    dbData.layouts[`top_${mf.id}_${sfBeyond.id}_${newTopicId}`] = dbData.layouts[oldLayoutKey];
                                                 }
 
                                                 sfBeyond.topics.push({
@@ -504,8 +542,8 @@
                         delete dbData.categoryVisibility;
                         ['extracurriculars', 'hobbies', 'achievements', 'photoFeed'].forEach(c => delete dbData[c]);
 
-                        // Save the newly structured data immediately
-                        docRef.set(dbData, { merge: true });
+                        // Save the newly structured data immediately. Use catch to prevent public viewer console errors.
+                        docRef.set(dbData, { merge: true }).catch(e => console.log("Migration saved locally. Awaiting admin login to sync to cloud."));
                     }
                     // --- END TRANSLATOR ---
 
@@ -1528,6 +1566,7 @@
                                         </button>
                                     </div>
                                     <div class="relative group ${state.isEditMode ? 'cursor-pointer' : ''}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('contactSocial', ${idx})"` : ''}>
+                                        <!-- Protected Social Colors -->
                                         <i class="${getIconClass(social.icon, 'fa-brands')} text-3xl ${social.color || 'text-slate-700'} mb-3 mt-2 group-hover:scale-110 transition-transform block"></i>
                                         ${state.isEditMode ? `<div class="absolute top-0 -right-3 bg-white text-slate-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
                                     </div>
@@ -1901,11 +1940,11 @@
                                         <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
                                         <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
                                     ` : ''}
-                                    <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl" title="Add Video"><i class="fa-brands fa-youtube text-xs"></i></button>
-                                    <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl"><i class="fa-solid fa-trash text-xs"></i></button>
+                                    <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2" title="Add Video"><i class="fa-brands fa-youtube"></i></button>
+                                    <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
-                            <div class="relative bg-slate-50 min-h-[350px]">
+                            <div class="relative bg-slate-50 min-h-[350px] flex items-center justify-center">
                                 ${mediaHtml}
                                 <input type="file" id="item_media_${cKey}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'item', '${mf.id}', '${sf.id}', '${top.id}', ${idx})">
                             </div>
@@ -1945,8 +1984,8 @@
                                             <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
                                             <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
                                         ` : ''}
-                                        <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl"><i class="fa-brands fa-youtube text-xs"></i></button>
-                                        <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl"><i class="fa-solid fa-trash text-xs"></i></button>
+                                        <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-brands fa-youtube text-xs"></i></button>
+                                        <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
                                     </div>
                                 </div>
                                 <textarea rows="3" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-sm font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty" placeholder="Description...">${item.desc || ''}</textarea>
@@ -2038,8 +2077,8 @@
                                         <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
                                         <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
                                     ` : ''}
-                                    <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl transition"><i class="fa-brands fa-youtube"></i></button>
-                                    <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl transition"><i class="fa-solid fa-trash"></i></button>
+                                    <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl hover:bg-rose-100 transition"><i class="fa-brands fa-youtube"></i></button>
+                                    <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl hover:bg-rose-100 transition"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                             <textarea rows="5" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-lg font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty leading-relaxed" placeholder="Description...">${item.desc || ''}</textarea>
@@ -2200,8 +2239,8 @@
         let autoSlideInterval;
 
         function startAutoSlide() {
-            clearInterval(autoSlideInterval);
-            if(state.isEditMode) return; 
+            clearInterval(autoSlideInterval); // Clear any existing interval
+            if(state.isEditMode) return; // Don't auto-slide in edit mode
             
             autoSlideInterval = setInterval(() => {
                 document.querySelectorAll('.carousel-container').forEach(container => {
@@ -2238,6 +2277,7 @@
                                         const blurBg = container.querySelector('.bg-cover');
                                         if(blurBg) blurBg.style.backgroundImage = `url('${imgEl.src}')`;
                                         
+                                        // Update parent click handler to new index
                                         imgEl.parentElement.setAttribute('onclick', `openModal('${context}', ${idx})`);
                                     }, 150);
                                 } else {
@@ -2257,6 +2297,7 @@
             }, 5000);
         }
 
+        // Call it initially
         startAutoSlide();
 
         function modalChangeSlide(dir) {
@@ -2320,6 +2361,7 @@
             items[idx] = items[newIdx];
             items[newIdx] = temp;
             
+            // Fix: Reset carousel index so you don't load the wrong photo array position after moving
             state[`idx_item.${mfId}_${sfId}_${topId}_${idx}`] = 0;
             state[`idx_item.${mfId}_${sfId}_${topId}_${newIdx}`] = 0;
             
