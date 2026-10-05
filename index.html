@@ -204,7 +204,7 @@
         </div>
     </div>
 
-    <!-- Custom Action Modal -->
+    <!-- Custom Action Modal (Replaces native alerts/prompts/confirms) -->
     <div id="action-modal" class="fixed inset-0 z-[999999] hidden bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-[2rem] p-8 shadow-2xl max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="action-modal-panel">
             <h3 id="action-modal-title" class="text-xl font-extrabold text-slate-800 mb-2"></h3>
@@ -218,7 +218,7 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast Notification (With safe-area bottom padding) -->
     <div id="toast-notification" class="fixed right-6 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-sm font-medium border border-slate-700" style="bottom: max(env(safe-area-inset-bottom), 1.5rem);">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toast-msg">Action successful</span>
@@ -227,8 +227,10 @@
     <aside id="app-sidebar" class="glass-card border-r border-slate-200/50 flex flex-col w-[20rem] flex-shrink-0 relative shadow-[4px_0_24px_rgba(37,99,235,0.05)] z-40 overflow-y-auto overflow-x-hidden">
         
         <!-- Profile Section -->
+        <!-- MOBILE FIX: Padding-top calc adds safe-area-inset-top so the notch does not cover the avatar -->
         <div class="pb-4 flex flex-col items-center border-b border-slate-100/50 relative group flex-shrink-0" style="padding-top: calc(1.5rem + env(safe-area-inset-top)); padding-left: 1.5rem; padding-right: 1.5rem;">
             
+            <!-- UPDATE: Sidebar toggle button perfectly aligned with lock icon inside the padding -->
             <button onclick="toggleSidebarCollapse()" id="sidebar-toggle-btn" class="hidden md:flex absolute right-4 bg-white border border-slate-200 text-slate-500 hover:text-slate-900 w-7 h-7 rounded-full items-center justify-center shadow-md z-10 transition-all" style="top: calc(1.5rem + env(safe-area-inset-top));">
                 <i class="fa-solid fa-chevron-left text-[10px]" id="collapse-icon"></i>
             </button>
@@ -252,10 +254,11 @@
             </div>
         </div>
 
-        <!-- Navigation Menu -->
+        <!-- Navigation Menu (Dynamic Tree) -->
         <nav class="p-4 space-y-3 flex-1" id="sidebar-nav"></nav>
 
-        <!-- Footer -->
+        <!-- Footer with Minimal Lock Icon & Theme Picker -->
+        <!-- Safe-area bottom padding to ensure it's not hidden by iOS home indicator -->
         <div class="p-4 border-t border-slate-100/50 bg-slate-50/50 flex flex-col space-y-3 mt-auto flex-shrink-0" style="padding-bottom: max(env(safe-area-inset-bottom), 1rem);">
             <div class="flex justify-between items-center hide-on-collapse">
                 <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest edit-controls-block">Color Theme</span>
@@ -264,7 +267,7 @@
                 </button>
             </div>
             
-            <!-- Phase 2: Expanded Premium Color Themes (Admin Mode Only) -->
+            <!-- Color Theme Selector (Admin Mode Only) -->
             <div class="edit-controls-block hide-on-collapse pb-1 space-y-2">
                 <div class="flex items-center justify-between w-full">
                     <button onclick="setTheme('blue')" title="Ocean Blue" class="w-5 h-5 rounded-full bg-blue-600 hover:scale-110 transition shadow-sm" id="theme-btn-blue"></button>
@@ -291,12 +294,15 @@
 
     <main class="flex-1 flex flex-col h-full overflow-hidden relative min-w-0">
         
+        <!-- Breadcrumb Header -->
+        <!-- MOBILE FIX: Padding-top properly shifts the header down for the notch/status bar -->
         <header class="glass-card border-b border-slate-200/50 px-4 md:px-6 flex items-center justify-between flex-shrink-0 z-10 relative w-full" style="padding-top: max(env(safe-area-inset-top), 12px); height: calc(4rem + max(env(safe-area-inset-top), 12px)); box-sizing: border-box;">
             <div class="flex items-center space-x-3 min-w-0 flex-1">
                 <button onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-10 h-10 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition flex-shrink-0">
                     <i class="fa-solid fa-bars text-lg"></i>
                 </button>
                 
+                <!-- Website Map Breadcrumbs -->
                 <div class="flex items-center space-x-2 text-xs md:text-sm font-semibold text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-hide flex-1 py-2" id="breadcrumb-container" style="-webkit-overflow-scrolling: touch;">
                     <!-- Injected by JS -->
                 </div>
@@ -309,6 +315,7 @@
             </div>
         </header>
 
+        <!-- Dynamic Viewport -->
         <div id="main-content-viewport" class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 lg:p-10 fade-in scroll-smooth" style="padding-bottom: max(env(safe-area-inset-bottom), 2rem);">
             <!-- Content Injected via JS -->
         </div>
@@ -328,6 +335,7 @@
             royal: { name: 'Royal Purple', primary: '#4f46e5', hover: '#4338ca', light: '#eef2ff', border: '#c7d2fe', gradient: 'linear-gradient(to right, #4f46e5, #9333ea)' }
         };
 
+        // Standard FontAwesome Icon Library for Picker
         const iconLibrary = [
             'fa-solid fa-star', 'fa-solid fa-graduation-cap', 'fa-solid fa-medal', 'fa-solid fa-trophy', 
             'fa-solid fa-palette', 'fa-solid fa-images', 'fa-solid fa-book-open', 'fa-solid fa-school', 
@@ -921,6 +929,19 @@
             renderApp();
         }
 
+        function toggleSubjectVisibility(e, classId, subjectId) {
+            e.stopPropagation();
+            const cls = state.classes.find(c => c.id === classId);
+            if (cls) {
+                const sub = cls.subjects.find(s => s.id === subjectId);
+                if (sub) {
+                    sub.isVisible = sub.isVisible === false ? true : false;
+                    triggerSave();
+                    renderApp();
+                }
+            }
+        }
+
         function openSidebarMenu(type, id) {
             if (window.innerWidth < 768) {
                 const sidebar = document.getElementById('app-sidebar');
@@ -1178,14 +1199,21 @@
                                 <div class="space-y-0.5 mt-0.5 ${isClsCollapsed ? 'hidden' : 'block'} pl-8 border-l-2 border-slate-100 ml-7">
                         `;
                         cls.subjects.forEach(sub => {
+                            const isVisibleSub = sub.isVisible !== false;
+                            if (!isVisibleSub && !state.isEditMode) return;
+                            const hiddenClassSub = !isVisibleSub ? 'opacity-50 grayscale' : '';
                             const isActive = state.activeIds.subjectId === sub.id;
+                            
                             html += `
-                                <div onclick="switchView('subject', '${sec.id}', '${cls.id}', '${sub.id}')" class="flex items-center justify-between py-1.5 px-2 rounded-lg cursor-pointer transition ${isActive ? 'font-bold' : 'text-slate-500 hover:text-slate-800'} min-w-0" ${isActive ? 'style="background-color: var(--theme-light); color: var(--theme-primary);"' : ''}>
+                                <div onclick="switchView('subject', '${sec.id}', '${cls.id}', '${sub.id}')" class="flex items-center justify-between py-1.5 px-2 rounded-lg cursor-pointer transition ${isActive ? 'font-bold' : 'text-slate-500 hover:text-slate-800'} min-w-0 ${hiddenClassSub}" ${isActive ? 'style="background-color: var(--theme-light); color: var(--theme-primary);"' : ''}>
                                     <div class="flex items-center space-x-2 min-w-0">
                                         <i class="fa-solid fa-book-open text-[9px] text-slate-300 flex-shrink-0"></i>
                                         <span class="text-xs truncate min-w-0" data-sync="subject.name_${cls.id}_${sub.id}">${sub.name}</span>
                                     </div>
-                                    <button onclick="removeSubject(event, '${cls.id}', '${sub.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1" title="Delete Subject"><i class="fa-solid fa-times text-[9px]"></i></button>
+                                    <div class="flex items-center space-x-0.5">
+                                        <button onclick="toggleSubjectVisibility(event, '${cls.id}', '${sub.id}')" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1" title="Toggle Visibility"><i class="fa-solid ${isVisibleSub ? 'fa-eye' : 'fa-eye-slash'} text-[9px]"></i></button>
+                                        <button onclick="removeSubject(event, '${cls.id}', '${sub.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1" title="Delete Subject"><i class="fa-solid fa-times text-[9px]"></i></button>
+                                    </div>
                                 </div>
                             `;
                         });
@@ -1818,9 +1846,13 @@
                             <div class="p-8 md:p-10 flex flex-col justify-center min-w-0 w-full">
                                 <div class="flex items-start justify-between gap-4 min-w-0 mb-4">
                                     <textarea rows="2" data-field="project.title" data-ids="${cls.id},${sub.id},${idx}" class="w-full font-extrabold text-slate-800 text-2xl md:text-3xl bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0" placeholder="Title">${proj.title}</textarea>
-                                    <div class="flex items-center space-x-2">
-                                        <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl transition items-center justify-center flex-shrink-0" title="Add YouTube Video"><i class="fa-brands fa-youtube"></i></button>
-                                        <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl flex-shrink-0 transition"><i class="fa-solid fa-trash"></i></button>
+                                    <div class="flex items-center space-x-1.5 flex-wrap justify-end gap-y-2">
+                                        ${state.isEditMode ? `
+                                            <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                            <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === projects.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                        ` : ''}
+                                        <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl transition items-center justify-center flex-shrink-0 shadow-sm" title="Add YouTube Video"><i class="fa-brands fa-youtube"></i></button>
+                                        <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl flex-shrink-0 transition shadow-sm"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </div>
                                 <textarea rows="5" data-field="project.desc" data-ids="${cls.id},${sub.id},${idx}" class="w-full text-base font-medium text-slate-600 leading-relaxed bg-transparent editable-border py-1 mt-3 resize-none hide-if-empty min-w-0" placeholder="Description...">${proj.desc || ''}</textarea>
@@ -1844,7 +1876,11 @@
                             <div class="p-5 flex flex-col space-y-3 flex-1">
                                 <div class="flex items-start justify-between gap-2">
                                     <textarea rows="2" data-field="project.title" data-ids="${cls.id},${sub.id},${idx}" class="w-full font-extrabold text-slate-800 text-lg bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight" placeholder="Title">${proj.title}</textarea>
-                                    <div class="flex items-center space-x-1">
+                                    <div class="flex items-center space-x-1 flex-shrink-0">
+                                        ${state.isEditMode ? `
+                                            <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                            <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === projects.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                        ` : ''}
                                         <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl" title="Add Video"><i class="fa-brands fa-youtube text-xs"></i></button>
                                         <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl"><i class="fa-solid fa-trash text-xs"></i></button>
                                     </div>
@@ -1868,9 +1904,13 @@
                                     <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=User'}" class="w-9 h-9 rounded-full object-cover shadow-sm protected-media">
                                     <span class="font-extrabold text-sm text-slate-900">${state.profile.name}</span>
                                 </div>
-                                <div class="flex items-center space-x-2">
-                                    <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2" title="Add Video"><i class="fa-brands fa-youtube"></i></button>
-                                    <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-solid fa-trash"></i></button>
+                                <div class="flex items-center space-x-1.5">
+                                    ${state.isEditMode ? `
+                                        <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                        <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === projects.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                    ` : ''}
+                                    <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl" title="Add Video"><i class="fa-brands fa-youtube text-xs"></i></button>
+                                    <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl"><i class="fa-solid fa-trash text-xs"></i></button>
                                 </div>
                             </div>
                             <div class="relative bg-slate-50 min-h-[350px]">
@@ -1908,9 +1948,13 @@
                             <div class="p-6 flex flex-col space-y-3 flex-1">
                                 <div class="flex items-start justify-between">
                                     <textarea rows="1" data-field="project.title" data-ids="${cls.id},${sub.id},${idx}" class="w-full font-extrabold text-slate-900 text-xl bg-transparent editable-border resize-none" placeholder="Title">${proj.title}</textarea>
-                                    <div class="flex items-center space-x-1">
-                                        <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-brands fa-youtube text-xs"></i></button>
-                                        <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
+                                    <div class="flex items-center space-x-1 flex-shrink-0">
+                                        ${state.isEditMode ? `
+                                            <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                            <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === projects.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                        ` : ''}
+                                        <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl"><i class="fa-brands fa-youtube text-xs"></i></button>
+                                        <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl"><i class="fa-solid fa-trash text-xs"></i></button>
                                     </div>
                                 </div>
                                 <textarea rows="3" data-field="project.desc" data-ids="${cls.id},${sub.id},${idx}" class="w-full text-sm font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty" placeholder="Description...">${proj.desc || ''}</textarea>
@@ -1936,9 +1980,13 @@
                                 <div class="p-8 flex flex-col justify-center flex-1 space-y-3">
                                     <div class="flex justify-between items-start">
                                         <textarea rows="1" data-field="project.title" data-ids="${cls.id},${sub.id},${idx}" class="w-full font-extrabold text-slate-900 text-2xl bg-transparent editable-border resize-none" placeholder="Title">${proj.title}</textarea>
-                                        <div class="flex items-center space-x-1">
-                                            <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-brands fa-youtube"></i></button>
-                                            <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-solid fa-trash"></i></button>
+                                        <div class="flex items-center space-x-1.5 flex-wrap justify-end gap-y-2">
+                                            ${state.isEditMode ? `
+                                                <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                                <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === projects.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                            ` : ''}
+                                            <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl transition"><i class="fa-brands fa-youtube"></i></button>
+                                            <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl transition"><i class="fa-solid fa-trash"></i></button>
                                         </div>
                                     </div>
                                     <textarea rows="4" data-field="project.desc" data-ids="${cls.id},${sub.id},${idx}" class="w-full text-sm font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty leading-relaxed" placeholder="Description...">${proj.desc || ''}</textarea>
@@ -1968,7 +2016,11 @@
                             <div class="relative z-10 space-y-4 max-w-4xl w-full pointer-events-none">
                                 <div class="flex justify-between items-start pointer-events-auto">
                                     <textarea rows="1" data-field="project.title" data-ids="${cls.id},${sub.id},${idx}" class="w-full font-extrabold text-white text-4xl md:text-5xl bg-transparent editable-border resize-none" placeholder="Title">${proj.title}</textarea>
-                                    <div class="flex items-center space-x-2">
+                                    <div class="flex items-center space-x-2 flex-shrink-0">
+                                        ${state.isEditMode ? `
+                                            <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, -1)" class="bg-white/20 text-white hover:bg-white/40 p-3 rounded-xl transition" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                            <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, 1)" class="bg-white/20 text-white hover:bg-white/40 p-3 rounded-xl transition" ${idx === projects.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                        ` : ''}
                                         <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex bg-white/20 text-white hover:bg-rose-500 p-3 rounded-xl transition"><i class="fa-brands fa-youtube text-sm"></i></button>
                                         <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex bg-white/20 text-white hover:bg-rose-500 p-3 rounded-xl transition"><i class="fa-solid fa-trash text-sm"></i></button>
                                     </div>
@@ -1989,9 +2041,13 @@
                         <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-sm bg-white border border-slate-100 p-8 md:p-12 space-y-6">
                             <div class="flex justify-between items-start border-b border-slate-100 pb-6">
                                 <textarea rows="1" data-field="project.title" data-ids="${cls.id},${sub.id},${idx}" class="w-full font-extrabold text-slate-900 text-3xl bg-transparent editable-border resize-none" placeholder="Title">${proj.title}</textarea>
-                                <div class="flex items-center space-x-1">
-                                    <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl"><i class="fa-brands fa-youtube"></i></button>
-                                    <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl"><i class="fa-solid fa-trash"></i></button>
+                                <div class="flex items-center space-x-1.5 flex-shrink-0 flex-wrap justify-end">
+                                    ${state.isEditMode ? `
+                                        <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                        <button onclick="moveProject('${cls.id}', '${sub.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === projects.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                    ` : ''}
+                                    <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl"><i class="fa-brands fa-youtube"></i></button>
+                                    <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                             <textarea rows="5" data-field="project.desc" data-ids="${cls.id},${sub.id},${idx}" class="w-full text-lg font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty leading-relaxed" placeholder="Description...">${proj.desc || ''}</textarea>
@@ -2022,7 +2078,7 @@
                             </div>
                         </div>
 
-                        <div class="relative hide-if-no-media bg-slate-900 w-full min-h-[400px] rounded-[1.5rem] overflow-hidden shadow-inner">
+                        <div class="relative hide-if-no-media bg-slate-900 w-full min-h-[400px] rounded-[1.5rem] overflow-hidden shadow-inner flex items-center justify-center">
                             ${mediaHtml}
                             <input type="file" id="proj_media_${cKey}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'project', '${cls.id}', '${sub.id}', ${pIdx})">
                         </div>
@@ -2030,9 +2086,13 @@
                         <div class="space-y-4 pt-4">
                             <div class="flex justify-between items-start">
                                 <textarea rows="1" data-field="project.title" data-ids="${cls.id},${sub.id},${pIdx}" class="w-full font-extrabold text-slate-900 text-2xl md:text-3xl bg-transparent editable-border resize-none" placeholder="Title">${proj.title}</textarea>
-                                <div class="flex items-center space-x-1">
-                                    <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${pIdx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl"><i class="fa-brands fa-youtube"></i></button>
-                                    <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${pIdx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl"><i class="fa-solid fa-trash"></i></button>
+                                <div class="flex items-center space-x-1.5 flex-shrink-0 flex-wrap justify-end">
+                                    ${state.isEditMode ? `
+                                        <button onclick="moveProject('${cls.id}', '${sub.id}', ${pIdx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${pIdx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                        <button onclick="moveProject('${cls.id}', '${sub.id}', ${pIdx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${pIdx === projects.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                    ` : ''}
+                                    <button onclick="addProjectVideo('${cls.id}', '${sub.id}', ${pIdx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl transition"><i class="fa-brands fa-youtube"></i></button>
+                                    <button onclick="removeProjectCard('${cls.id}', '${sub.id}', ${pIdx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl transition"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                             <textarea rows="4" data-field="project.desc" data-ids="${cls.id},${sub.id},${pIdx}" class="w-full text-base font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty" placeholder="Description...">${proj.desc || ''}</textarea>
@@ -2153,9 +2213,13 @@
                             <div class="p-8 md:p-10 flex flex-col justify-center min-w-0 w-full">
                                 <div class="flex items-start justify-between gap-4 min-w-0 mb-4">
                                     <textarea rows="2" data-field="generic.title" data-ids="${category},${classId},${idx}" class="w-full font-extrabold text-slate-800 text-2xl md:text-3xl bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0" placeholder="Title">${item.title}</textarea>
-                                    <div class="flex items-center space-x-2">
-                                        <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl transition items-center justify-center flex-shrink-0" title="Add YouTube Video"><i class="fa-brands fa-youtube"></i></button>
-                                        <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl flex-shrink-0 transition"><i class="fa-solid fa-trash"></i></button>
+                                    <div class="flex items-center space-x-1.5 flex-wrap justify-end gap-y-2">
+                                        ${state.isEditMode ? `
+                                            <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                            <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                        ` : ''}
+                                        <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl transition items-center justify-center flex-shrink-0 shadow-sm" title="Add YouTube Video"><i class="fa-brands fa-youtube"></i></button>
+                                        <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl flex-shrink-0 transition shadow-sm"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </div>
                                 <textarea rows="5" data-field="generic.desc" data-ids="${category},${classId},${idx}" class="w-full text-base font-medium text-slate-600 leading-relaxed bg-transparent editable-border py-1 mt-3 resize-none hide-if-empty min-w-0" placeholder="Description...">${item.desc || ''}</textarea>
@@ -2179,7 +2243,11 @@
                             <div class="p-5 flex flex-col space-y-3 flex-1">
                                 <div class="flex items-start justify-between gap-2">
                                     <textarea rows="2" data-field="generic.title" data-ids="${category},${classId},${idx}" class="w-full font-extrabold text-slate-800 text-lg bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight" placeholder="Title">${item.title}</textarea>
-                                    <div class="flex items-center space-x-1">
+                                    <div class="flex items-center space-x-1 flex-shrink-0">
+                                        ${state.isEditMode ? `
+                                            <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                            <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                        ` : ''}
                                         <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl" title="Add Video"><i class="fa-brands fa-youtube text-xs"></i></button>
                                         <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl"><i class="fa-solid fa-trash text-xs"></i></button>
                                     </div>
@@ -2203,12 +2271,16 @@
                                     <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=User'}" class="w-9 h-9 rounded-full object-cover shadow-sm protected-media">
                                     <span class="font-extrabold text-sm text-slate-900">${state.profile.name}</span>
                                 </div>
-                                <div class="flex items-center space-x-2">
+                                <div class="flex items-center space-x-1.5">
+                                    ${state.isEditMode ? `
+                                        <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                        <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                    ` : ''}
                                     <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 p-2" title="Add Video"><i class="fa-brands fa-youtube"></i></button>
                                     <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
-                            <div class="relative bg-slate-50 min-h-[350px]">
+                            <div class="relative bg-slate-50 min-h-[350px] flex items-center justify-center">
                                 ${mediaHtml}
                                 <input type="file" id="gen_media_${cKey.replace(/\|/g, '_')}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'generic', '${category}', '${classId}', ${idx})">
                             </div>
@@ -2243,7 +2315,11 @@
                             <div class="p-6 flex flex-col space-y-3 flex-1">
                                 <div class="flex items-start justify-between">
                                     <textarea rows="1" data-field="generic.title" data-ids="${category},${classId},${idx}" class="w-full font-extrabold text-slate-900 text-xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
-                                    <div class="flex items-center space-x-1">
+                                    <div class="flex items-center space-x-1 flex-shrink-0">
+                                        ${state.isEditMode ? `
+                                            <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                            <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2 rounded-xl transition" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                        ` : ''}
                                         <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-brands fa-youtube text-xs"></i></button>
                                         <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
                                     </div>
@@ -2271,9 +2347,13 @@
                                 <div class="p-8 flex flex-col justify-center flex-1 space-y-3">
                                     <div class="flex justify-between items-start">
                                         <textarea rows="1" data-field="generic.title" data-ids="${category},${classId},${idx}" class="w-full font-extrabold text-slate-900 text-2xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
-                                        <div class="flex items-center space-x-1">
-                                            <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-brands fa-youtube"></i></button>
-                                            <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-solid fa-trash"></i></button>
+                                        <div class="flex items-center space-x-1.5 flex-wrap justify-end gap-y-2">
+                                            ${state.isEditMode ? `
+                                                <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                                <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                            ` : ''}
+                                            <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 p-2.5 rounded-xl transition bg-rose-50 hover:bg-rose-100"><i class="fa-brands fa-youtube"></i></button>
+                                            <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 p-2.5 rounded-xl transition bg-rose-50 hover:bg-rose-100"><i class="fa-solid fa-trash"></i></button>
                                         </div>
                                     </div>
                                     <textarea rows="4" data-field="generic.desc" data-ids="${category},${classId},${idx}" class="w-full text-sm font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty leading-relaxed" placeholder="Description...">${item.desc || ''}</textarea>
@@ -2303,7 +2383,11 @@
                             <div class="relative z-10 space-y-4 max-w-4xl w-full pointer-events-none">
                                 <div class="flex justify-between items-start pointer-events-auto">
                                     <textarea rows="1" data-field="generic.title" data-ids="${category},${classId},${idx}" class="w-full font-extrabold text-white text-4xl md:text-5xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
-                                    <div class="flex items-center space-x-2">
+                                    <div class="flex items-center space-x-2 flex-shrink-0">
+                                        ${state.isEditMode ? `
+                                            <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, -1)" class="bg-white/20 text-white hover:bg-white/40 p-3 rounded-xl transition" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                            <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, 1)" class="bg-white/20 text-white hover:bg-white/40 p-3 rounded-xl transition" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                        ` : ''}
                                         <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex bg-white/20 text-white hover:bg-rose-500 p-3 rounded-xl transition"><i class="fa-brands fa-youtube text-sm"></i></button>
                                         <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex bg-white/20 text-white hover:bg-rose-500 p-3 rounded-xl transition"><i class="fa-solid fa-trash text-sm"></i></button>
                                     </div>
@@ -2324,9 +2408,13 @@
                         <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-sm bg-white border border-slate-100 p-8 md:p-12 space-y-6">
                             <div class="flex justify-between items-start border-b border-slate-100 pb-6">
                                 <textarea rows="1" data-field="generic.title" data-ids="${category},${classId},${idx}" class="w-full font-extrabold text-slate-900 text-3xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
-                                <div class="flex items-center space-x-1">
-                                    <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl"><i class="fa-brands fa-youtube"></i></button>
-                                    <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl"><i class="fa-solid fa-trash"></i></button>
+                                <div class="flex items-center space-x-1.5 flex-shrink-0 flex-wrap justify-end">
+                                    ${state.isEditMode ? `
+                                        <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                        <button onclick="moveGenericItem('${category}', '${classId}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                    ` : ''}
+                                    <button onclick="addGenericVideo('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl hover:bg-rose-100 transition"><i class="fa-brands fa-youtube"></i></button>
+                                    <button onclick="removeGenericItem('${category}', '${classId}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl hover:bg-rose-100 transition"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                             <textarea rows="5" data-field="generic.desc" data-ids="${category},${classId},${idx}" class="w-full text-lg font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty leading-relaxed" placeholder="Description...">${item.desc || ''}</textarea>
@@ -2357,7 +2445,7 @@
                             </div>
                         </div>
 
-                        <div class="relative hide-if-no-media bg-slate-900 w-full min-h-[400px] rounded-[1.5rem] overflow-hidden shadow-inner">
+                        <div class="relative hide-if-no-media bg-slate-900 w-full min-h-[400px] rounded-[1.5rem] overflow-hidden shadow-inner flex items-center justify-center">
                             ${mediaHtml}
                             <input type="file" id="gen_media_${cKey.replace(/\|/g, '_')}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'generic', '${category}', '${classId}', ${pIdx})">
                         </div>
@@ -2365,9 +2453,13 @@
                         <div class="space-y-4 pt-4">
                             <div class="flex justify-between items-start">
                                 <textarea rows="1" data-field="generic.title" data-ids="${category},${classId},${pIdx}" class="w-full font-extrabold text-slate-900 text-2xl md:text-3xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
-                                <div class="flex items-center space-x-1">
-                                    <button onclick="addGenericVideo('${category}', '${classId}', ${pIdx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl"><i class="fa-brands fa-youtube"></i></button>
-                                    <button onclick="removeGenericItem('${category}', '${classId}', ${pIdx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl"><i class="fa-solid fa-trash"></i></button>
+                                <div class="flex items-center space-x-1.5 flex-wrap justify-end gap-y-2">
+                                    ${state.isEditMode ? `
+                                        <button onclick="moveGenericItem('${category}', '${classId}', ${pIdx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${pIdx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                        <button onclick="moveGenericItem('${category}', '${classId}', ${pIdx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-blue-50 p-2.5 rounded-xl transition shadow-sm" ${pIdx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                    ` : ''}
+                                    <button onclick="addGenericVideo('${category}', '${classId}', ${pIdx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl hover:bg-rose-100 transition"><i class="fa-brands fa-youtube"></i></button>
+                                    <button onclick="removeGenericItem('${category}', '${classId}', ${pIdx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl hover:bg-rose-100 transition"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                             <textarea rows="4" data-field="generic.desc" data-ids="${category},${classId},${pIdx}" class="w-full text-base font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty" placeholder="Description...">${item.desc || ''}</textarea>
@@ -2479,6 +2571,65 @@
             }
         }
 
+        // Global interval variable
+        let autoSlideInterval;
+
+        function startAutoSlide() {
+            clearInterval(autoSlideInterval); // Clear any existing interval
+            if(state.isEditMode) return; // Don't auto-slide in edit mode
+            
+            autoSlideInterval = setInterval(() => {
+                document.querySelectorAll('.carousel-container').forEach(container => {
+                    try {
+                        const imagesStr = container.getAttribute('data-images');
+                        if(!imagesStr) return;
+                        
+                        const images = JSON.parse(imagesStr.replace(/&quot;/g, '"'));
+                        if (images.length > 1) {
+                            let idx = parseInt(container.getAttribute('data-index'));
+                            idx = (idx + 1) % images.length;
+                            
+                            container.setAttribute('data-index', idx);
+                            const currentItem = images[idx];
+                            const inputId = container.getAttribute('data-input') || 'temp_input';
+                            const context = container.getAttribute('data-context');
+                            
+                            if (typeof currentItem === 'object' && currentItem.type === 'video') {
+                                container.outerHTML = renderCarousel(images, context, inputId);
+                            } else {
+                                const imgEl = container.querySelector('.carousel-img');
+                                if(imgEl) {
+                                    imgEl.style.opacity = '0.7';
+                                    setTimeout(() => {
+                                        imgEl.src = typeof currentItem === 'string' ? currentItem : currentItem.url;
+                                        imgEl.style.opacity = '1';
+                                        
+                                        const blurBg = container.querySelector('.bg-cover');
+                                        if(blurBg) blurBg.style.backgroundImage = `url('${imgEl.src}')`;
+                                        
+                                        // Update parent click handler to new index
+                                        imgEl.parentElement.setAttribute('onclick', `openModal('${context}', ${idx})`);
+                                    }, 150);
+                                } else {
+                                    container.outerHTML = renderCarousel(images, context, inputId);
+                                }
+                            }
+                            
+                            const dots = container.querySelectorAll('.carousel-dot');
+                            dots.forEach((dot, i) => {
+                                dot.className = `carousel-dot w-2 h-2 rounded-full transition-all duration-300 ${i === idx ? 'bg-white scale-125' : 'bg-white/40'}`;
+                            });
+                            
+                            state[`idx_${context}`] = idx;
+                        }
+                    } catch(e) {}
+                });
+            }, 5000);
+        }
+
+        // Call it initially
+        startAutoSlide();
+
         function modalChangeSlide(dir) {
             const container = document.querySelector(`[data-context="${state.modalContext}"]`);
             if(!container) return;
@@ -2488,56 +2639,9 @@
             renderModal();
         }
 
-        setInterval(() => {
-            if(state.isEditMode) return;
-            document.querySelectorAll('.carousel-container').forEach(container => {
-                try {
-                    const imagesStr = container.getAttribute('data-images');
-                    if(!imagesStr) return;
-                    
-                    const images = JSON.parse(imagesStr.replace(/&quot;/g, '"'));
-                    if (images.length > 1) {
-                        let idx = parseInt(container.getAttribute('data-index'));
-                        idx = (idx + 1) % images.length;
-                        
-                        container.setAttribute('data-index', idx);
-                        const currentItem = images[idx];
-                        const inputId = container.getAttribute('data-input') || 'temp_input';
-                        const context = container.getAttribute('data-context');
-                        
-                        if (typeof currentItem === 'object' && currentItem.type === 'video') {
-                            container.outerHTML = renderCarousel(images, context, inputId);
-                        } else {
-                            const imgEl = container.querySelector('.carousel-img');
-                            if(imgEl) {
-                                imgEl.style.opacity = '0.7';
-                                setTimeout(() => {
-                                    imgEl.src = typeof currentItem === 'string' ? currentItem : currentItem.url;
-                                    imgEl.style.opacity = '1';
-                                    
-                                    const blurBg = container.querySelector('.bg-cover');
-                                    if(blurBg) blurBg.style.backgroundImage = `url('${imgEl.src}')`;
-                                    
-                                    // Update parent click handler to new index
-                                    imgEl.parentElement.setAttribute('onclick', `openModal('${context}', ${idx})`);
-                                }, 150);
-                            } else {
-                                container.outerHTML = renderCarousel(images, context, inputId);
-                            }
-                        }
-                        
-                        const dots = container.querySelectorAll('.carousel-dot');
-                        dots.forEach((dot, i) => {
-                            dot.className = `carousel-dot w-2 h-2 rounded-full transition-all duration-300 ${i === idx ? 'bg-white scale-125' : 'bg-white/40'}`;
-                        });
-                        
-                        state[`idx_${context}`] = idx;
-                    }
-                } catch(e) {}
-            });
-        }, 5000);
-
         function manualChangeSlide(context, dir) {
+            startAutoSlide(); // Explicitly restart the timer on manual click
+            
             const el = document.querySelector(`[data-context="${context}"]`);
             if(!el) return;
             const images = JSON.parse(el.getAttribute('data-images').replace(/&quot;/g, '"'));
@@ -2582,6 +2686,42 @@
             }
             triggerSave();
             renderApp();
+        }
+
+        function moveProject(classId, subjectId, idx, dir) {
+            const cls = state.classes.find(c => c.id === classId);
+            const sub = cls.subjects.find(s => s.id === subjectId);
+            const projs = sub.projects;
+            
+            const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= projs.length) return;
+            
+            const temp = projs[idx];
+            projs[idx] = projs[newIdx];
+            projs[newIdx] = temp;
+            
+            // Fix: Reset carousel index so you don't load the wrong photo array position after moving
+            state[`idx_project.${classId}|${subjectId}|${idx}`] = 0;
+            state[`idx_project.${classId}|${subjectId}|${newIdx}`] = 0;
+            
+            triggerSave(); renderApp();
+        }
+
+        function moveGenericItem(category, classId, idx, dir) {
+            const items = state[category][classId];
+            
+            const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= items.length) return;
+            
+            const temp = items[idx];
+            items[idx] = items[newIdx];
+            items[newIdx] = temp;
+            
+            // Fix: Reset carousel index
+            state[`idx_generic.${category}|${classId}|${idx}`] = 0;
+            state[`idx_generic.${category}|${classId}|${newIdx}`] = 0;
+            
+            triggerSave(); renderApp();
         }
 
         function toggleShortcut(e, key) {
@@ -2685,6 +2825,7 @@
                         if(!items[arg3].media) items[arg3].media = [];
                         items[arg3].media.push(res);
                     }
+                    startAutoSlide(); // Restart timer on upload
                     triggerSave();
                     renderApp();
                 });
@@ -2716,6 +2857,7 @@
                     
                     if(!state.about.media) state.about.media = [];
                     state.about.media.push({ type: 'video', url: embedUrl });
+                    startAutoSlide();
                     triggerSave(); 
                     renderApp();
                 }
@@ -2737,6 +2879,7 @@
                     if(!sub.projects[pIdx].media) sub.projects[pIdx].media = [];
                     
                     sub.projects[pIdx].media.push({ type: 'video', url: embedUrl });
+                    startAutoSlide();
                     triggerSave();
                     renderApp();
                 }
@@ -2758,6 +2901,7 @@
                     if(!items[pIdx].media) items[pIdx].media = [];
                     
                     items[pIdx].media.push({ type: 'video', url: embedUrl });
+                    startAutoSlide();
                     triggerSave();
                     renderApp();
                 }
@@ -2967,3 +3111,4 @@
     </script>
 </body>
 </html>
+```eof
