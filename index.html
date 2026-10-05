@@ -227,10 +227,8 @@
     <aside id="app-sidebar" class="glass-card border-r border-slate-200/50 flex flex-col w-[20rem] flex-shrink-0 relative shadow-[4px_0_24px_rgba(37,99,235,0.05)] z-40 overflow-y-auto overflow-x-hidden">
         
         <!-- Profile Section -->
-        <!-- MOBILE FIX: Padding-top calc adds safe-area-inset-top so the notch does not cover the avatar -->
         <div class="pb-4 flex flex-col items-center border-b border-slate-100/50 relative group flex-shrink-0" style="padding-top: calc(1.5rem + env(safe-area-inset-top)); padding-left: 1.5rem; padding-right: 1.5rem;">
             
-            <!-- UPDATE: Sidebar toggle button perfectly aligned with lock icon inside the padding -->
             <button onclick="toggleSidebarCollapse()" id="sidebar-toggle-btn" class="hidden md:flex absolute right-4 bg-white border border-slate-200 text-slate-500 hover:text-slate-900 w-7 h-7 rounded-full items-center justify-center shadow-md z-10 transition-all" style="top: calc(1.5rem + env(safe-area-inset-top));">
                 <i class="fa-solid fa-chevron-left text-[10px]" id="collapse-icon"></i>
             </button>
@@ -254,11 +252,10 @@
             </div>
         </div>
 
-        <!-- Navigation Menu (Dynamic Tree) -->
+        <!-- Navigation Menu -->
         <nav class="p-4 space-y-3 flex-1" id="sidebar-nav"></nav>
 
-        <!-- Footer with Minimal Lock Icon & Theme Picker -->
-        <!-- Safe-area bottom padding to ensure it's not hidden by iOS home indicator -->
+        <!-- Footer -->
         <div class="p-4 border-t border-slate-100/50 bg-slate-50/50 flex flex-col space-y-3 mt-auto flex-shrink-0" style="padding-bottom: max(env(safe-area-inset-bottom), 1rem);">
             <div class="flex justify-between items-center hide-on-collapse">
                 <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest edit-controls-block">Color Theme</span>
@@ -267,7 +264,7 @@
                 </button>
             </div>
             
-            <!-- Phase 2: Expanded Premium Color Themes (Admin Mode Only) -->
+            <!-- Phase 2: Expanded Premium Color Themes -->
             <div class="edit-controls-block hide-on-collapse pb-1 space-y-2">
                 <div class="flex items-center justify-between w-full">
                     <button onclick="setTheme('blue')" title="Ocean Blue" class="w-5 h-5 rounded-full bg-blue-600 hover:scale-110 transition shadow-sm" id="theme-btn-blue"></button>
@@ -294,15 +291,12 @@
 
     <main class="flex-1 flex flex-col h-full overflow-hidden relative min-w-0">
         
-        <!-- Breadcrumb Header -->
-        <!-- MOBILE FIX: Padding-top properly shifts the header down for the notch/status bar -->
         <header class="glass-card border-b border-slate-200/50 px-4 md:px-6 flex items-center justify-between flex-shrink-0 z-10 relative w-full" style="padding-top: max(env(safe-area-inset-top), 12px); height: calc(4rem + max(env(safe-area-inset-top), 12px)); box-sizing: border-box;">
             <div class="flex items-center space-x-3 min-w-0 flex-1">
                 <button onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-10 h-10 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition flex-shrink-0">
                     <i class="fa-solid fa-bars text-lg"></i>
                 </button>
                 
-                <!-- Website Map Breadcrumbs -->
                 <div class="flex items-center space-x-2 text-xs md:text-sm font-semibold text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-hide flex-1 py-2" id="breadcrumb-container" style="-webkit-overflow-scrolling: touch;">
                     <!-- Injected by JS -->
                 </div>
@@ -315,7 +309,6 @@
             </div>
         </header>
 
-        <!-- Dynamic Viewport -->
         <div id="main-content-viewport" class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 lg:p-10 fade-in scroll-smooth" style="padding-bottom: max(env(safe-area-inset-bottom), 2rem);">
             <!-- Content Injected via JS -->
         </div>
@@ -335,7 +328,6 @@
             royal: { name: 'Royal Purple', primary: '#4f46e5', hover: '#4338ca', light: '#eef2ff', border: '#c7d2fe', gradient: 'linear-gradient(to right, #4f46e5, #9333ea)' }
         };
 
-        // Standard FontAwesome Icon Library for Picker
         const iconLibrary = [
             'fa-solid fa-star', 'fa-solid fa-graduation-cap', 'fa-solid fa-medal', 'fa-solid fa-trophy', 
             'fa-solid fa-palette', 'fa-solid fa-images', 'fa-solid fa-book-open', 'fa-solid fa-school', 
@@ -414,6 +406,7 @@
 
         const DOC_ID = "ANAYSHA_PORTFOLIO_MASTER_DATA_V1";
         window.initialLoadDone = false;
+        window.hasAttemptedMigration = false;
         let unsubscribeSnapshot = null;
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -433,7 +426,10 @@
                         startAutoSlide();
                     }
                     
-                    if (prevMode !== state.isEditMode && state.mainFolders) {
+                    // If they just logged in and we haven't successfully synced migration, reload to trigger it safely
+                    if (state.isEditMode && !window.hasAttemptedMigration && unsubscribeSnapshot) {
+                        loadFromFirebase();
+                    } else if (prevMode !== state.isEditMode && state.mainFolders) {
                         renderApp();
                     }
                 });
@@ -455,6 +451,8 @@
         async function loadFromFirebase() {
             const docRef = db.collection('portfolioData').doc(DOC_ID);
             
+            if (unsubscribeSnapshot) unsubscribeSnapshot();
+
             unsubscribeSnapshot = docRef.onSnapshot(docSnap => {
                 if (docSnap.exists) {
                     // Prevent cursor jump for admin making local edits
@@ -542,8 +540,13 @@
                         delete dbData.categoryVisibility;
                         ['extracurriculars', 'hobbies', 'achievements', 'photoFeed'].forEach(c => delete dbData[c]);
 
-                        // Save the newly structured data immediately. Use catch to prevent public viewer console errors.
-                        docRef.set(dbData, { merge: true }).catch(e => console.log("Migration saved locally. Awaiting admin login to sync to cloud."));
+                        // AIRTIGHT SAFETY LOCK: Only attempt to write the migrated structure to the cloud IF logged in as Admin.
+                        if (!window.hasAttemptedMigration) {
+                            window.hasAttemptedMigration = true;
+                            if (auth.currentUser) {
+                                docRef.set(dbData, { merge: true }).catch(e => console.log("Migration awaits admin."));
+                            }
+                        }
                     }
                     // --- END TRANSLATOR ---
 
@@ -1162,7 +1165,7 @@
 
             let html = `
                 <div class="menu-item mt-2 mb-1 group relative">
-                    <div class="flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition ${state.currentView === 'about' ? activeStyle : inactiveStyle} center-on-collapse" onclick="handleIconClick(event, () => switchView('about'))">
+                    <div onclick="handleIconClick(event, () => switchView('about'))" class="flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition ${state.currentView === 'about' ? activeStyle : inactiveStyle} center-on-collapse">
                         <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${state.currentView === 'about' ? iconActiveStyle : iconInactiveStyle}"><i class="fa-solid fa-user text-sm"></i></div>
                         <textarea rows="1" data-field="about.menuTitle" class="w-full text-sm font-semibold bg-transparent editable-border p-0 resize-none overflow-hidden cursor-pointer truncate hide-on-collapse" onclick="event.stopPropagation()">${state.about.menuTitle || 'About Me'}</textarea>
                     </div>
@@ -1932,7 +1935,7 @@
                         <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-sm bg-white border border-slate-100">
                             <div class="p-4 flex items-center justify-between border-b border-slate-100">
                                 <div class="flex items-center space-x-3">
-                                    <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=User'}" class="w-9 h-9 rounded-full object-cover shadow-sm protected-media">
+                                    <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=Anaysha'}" class="w-9 h-9 rounded-full object-cover shadow-sm protected-media">
                                     <span class="font-extrabold text-sm text-slate-900">${state.profile.name}</span>
                                 </div>
                                 <div class="flex items-center space-x-1.5">
@@ -2239,8 +2242,8 @@
         let autoSlideInterval;
 
         function startAutoSlide() {
-            clearInterval(autoSlideInterval); // Clear any existing interval
-            if(state.isEditMode) return; // Don't auto-slide in edit mode
+            clearInterval(autoSlideInterval);
+            if(state.isEditMode) return; 
             
             autoSlideInterval = setInterval(() => {
                 document.querySelectorAll('.carousel-container').forEach(container => {
@@ -2277,7 +2280,6 @@
                                         const blurBg = container.querySelector('.bg-cover');
                                         if(blurBg) blurBg.style.backgroundImage = `url('${imgEl.src}')`;
                                         
-                                        // Update parent click handler to new index
                                         imgEl.parentElement.setAttribute('onclick', `openModal('${context}', ${idx})`);
                                     }, 150);
                                 } else {
@@ -2297,7 +2299,6 @@
             }, 5000);
         }
 
-        // Call it initially
         startAutoSlide();
 
         function modalChangeSlide(dir) {
