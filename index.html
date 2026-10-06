@@ -1247,6 +1247,7 @@
                                     <button onclick="toggleItemVisibility(event, state.mainFolders.find(m=>m.id==='${mf.id}').subFolders.find(s=>s.id==='${sf.id}').topics.find(t=>t.id==='${top.id}'))" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid ${isVisibleTop ? 'fa-eye' : 'fa-eye-slash'} text-[9px]"></i></button>
                                     <button onclick="moveTopic(event, '${mf.id}', '${sf.id}', '${top.id}', -1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1"><i class="fa-solid fa-arrow-up text-[9px]"></i></button>
                                     <button onclick="moveTopic(event, '${mf.id}', '${sf.id}', '${top.id}', 1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1"><i class="fa-solid fa-arrow-down text-[9px]"></i></button>
+                                    <button onclick="transferTopic(event, '${mf.id}', '${sf.id}', '${top.id}')" class="edit-controls-flex text-indigo-400 hover:text-indigo-600 p-1" title="Move to another Subcategory"><i class="fa-solid fa-right-left text-[9px]"></i></button>
                                     <button onclick="removeTopic(event, '${mf.id}', '${sf.id}', '${top.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-times text-[9px]"></i></button>
                                 </div>
                             </div>
@@ -2458,6 +2459,81 @@
                 triggerSave();
                 renderApp();
                 showToast("Subcategory moved successfully!");
+            };
+        }
+
+        function transferTopic(e, mfId, sfId, topId) {
+            e.stopPropagation();
+            const mf = state.mainFolders.find(m => m.id === mfId);
+            const sf = mf.subFolders.find(s => s.id === sfId);
+            const topIndex = sf.topics.findIndex(t => t.id === topId);
+            const top = sf.topics[topIndex];
+
+            let optionsHtml = '';
+            state.mainFolders.forEach(m => {
+                (m.subFolders || []).forEach(s => {
+                    if (s.id !== sfId) { // Prevent moving to itself
+                        optionsHtml += `<button onclick="executeTopicTransfer('${mfId}', '${sfId}', ${topIndex}, '${m.id}', '${s.id}')" class="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-[var(--theme-light)] hover:text-[var(--theme-primary)] text-slate-700 font-bold text-sm transition mb-2"><i class="fa-regular fa-folder-open mr-2"></i> Move to ${m.name} / ${s.name}</button>`;
+                    }
+                });
+            });
+
+            if (optionsHtml === '') {
+                optionsHtml = `<p class="text-sm text-slate-500 text-center py-4">No other Subcategories exist to move this to.</p>`;
+            }
+
+            const modal = document.getElementById('action-modal');
+            const panel = document.getElementById('action-modal-panel');
+            const title = document.getElementById('action-modal-title');
+            const input1 = document.getElementById('action-modal-input-1');
+            const input2 = document.getElementById('action-modal-input-2');
+            const cancelBtn = document.getElementById('action-modal-cancel');
+            const submitBtn = document.getElementById('action-modal-submit');
+            
+            title.innerText = `Move '${top.name}'`;
+            input1.classList.add('hidden');
+            input2.classList.add('hidden');
+            submitBtn.classList.add('hidden');
+
+            const desc = document.getElementById('action-modal-desc');
+            desc.classList.remove('hidden');
+            desc.innerHTML = `Select a destination:<div class="mt-4 max-h-48 overflow-y-auto">${optionsHtml}</div>`;
+
+            const cleanup = () => {
+                modal.classList.add('opacity-0');
+                panel.classList.remove('scale-100');
+                panel.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    desc.classList.add('hidden');
+                    desc.innerHTML = '';
+                    submitBtn.classList.remove('hidden');
+                }, 300);
+            };
+            
+            cancelBtn.onclick = cleanup;
+            
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            panel.classList.remove('scale-95');
+            panel.classList.add('scale-100');
+            
+            window.executeTopicTransfer = (fromMfId, fromSfId, topIdx, toMfId, toSfId) => {
+                const fMf = state.mainFolders.find(m => m.id === fromMfId);
+                const fSf = fMf.subFolders.find(s => s.id === fromSfId);
+                
+                const tMf = state.mainFolders.find(m => m.id === toMfId);
+                const tSf = tMf.subFolders.find(s => s.id === toSfId);
+                
+                const topic = fSf.topics.splice(topIdx, 1)[0];
+                if(!tSf.topics) tSf.topics = [];
+                tSf.topics.push(topic);
+                
+                cleanup();
+                triggerSave();
+                renderApp();
+                showToast("Topic moved successfully!");
             };
         }
 
