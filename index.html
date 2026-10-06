@@ -1194,6 +1194,8 @@
                             <div class="flex items-center space-x-1 p-1 hide-on-collapse" onclick="handleIconClick(event, () => toggleMenuSection('mf', '${mf.id}'))">
                                 <i class="fa-solid fa-chevron-${isMfCollapsed ? 'down' : 'up'} text-[10px] ${isActiveMf ? 'text-white/80' : 'text-slate-400'} transition"></i>
                                 <button onclick="toggleItemVisibility(event, state.mainFolders.find(m=>m.id==='${mf.id}'))" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1" title="Toggle Visibility"><i class="fa-solid ${isVisibleMf ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i></button>
+                                <button onclick="moveMainFolder(event, '${mf.id}', -1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1" title="Move Up"><i class="fa-solid fa-arrow-up text-[10px]"></i></button>
+                                <button onclick="moveMainFolder(event, '${mf.id}', 1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1" title="Move Down"><i class="fa-solid fa-arrow-down text-[10px]"></i></button>
                                 <button onclick="removeMainFolder(event, '${mf.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1" title="Delete"><i class="fa-solid fa-times text-[10px]"></i></button>
                             </div>
                         </div>
@@ -1219,6 +1221,9 @@
                                 <div class="flex items-center space-x-1">
                                     <i class="fa-solid fa-chevron-${isSfCollapsed ? 'down' : 'up'} text-[8px] text-slate-400 transition"></i>
                                     <button onclick="toggleItemVisibility(event, state.mainFolders.find(m=>m.id==='${mf.id}').subFolders.find(s=>s.id==='${sf.id}'))" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1" title="Toggle Visibility"><i class="fa-solid ${isVisibleSf ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i></button>
+                                    <button onclick="moveSubFolder(event, '${mf.id}', '${sf.id}', -1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1" title="Move Up"><i class="fa-solid fa-arrow-up text-[10px]"></i></button>
+                                    <button onclick="moveSubFolder(event, '${mf.id}', '${sf.id}', 1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1" title="Move Down"><i class="fa-solid fa-arrow-down text-[10px]"></i></button>
+                                    <button onclick="transferSubFolder(event, '${mf.id}', '${sf.id}')" class="edit-controls-flex text-indigo-400 hover:text-indigo-600 p-1" title="Move to another Folder"><i class="fa-solid fa-right-left text-[10px]"></i></button>
                                     <button onclick="removeSubFolder(event, '${mf.id}', '${sf.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-times text-[10px]"></i></button>
                                 </div>
                             </div>
@@ -1240,6 +1245,8 @@
                                 </div>
                                 <div class="flex items-center space-x-0.5">
                                     <button onclick="toggleItemVisibility(event, state.mainFolders.find(m=>m.id==='${mf.id}').subFolders.find(s=>s.id==='${sf.id}').topics.find(t=>t.id==='${top.id}'))" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid ${isVisibleTop ? 'fa-eye' : 'fa-eye-slash'} text-[9px]"></i></button>
+                                    <button onclick="moveTopic(event, '${mf.id}', '${sf.id}', '${top.id}', -1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1"><i class="fa-solid fa-arrow-up text-[9px]"></i></button>
+                                    <button onclick="moveTopic(event, '${mf.id}', '${sf.id}', '${top.id}', 1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1"><i class="fa-solid fa-arrow-down text-[9px]"></i></button>
                                     <button onclick="removeTopic(event, '${mf.id}', '${sf.id}', '${top.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-times text-[9px]"></i></button>
                                 </div>
                             </div>
@@ -1935,7 +1942,7 @@
                         <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-sm bg-white border border-slate-100">
                             <div class="p-4 flex items-center justify-between border-b border-slate-100">
                                 <div class="flex items-center space-x-3">
-                                    <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=Anaysha'}" class="w-9 h-9 rounded-full object-cover shadow-sm protected-media">
+                                    <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=User'}" class="w-9 h-9 rounded-full object-cover shadow-sm protected-media">
                                     <span class="font-extrabold text-sm text-slate-900">${state.profile.name}</span>
                                 </div>
                                 <div class="flex items-center space-x-1.5">
@@ -2242,8 +2249,8 @@
         let autoSlideInterval;
 
         function startAutoSlide() {
-            clearInterval(autoSlideInterval);
-            if(state.isEditMode) return; 
+            clearInterval(autoSlideInterval); // Clear any existing interval
+            if(state.isEditMode) return; // Don't auto-slide in edit mode
             
             autoSlideInterval = setInterval(() => {
                 document.querySelectorAll('.carousel-container').forEach(container => {
@@ -2280,6 +2287,7 @@
                                         const blurBg = container.querySelector('.bg-cover');
                                         if(blurBg) blurBg.style.backgroundImage = `url('${imgEl.src}')`;
                                         
+                                        // Update parent click handler to new index
                                         imgEl.parentElement.setAttribute('onclick', `openModal('${context}', ${idx})`);
                                     }, 150);
                                 } else {
@@ -2299,6 +2307,7 @@
             }, 5000);
         }
 
+        // Call it initially
         startAutoSlide();
 
         function modalChangeSlide(dir) {
@@ -2348,6 +2357,108 @@
             }
             triggerSave();
             renderApp();
+        }
+
+        function moveMainFolder(e, mfId, dir) {
+            e.stopPropagation();
+            const idx = state.mainFolders.findIndex(m => m.id === mfId);
+            const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= state.mainFolders.length) return;
+            const temp = state.mainFolders[idx];
+            state.mainFolders[idx] = state.mainFolders[newIdx];
+            state.mainFolders[newIdx] = temp;
+            triggerSave(); renderApp();
+        }
+
+        function moveSubFolder(e, mfId, sfId, dir) {
+            e.stopPropagation();
+            const mf = state.mainFolders.find(m => m.id === mfId);
+            if (!mf) return;
+            const idx = mf.subFolders.findIndex(s => s.id === sfId);
+            const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= mf.subFolders.length) return;
+            const temp = mf.subFolders[idx];
+            mf.subFolders[idx] = mf.subFolders[newIdx];
+            mf.subFolders[newIdx] = temp;
+            triggerSave(); renderApp();
+        }
+
+        function moveTopic(e, mfId, sfId, topId, dir) {
+            e.stopPropagation();
+            const sf = state.mainFolders.find(m => m.id === mfId)?.subFolders.find(s => s.id === sfId);
+            if (!sf) return;
+            const idx = sf.topics.findIndex(t => t.id === topId);
+            const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= sf.topics.length) return;
+            const temp = sf.topics[idx];
+            sf.topics[idx] = sf.topics[newIdx];
+            sf.topics[newIdx] = temp;
+            triggerSave(); renderApp();
+        }
+
+        function transferSubFolder(e, mfId, sfId) {
+            e.stopPropagation();
+            const mf = state.mainFolders.find(m => m.id === mfId);
+            const sfIndex = mf.subFolders.findIndex(s => s.id === sfId);
+            const sf = mf.subFolders[sfIndex];
+
+            let optionsHtml = state.mainFolders
+                .filter(m => m.id !== mfId)
+                .map((m, index) => `<button onclick="executeTransfer('${mfId}', ${sfIndex}, '${m.id}')" class="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-[var(--theme-light)] hover:text-[var(--theme-primary)] text-slate-700 font-bold text-sm transition mb-2"><i class="fa-regular fa-folder mr-2"></i> Move to ${m.name}</button>`)
+                .join('');
+
+            if (optionsHtml === '') {
+                optionsHtml = `<p class="text-sm text-slate-500 text-center py-4">No other Main Folders exist to move this to.</p>`;
+            }
+
+            const modal = document.getElementById('action-modal');
+            const panel = document.getElementById('action-modal-panel');
+            const title = document.getElementById('action-modal-title');
+            const input1 = document.getElementById('action-modal-input-1');
+            const input2 = document.getElementById('action-modal-input-2');
+            const cancelBtn = document.getElementById('action-modal-cancel');
+            const submitBtn = document.getElementById('action-modal-submit');
+            
+            title.innerText = `Move '${sf.name}'`;
+            input1.classList.add('hidden');
+            input2.classList.add('hidden');
+            submitBtn.classList.add('hidden');
+
+            const desc = document.getElementById('action-modal-desc');
+            desc.classList.remove('hidden');
+            desc.innerHTML = `Select a destination folder:<div class="mt-4 max-h-48 overflow-y-auto">${optionsHtml}</div>`;
+
+            const cleanup = () => {
+                modal.classList.add('opacity-0');
+                panel.classList.remove('scale-100');
+                panel.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    desc.classList.add('hidden');
+                    desc.innerHTML = '';
+                    submitBtn.classList.remove('hidden');
+                }, 300);
+            };
+            
+            cancelBtn.onclick = cleanup;
+            
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            panel.classList.remove('scale-95');
+            panel.classList.add('scale-100');
+            
+            window.executeTransfer = (fromMfId, sfIdx, toMfId) => {
+                const fromMf = state.mainFolders.find(m => m.id === fromMfId);
+                const toMf = state.mainFolders.find(m => m.id === toMfId);
+                const subFolder = fromMf.subFolders.splice(sfIdx, 1)[0];
+                if(!toMf.subFolders) toMf.subFolders = [];
+                toMf.subFolders.push(subFolder);
+                cleanup();
+                triggerSave();
+                renderApp();
+                showToast("Subcategory moved successfully!");
+            };
         }
 
         function moveItem(mfId, sfId, topId, idx, dir) {
