@@ -438,7 +438,8 @@
             loadFromFirebase();
         });
 
-        setTimeout(() => hideLoader(), 4000);
+        // SAFETY FALLBACK: Forces the loader to hide after 12s if there's a slow/blocked network
+        setTimeout(() => hideLoader(), 12000);
 
         function hideLoader() {
             const loader = document.getElementById('global-loader');
@@ -1876,7 +1877,7 @@
             if (currentLayout === 'normal') {
                 layoutHtml = `<div class="flex flex-col space-y-10">
                     ${items.map((item, idx) => {
-                        const cKey = `${mf.id}_${sf.id}_${top.id}_${idx}`;
+                        const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         const reverseClass = idx % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row';
                         return `
@@ -1907,7 +1908,7 @@
             else if (currentLayout === 'grid') {
                 layoutHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     ${items.map((item, idx) => {
-                        const cKey = `${mf.id}_${sf.id}_${top.id}_${idx}`;
+                        const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         return `
                         <div class="glass-card rounded-[2rem] overflow-hidden shadow-sm flex flex-col bg-white border border-slate-100 group">
@@ -1937,13 +1938,13 @@
             else if (currentLayout === 'instagram') {
                 layoutHtml = `<div class="max-w-xl mx-auto space-y-8">
                     ${items.map((item, idx) => {
-                        const cKey = `${mf.id}_${sf.id}_${top.id}_${idx}`;
+                        const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         return `
                         <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-sm bg-white border border-slate-100">
                             <div class="p-4 flex items-center justify-between border-b border-slate-100">
                                 <div class="flex items-center space-x-3">
-                                    <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=User'}" class="w-9 h-9 rounded-full object-cover shadow-sm protected-media">
+                                    <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=Anaysha'}" class="w-9 h-9 rounded-full object-cover shadow-sm protected-media">
                                     <span class="font-extrabold text-sm text-slate-900">${state.profile.name}</span>
                                 </div>
                                 <div class="flex items-center space-x-1.5">
@@ -1978,7 +1979,7 @@
             else if (currentLayout === 'bento') {
                 layoutHtml = `<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     ${items.map((item, idx) => {
-                        const cKey = `${mf.id}_${sf.id}_${top.id}_${idx}`;
+                        const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         const spanClass = idx === 0 ? 'md:col-span-2 md:row-span-2' : '';
                         return `
@@ -2009,7 +2010,7 @@
             else if (currentLayout === 'timeline') {
                 layoutHtml = `<div class="relative border-l-2 border-blue-200 ml-4 md:ml-32 space-y-12 pl-6 md:pl-10 pb-8">
                     ${items.map((item, idx) => {
-                        const cKey = `${mf.id}_${sf.id}_${top.id}_${idx}`;
+                        const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         return `
                         <div class="relative group">
@@ -2042,7 +2043,7 @@
             else if (currentLayout === 'hero') {
                 layoutHtml = `<div class="space-y-12">
                     ${items.map((item, idx) => {
-                        const cKey = `${mf.id}_${sf.id}_${top.id}_${idx}`;
+                        const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const firstImg = item.media && item.media.length > 0 ? (typeof item.media[0] === 'string' ? item.media[0] : item.media[0].url) : '';
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         return `
@@ -2077,7 +2078,7 @@
             else if (currentLayout === 'minimal') {
                 layoutHtml = `<div class="max-w-3xl mx-auto space-y-8">
                     ${items.map((item, idx) => {
-                        const cKey = `${mf.id}_${sf.id}_${top.id}_${idx}`;
+                        const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         return `
                         <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-sm bg-white border border-slate-100 p-8 md:p-12 space-y-6">
@@ -2107,7 +2108,7 @@
                 let pIdx = state[presKey] || 0;
                 if (pIdx >= items.length) pIdx = 0;
                 const item = items[pIdx];
-                const cKey = `${mf.id}_${sf.id}_${top.id}_${pIdx}`;
+                const cKey = `${mf.id}--${sf.id}--${top.id}--${pIdx}`;
                 const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
 
                 layoutHtml = `
@@ -2341,11 +2342,11 @@
                 state.about.media.splice(idx, 1);
                 state['idx_about.media'] = 0;
             } else if (context.startsWith('item.')) {
-                const parts = context.replace('item.', '').split('_');
-                const mfId = parts[0] + '_' + parts[1];
-                const sfId = parts[2] + '_' + parts[3] + '_' + parts[4];
-                const topId = parts.slice(5, -1).join('_');
-                const pIdx = parseInt(parts[parts.length - 1]);
+                const parts = context.replace('item.', '').split('--');
+                const mfId = parts[0];
+                const sfId = parts[1];
+                const topId = parts[2];
+                const pIdx = parseInt(parts[3]);
                 
                 const mf = state.mainFolders.find(m => m.id === mfId);
                 const sf = mf?.subFolders.find(s => s.id === sfId);
@@ -2550,8 +2551,8 @@
             items[newIdx] = temp;
             
             // Fix: Reset carousel index so you don't load the wrong photo array position after moving
-            state[`idx_item.${mfId}_${sfId}_${topId}_${idx}`] = 0;
-            state[`idx_item.${mfId}_${sfId}_${topId}_${newIdx}`] = 0;
+            state[`idx_item.${mfId}--${sfId}--${topId}--${idx}`] = 0;
+            state[`idx_item.${mfId}--${sfId}--${topId}--${newIdx}`] = 0;
             
             triggerSave(); renderApp();
         }
@@ -2709,11 +2710,11 @@
             if (context === 'about.media') {
                 addAboutVideo();
             } else if (context.startsWith('item.')) {
-                const parts = context.replace('item.', '').split('_');
-                const mfId = parts[0] + '_' + parts[1];
-                const sfId = parts[2] + '_' + parts[3] + '_' + parts[4];
-                const topId = parts.slice(5, -1).join('_');
-                const pIdx = parseInt(parts[parts.length - 1]);
+                const parts = context.replace('item.', '').split('--');
+                const mfId = parts[0];
+                const sfId = parts[1];
+                const topId = parts[2];
+                const pIdx = parseInt(parts[3]);
                 addItemVideo(mfId, sfId, topId, pIdx);
             }
         }
