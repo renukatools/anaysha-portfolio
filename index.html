@@ -41,57 +41,48 @@
 
     <style>
         :root {
-            /* Dynamic Theme Variables */
+            /* Dynamic Theme Action Colors */
             --theme-primary: #2563eb;
             --theme-hover: #1d4ed8;
             --theme-light: #eff6ff;
             --theme-border: #bfdbfe;
             --theme-gradient: linear-gradient(to right, #2563eb, #4f46e5);
             
-            /* Structural Colors (Allow for Pro Dark Themes) */
-            --bg-body: #f8fafc;
+            /* Structural Background & Text Colors (Infinite Theme Engine) */
+            --bg-body: radial-gradient(ellipse at top right, #dbeafe, #f8fafc, #ffffff);
+            --bg-sidebar: rgba(255, 255, 255, 0.95);
             --bg-card: rgba(255, 255, 255, 0.95);
             --bg-card-solid: #ffffff;
-            --bg-sidebar: rgba(255, 255, 255, 0.95);
-            --bg-input: transparent;
+            --bg-light-tint: rgba(0,0,0,0.02);
+            --bg-border-tint: rgba(0,0,0,0.05);
+            
             --text-main: #1e293b;
             --text-muted: #64748b;
-            --border-color: rgba(226, 232, 240, 0.5);
+            --sidebar-text-main: #1e293b;
+            --sidebar-text-muted: #64748b;
+            
+            --border-color: rgba(226, 232, 240, 0.6);
             --shadow-color: rgba(0, 0, 0, 0.05);
         }
 
-        /* Pro Dark Theme Overrides */
-        body.pro-theme-dark {
-            --bg-body: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.85);
-            --bg-card-solid: #1e293b;
-            --bg-sidebar: rgba(15, 23, 42, 0.95);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: rgba(51, 65, 85, 0.5);
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            background: var(--bg-body) !important;
-        }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            -webkit-tap-highlight-color: transparent; 
-            height: 100vh;
-            height: 100dvh;
-            background: var(--bg-body);
-            color: var(--text-main);
-        }
+        /* MASTER THEME OVERRIDES (Ensures Tailwind classes listen to our dynamic CSS variables) */
+        body { background: var(--bg-body) !important; color: var(--text-main) !important; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass-card { background: var(--bg-card) !important; backdrop-filter: blur(12px); border: 1px solid var(--border-color) !important; box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color) !important; }
+        .solid-card { background: var(--bg-card-solid) !important; border: 1px solid var(--border-color) !important; }
+        #app-sidebar { background: var(--bg-sidebar) !important; border-color: var(--border-color) !important; }
+        header { background: var(--bg-sidebar) !important; border-color: var(--border-color) !important; }
         
-        /* Apply dynamic structural colors */
-        .glass-card { background: var(--bg-card); backdrop-filter: blur(12px); border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color); }
-        .solid-card { background: var(--bg-card-solid); border: 1px solid var(--border-color); }
-        .text-slate-800, .text-slate-900 { color: var(--text-main) !important; }
-        .text-slate-500, .text-slate-600, .text-slate-400 { color: var(--text-muted) !important; }
         .bg-white { background-color: var(--bg-card-solid) !important; }
-        .border-slate-100, .border-slate-200 { border-color: var(--border-color) !important; }
-        .bg-slate-50 { background-color: rgba(0,0,0,0.02) !important; }
-        body.pro-theme-dark .bg-slate-50 { background-color: rgba(255,255,255,0.03) !important; }
+        .bg-slate-50 { background-color: var(--bg-light-tint) !important; }
+        .bg-slate-100 { background-color: var(--bg-border-tint) !important; }
+        .border-slate-100, .border-slate-200, .border-slate-300 { border-color: var(--border-color) !important; }
         
+        .text-slate-800, .text-slate-900 { color: var(--text-main) !important; }
+        .text-slate-400, .text-slate-500, .text-slate-600 { color: var(--text-muted) !important; }
+        
+        #app-sidebar .text-slate-800, #app-sidebar .text-slate-900 { color: var(--sidebar-text-main) !important; }
+        #app-sidebar .text-slate-400, #app-sidebar .text-slate-500, #app-sidebar .text-slate-600 { color: var(--sidebar-text-muted) !important; }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--theme-border); border-radius: 10px; }
@@ -113,11 +104,11 @@
         body:not(.edit-mode) .hide-if-empty:empty,
         body:not(.edit-mode) .hide-if-no-media:not(:has(img)):not(:has(iframe)) { display: none !important; }
 
-        body.edit-mode .edit-mode-hidden-item { opacity: 0.6; filter: grayscale(40%); border: 1px dashed #cbd5e1; }
+        body.edit-mode .edit-mode-hidden-item { opacity: 0.6; filter: grayscale(40%); border: 1px dashed var(--border-color); }
 
         .protected-media { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-user-drag: none; pointer-events: auto; }
 
-        #app-sidebar { background: var(--bg-sidebar); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        #app-sidebar { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         #app-sidebar.collapsed { width: 5.5rem; }
         #app-sidebar.collapsed .hide-on-collapse { display: none; opacity: 0; }
         #app-sidebar.collapsed .center-on-collapse { justify-content: center; padding-left: 0; padding-right: 0; }
@@ -159,15 +150,16 @@
         @media (min-width: 768px) {
             .carousel-container { min-height: 400px !important; }
         }
-        
-        /* Custom Color Picker Styling */
-        input[type="color"] { -webkit-appearance: none; border: none; width: 32px; height: 32px; border-radius: 50%; overflow: hidden; cursor: pointer; padding: 0; background: transparent; }
+
+        /* Native Custom Color Picker Button Override */
+        input[type="color"] { -webkit-appearance: none; border: none; width: 24px; height: 24px; border-radius: 50%; overflow: hidden; cursor: pointer; padding: 0; background: transparent; }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: 2px solid white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        input[type="color"]::-webkit-color-swatch { border: 1px solid rgba(255,255,255,0.5); border-radius: 50%; }
     </style>
 </head>
 
-<body class="w-full">
+<!-- RESTORED DESKTOP LAYOUT (flex h-screen) -->
+<body class="w-full flex h-screen overflow-hidden transition-colors duration-500">
 
     <div id="global-loader" class="fixed inset-0 bg-slate-50 z-[99999] flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="w-16 h-16 border-4 border-slate-200 rounded-full animate-spin shadow-sm" style="border-top-color: var(--theme-primary);"></div>
@@ -248,7 +240,7 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast-notification" class="fixed right-6 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-sm font-medium border border-slate-700" style="bottom: max(env(safe-area-inset-bottom), 1.5rem);">
+    <div id="toast-notification" class="fixed right-6 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-sm font-medium border border-slate-700 z-[99999]" style="bottom: max(env(safe-area-inset-bottom), 1.5rem);">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toast-msg">Action successful</span>
     </div>
@@ -258,7 +250,7 @@
         <!-- Profile Section -->
         <div class="pb-4 flex flex-col items-center border-b border-slate-100 relative group flex-shrink-0" style="padding-top: calc(1.5rem + env(safe-area-inset-top)); padding-left: 1.5rem; padding-right: 1.5rem;">
             
-            <button onclick="toggleSidebarCollapse()" id="sidebar-toggle-btn" class="hidden md:flex absolute right-4 solid-card text-slate-500 hover:text-slate-900 w-7 h-7 rounded-full items-center justify-center shadow-md z-10 transition-all" style="top: calc(1.5rem + env(safe-area-inset-top));">
+            <button onclick="toggleSidebarCollapse()" id="sidebar-toggle-btn" class="hidden md:flex absolute right-4 solid-card text-slate-500 hover:text-[var(--theme-primary)] w-7 h-7 rounded-full items-center justify-center shadow-md z-10 transition-all" style="top: calc(1.5rem + env(safe-area-inset-top));">
                 <i class="fa-solid fa-chevron-left text-[10px]" id="collapse-icon"></i>
             </button>
 
@@ -284,7 +276,7 @@
         <!-- Navigation Menu -->
         <nav class="p-4 space-y-3 flex-1" id="sidebar-nav"></nav>
 
-        <!-- Footer -->
+        <!-- Footer / Multi-Theme Picker -->
         <div class="p-4 border-t border-slate-100 bg-slate-50 flex flex-col space-y-3 mt-auto flex-shrink-0" style="padding-bottom: max(env(safe-area-inset-bottom), 1rem);">
             <div class="flex justify-between items-center hide-on-collapse">
                 <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest edit-controls-block">Color Theme</span>
@@ -293,32 +285,48 @@
                 </button>
             </div>
             
-            <!-- Custom & Pro Themes -->
             <div class="edit-controls-block hide-on-collapse pb-1 space-y-3">
+                <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-widest pt-1 border-t border-slate-200">Classic Solids</div>
                 <div class="flex items-center justify-between w-full px-1">
                     <button onclick="setTheme('default')" title="Ocean Blue" class="w-6 h-6 rounded-full bg-blue-600 hover:scale-110 transition shadow-sm border border-white" id="theme-btn-default"></button>
                     <button onclick="setTheme('pink')" title="Rose Pink" class="w-6 h-6 rounded-full bg-pink-600 hover:scale-110 transition shadow-sm border border-white" id="theme-btn-pink"></button>
                     <button onclick="setTheme('emerald')" title="Emerald Green" class="w-6 h-6 rounded-full bg-emerald-600 hover:scale-110 transition shadow-sm border border-white" id="theme-btn-emerald"></button>
                     <button onclick="setTheme('amber')" title="Sunset Amber" class="w-6 h-6 rounded-full bg-amber-600 hover:scale-110 transition shadow-sm border border-white" id="theme-btn-amber"></button>
-                    
-                    <!-- Native Color Picker for Infinite Themes -->
-                    <div class="relative group" title="Custom Color">
-                        <input type="color" id="custom-color-picker" value="#8b5cf6" onchange="applyCustomTheme(this.value)" class="w-6 h-6 rounded-full shadow-sm cursor-pointer border border-white transition group-hover:scale-110">
-                        <div class="absolute inset-0 pointer-events-none flex items-center justify-center text-white mix-blend-difference opacity-50"><i class="fa-solid fa-palette text-[10px]"></i></div>
+                    <!-- Custom Color Picker Fix -->
+                    <div class="relative group" title="Custom Infinite Color">
+                        <input type="color" id="custom-color-picker" value="#8b5cf6" oninput="applyCustomTheme(this.value, false)" onchange="applyCustomTheme(this.value, true)" class="w-6 h-6 rounded-full shadow-sm cursor-pointer transition group-hover:scale-110">
+                        <div class="absolute inset-0 pointer-events-none flex items-center justify-center text-white mix-blend-difference opacity-70"><i class="fa-solid fa-palette text-[10px]"></i></div>
                     </div>
                 </div>
-                
-                <div class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest pt-1 border-t border-slate-200">Pro Dark Themes</div>
+
+                <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-widest pt-1 border-t border-slate-200">Premium Gradients</div>
                 <div class="flex items-center justify-between w-full px-1">
-                    <button onclick="setTheme('pro-slate')" title="Executive Slate" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white" id="theme-btn-pro-slate" style="background: linear-gradient(to right, #475569, #1e293b);"></button>
-                    <button onclick="setTheme('pro-navy')" title="Deep Navy" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white" id="theme-btn-pro-navy" style="background: linear-gradient(to right, #3b82f6, #1e3a8a);"></button>
-                    <button onclick="setTheme('pro-forest')" title="Forest Moss" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white" id="theme-btn-pro-forest" style="background: linear-gradient(to right, #10b981, #064e3b);"></button>
-                    <button onclick="setTheme('pro-crimson')" title="Dark Crimson" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white" id="theme-btn-pro-crimson" style="background: linear-gradient(to right, #e11d48, #881337);"></button>
-                    <button onclick="setTheme('pro-obsidian')" title="Obsidian Black" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white" id="theme-btn-pro-obsidian" style="background: linear-gradient(to right, #334155, #0f172a);"></button>
+                    <button onclick="setTheme('neon')" title="Midnight Neon" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white" id="theme-btn-neon" style="background: linear-gradient(to right, #8b5cf6, #ec4899);"></button>
+                    <button onclick="setTheme('ocean')" title="Ocean Breeze" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white" id="theme-btn-ocean" style="background: linear-gradient(to right, #0ea5e9, #10b981);"></button>
+                    <button onclick="setTheme('cherry')" title="Cherry Blossom" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white" id="theme-btn-cherry" style="background: linear-gradient(to right, #f43f5e, #fb923c);"></button>
+                    <button onclick="setTheme('sunset')" title="Sunset Glow" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white" id="theme-btn-sunset" style="background: linear-gradient(to right, #f97316, #eab308);"></button>
+                    <button onclick="setTheme('royal')" title="Royal Purple" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white" id="theme-btn-royal" style="background: linear-gradient(to right, #4f46e5, #9333ea);"></button>
+                </div>
+                
+                <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-widest pt-1 border-t border-slate-200">Pro Dark Themes</div>
+                <div class="flex items-center justify-between w-full px-1">
+                    <button onclick="setTheme('pro-obsidian')" title="Obsidian Black" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white bg-slate-800" id="theme-btn-pro-obsidian"></button>
+                    <button onclick="setTheme('pro-navy')" title="Deep Navy" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white bg-blue-900" id="theme-btn-pro-navy"></button>
+                    <button onclick="setTheme('pro-forest')" title="Forest Moss" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white bg-emerald-900" id="theme-btn-pro-forest"></button>
+                    <button onclick="setTheme('pro-crimson')" title="Dark Crimson" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white bg-rose-900" id="theme-btn-pro-crimson"></button>
+                    <button onclick="setTheme('pro-amethyst')" title="Imperial Amethyst" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white bg-purple-900" id="theme-btn-pro-amethyst"></button>
+                </div>
+
+                <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-widest pt-1 border-t border-slate-200">Professional UI Themes</div>
+                <div class="flex items-center justify-between w-full px-1">
+                    <button onclick="setTheme('ui-startup')" title="Startup Split-Tone" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white flex overflow-hidden" id="theme-btn-ui-startup"><div class="w-1/2 h-full bg-slate-900"></div><div class="w-1/2 h-full bg-slate-100"></div></button>
+                    <button onclick="setTheme('ui-journal')" title="Vintage Journal" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white flex overflow-hidden" id="theme-btn-ui-journal"><div class="w-1/2 h-full bg-amber-100"></div><div class="w-1/2 h-full bg-amber-50"></div></button>
+                    <button onclick="setTheme('ui-dashboard')" title="Cyber Dashboard" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white flex overflow-hidden" id="theme-btn-ui-dashboard"><div class="w-1/2 h-full bg-slate-900"></div><div class="w-1/2 h-full bg-slate-800"></div></button>
+                    <button onclick="setTheme('ui-slate')" title="Corporate Slate" class="w-6 h-6 rounded-full shadow hover:scale-110 transition border border-white bg-slate-200" id="theme-btn-ui-slate"></button>
+                    <div class="w-6 h-6"></div> <!-- Spacer -->
                 </div>
             </div>
             
-            <!-- Mobile / Collapsed Admin Lock Button -->
             <div class="flex justify-center center-on-collapse w-full" id="admin-lock-btn-mobile" style="display: none;">
                 <button onclick="handleAdminLoginToggle()" class="p-2 text-slate-400 hover:text-[var(--theme-primary)] hover:bg-slate-100 rounded-lg transition-all"><i class="fa-solid fa-lock text-sm" id="mobile-lock-icon"></i></button>
             </div>
@@ -351,17 +359,33 @@
     </main>
 
     <script>
-        // Theme Dictionary
+        // MASTER THEME DICTIONARY
         const predefinedThemes = {
-            'default': { primary: '#2563eb', hover: '#1d4ed8', light: '#eff6ff', border: '#bfdbfe', isDark: false },
-            'pink': { primary: '#db2777', hover: '#be185d', light: '#fdf2f8', border: '#fbcfe8', isDark: false },
-            'emerald': { primary: '#059669', hover: '#047857', light: '#ecfdf5', border: '#a7f3d0', isDark: false },
-            'amber': { primary: '#d97706', hover: '#b45309', light: '#fffbeb', border: '#fde68a', isDark: false },
-            'pro-slate': { primary: '#64748b', hover: '#475569', light: 'rgba(100,116,139,0.1)', border: '#334155', isDark: true, grad: 'linear-gradient(to right, #475569, #1e293b)' },
-            'pro-navy': { primary: '#3b82f6', hover: '#2563eb', light: 'rgba(59,130,246,0.1)', border: '#1e3a8a', isDark: true, grad: 'linear-gradient(to right, #3b82f6, #1e3a8a)' },
-            'pro-forest': { primary: '#10b981', hover: '#059669', light: 'rgba(16,185,129,0.1)', border: '#064e3b', isDark: true, grad: 'linear-gradient(to right, #10b981, #064e3b)' },
-            'pro-crimson': { primary: '#e11d48', hover: '#be123c', light: 'rgba(225,29,72,0.1)', border: '#881337', isDark: true, grad: 'linear-gradient(to right, #e11d48, #881337)' },
-            'pro-obsidian': { primary: '#94a3b8', hover: '#64748b', light: 'rgba(148,163,184,0.1)', border: '#0f172a', isDark: true, grad: 'linear-gradient(to right, #334155, #0f172a)' }
+            // Classic Solids
+            'default': { primary: '#2563eb', hover: '#1d4ed8', light: 'rgba(37,99,235,0.1)', border: '#bfdbfe', bgBody: 'radial-gradient(ellipse at top right, #dbeafe, #f8fafc, #ffffff)' },
+            'pink': { primary: '#db2777', hover: '#be185d', light: 'rgba(219,39,119,0.1)', border: '#fbcfe8', bgBody: 'radial-gradient(ellipse at top right, #fce7f3, #fdf2f8, #ffffff)' },
+            'emerald': { primary: '#059669', hover: '#047857', light: 'rgba(5,150,105,0.1)', border: '#a7f3d0', bgBody: 'radial-gradient(ellipse at top right, #d1fae5, #ecfdf5, #ffffff)' },
+            'amber': { primary: '#d97706', hover: '#b45309', light: 'rgba(217,119,6,0.1)', border: '#fde68a', bgBody: 'radial-gradient(ellipse at top right, #fef3c7, #fffbeb, #ffffff)' },
+            
+            // Gradients
+            'neon': { primary: '#8b5cf6', hover: '#7c3aed', light: 'rgba(139,92,246,0.1)', border: '#ddd6fe', grad: 'linear-gradient(to right, #8b5cf6, #ec4899)', bgBody: 'radial-gradient(ellipse at top right, #ede9fe, #fdf2f8, #ffffff)' },
+            'ocean': { primary: '#0ea5e9', hover: '#0284c7', light: 'rgba(14,165,233,0.1)', border: '#bae6fd', grad: 'linear-gradient(to right, #0ea5e9, #10b981)', bgBody: 'radial-gradient(ellipse at top right, #e0f2fe, #d1fae5, #ffffff)' },
+            'cherry': { primary: '#f43f5e', hover: '#e11d48', light: 'rgba(244,63,94,0.1)', border: '#fecdd3', grad: 'linear-gradient(to right, #f43f5e, #fb923c)', bgBody: 'radial-gradient(ellipse at top right, #ffe4e6, #ffedd5, #ffffff)' },
+            'sunset': { primary: '#f97316', hover: '#ea580c', light: 'rgba(249,115,22,0.1)', border: '#fed7aa', grad: 'linear-gradient(to right, #f97316, #eab308)', bgBody: 'radial-gradient(ellipse at top right, #ffedd5, #fefcbf, #ffffff)' },
+            'royal': { primary: '#4f46e5', hover: '#4338ca', light: 'rgba(79,70,229,0.1)', border: '#c7d2fe', grad: 'linear-gradient(to right, #4f46e5, #9333ea)', bgBody: 'radial-gradient(ellipse at top right, #e0e7ff, #f3e8ff, #ffffff)' },
+            
+            // Pro Dark Themes
+            'pro-obsidian': { primary: '#94a3b8', hover: '#64748b', light: 'rgba(148,163,184,0.1)', border: 'rgba(51,65,85,0.5)', grad: 'linear-gradient(to right, #334155, #0f172a)', bgBody: '#09090b', bgSidebar: 'rgba(24,24,27,0.95)', bgCard: 'rgba(39,39,42,0.85)', bgCardSolid: '#27272a', textMain: '#f8fafc', textMuted: '#a1a1aa' },
+            'pro-navy': { primary: '#60a5fa', hover: '#3b82f6', light: 'rgba(96,165,250,0.1)', border: 'rgba(30,58,138,0.5)', grad: 'linear-gradient(to right, #2563eb, #1e3a8a)', bgBody: '#020617', bgSidebar: 'rgba(15,23,42,0.95)', bgCard: 'rgba(30,41,59,0.85)', bgCardSolid: '#1e293b', textMain: '#f1f5f9', textMuted: '#94a3b8' },
+            'pro-forest': { primary: '#34d399', hover: '#10b981', light: 'rgba(52,211,153,0.1)', border: 'rgba(6,78,59,0.5)', grad: 'linear-gradient(to right, #10b981, #064e3b)', bgBody: '#022c22', bgSidebar: 'rgba(6,78,59,0.95)', bgCard: 'rgba(6,95,70,0.85)', bgCardSolid: '#065f46', textMain: '#ecfdf5', textMuted: '#6ee7b7' },
+            'pro-crimson': { primary: '#fb7185', hover: '#e11d48', light: 'rgba(251,113,133,0.1)', border: 'rgba(136,19,55,0.5)', grad: 'linear-gradient(to right, #e11d48, #881337)', bgBody: '#4c0519', bgSidebar: 'rgba(136,19,55,0.95)', bgCard: 'rgba(159,18,57,0.85)', bgCardSolid: '#9f1239', textMain: '#fff1f2', textMuted: '#fda4af' },
+            'pro-amethyst': { primary: '#c084fc', hover: '#9333ea', light: 'rgba(192,132,252,0.1)', border: 'rgba(88,28,135,0.5)', grad: 'linear-gradient(to right, #9333ea, #581c87)', bgBody: '#2e1065', bgSidebar: 'rgba(59,7,100,0.95)', bgCard: 'rgba(88,28,135,0.85)', bgCardSolid: '#581c87', textMain: '#faf5ff', textMuted: '#d8b4fe' },
+            
+            // Professional Thematic Layouts
+            'ui-startup': { primary: '#0ea5e9', hover: '#0284c7', light: 'rgba(14,165,233,0.1)', border: 'rgba(226,232,240,0.8)', bgBody: '#f8fafc', bgSidebar: '#0f172a', bgCard: 'rgba(255,255,255,0.95)', bgCardSolid: '#ffffff', textMain: '#0f172a', textMuted: '#64748b', sidebarTextMain: '#f8fafc', sidebarTextMuted: '#94a3b8' },
+            'ui-journal': { primary: '#b45309', hover: '#92400e', light: 'rgba(180,83,9,0.1)', border: 'rgba(217,119,6,0.2)', bgBody: '#fef3c7', bgSidebar: '#fffbeb', bgCard: 'rgba(255,251,235,0.95)', bgCardSolid: '#fffbeb', textMain: '#451a03', textMuted: '#78350f', sidebarTextMain: '#451a03', sidebarTextMuted: '#78350f' },
+            'ui-dashboard': { primary: '#22d3ee', hover: '#06b6d4', light: 'rgba(34,211,238,0.1)', border: 'rgba(51,65,85,0.8)', bgBody: '#0f172a', bgSidebar: '#1e293b', bgCard: 'rgba(30,41,59,0.85)', bgCardSolid: '#1e293b', textMain: '#f8fafc', textMuted: '#94a3b8', sidebarTextMain: '#f8fafc', sidebarTextMuted: '#94a3b8' },
+            'ui-slate': { primary: '#0f172a', hover: '#334155', light: 'rgba(15,23,42,0.1)', border: 'rgba(203,213,225,0.8)', bgBody: '#e2e8f0', bgSidebar: '#f8fafc', bgCard: 'rgba(255,255,255,0.95)', bgCardSolid: '#ffffff', textMain: '#0f172a', textMuted: '#475569', sidebarTextMain: '#0f172a', sidebarTextMuted: '#475569' }
         };
 
         const iconLibrary = [
@@ -401,7 +425,7 @@
             activeIds: { mfId: null, sfId: null, topicId: null },
             collapsedMenus: {},
             theme: 'default',
-            customThemeHex: '#8b5cf6', // Default color picker value
+            customThemeHex: '#8b5cf6',
             modalContext: null,
             modalIndex: 0,
             
@@ -418,7 +442,7 @@
                 media: [] 
             },
             
-            mainFolders: [], // Populated automatically by the Auto-Translator if empty
+            mainFolders: [],
             
             contact: {
                 isVisible: true,
@@ -474,7 +498,7 @@
             loadFromFirebase();
         });
 
-        // SAFETY FALLBACK
+        // 12-SECOND RACE CONDITION FIX
         setTimeout(() => hideLoader(), 12000);
 
         function hideLoader() {
@@ -496,7 +520,6 @@
 
                     let dbData = docSnap.data();
                     
-                    // --- THE INVISIBLE AUTO-TRANSLATOR ---
                     if (!dbData.mainFolders) {
                         let newMainFolders = [];
                         
@@ -576,7 +599,6 @@
                             }
                         }
                     }
-                    // --- END TRANSLATOR ---
 
                     let protectedStates = {
                         currentView: state.currentView,
@@ -601,7 +623,6 @@
 
                     state = { ...state, ...dbData, ...protectedStates, collapsedMenus: loadedCollapsed };
                     
-                    // Handle initial theme load safely
                     if (state.theme === 'custom') {
                         applyCustomTheme(state.customThemeHex || '#8b5cf6', false);
                     } else {
@@ -665,9 +686,7 @@
             state.customThemeHex = hexColor;
             
             const root = document.documentElement;
-            document.body.classList.remove('pro-theme-dark');
             
-            // Math magic to generate matching palette
             const rgb = hexToRgb(hexColor);
             const lightColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`;
             const hoverColor = adjustColor(hexColor, -20);
@@ -679,10 +698,22 @@
             root.style.setProperty('--theme-border', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25)`);
             root.style.setProperty('--theme-gradient', `linear-gradient(to right, ${hexColor}, ${gradSecondary})`);
             
+            // Revert back to light structural defaults for custom colors
+            root.style.setProperty('--bg-body', 'radial-gradient(ellipse at top right, #dbeafe, #f8fafc, #ffffff)');
+            root.style.setProperty('--bg-sidebar', 'rgba(255, 255, 255, 0.95)');
+            root.style.setProperty('--bg-card', 'rgba(255, 255, 255, 0.95)');
+            root.style.setProperty('--bg-card-solid', '#ffffff');
+            root.style.setProperty('--bg-light-tint', 'rgba(0,0,0,0.02)');
+            root.style.setProperty('--bg-border-tint', 'rgba(0,0,0,0.05)');
+            root.style.setProperty('--text-main', '#1e293b');
+            root.style.setProperty('--text-muted', '#64748b');
+            root.style.setProperty('--sidebar-text-main', '#1e293b');
+            root.style.setProperty('--sidebar-text-muted', '#64748b');
+            
             document.getElementById('custom-color-picker').value = hexColor;
             
             updateThemeButtonUI();
-            if(shouldSave) { triggerSave(); showToast("Custom Theme Applied!"); }
+            if(shouldSave) { triggerSave(); }
         }
 
         function applyTheme(themeName) {
@@ -690,17 +721,22 @@
             const root = document.documentElement;
             const th = predefinedThemes[state.theme] || predefinedThemes.default;
             
-            if (th.isDark) {
-                document.body.classList.add('pro-theme-dark');
-            } else {
-                document.body.classList.remove('pro-theme-dark');
-            }
-            
             root.style.setProperty('--theme-primary', th.primary);
             root.style.setProperty('--theme-hover', th.hover);
             root.style.setProperty('--theme-light', th.light);
             root.style.setProperty('--theme-border', th.border);
             root.style.setProperty('--theme-gradient', th.grad || `linear-gradient(to right, ${th.primary}, ${th.hover})`);
+            
+            root.style.setProperty('--bg-body', th.bgBody || 'radial-gradient(ellipse at top right, #dbeafe, #f8fafc, #ffffff)');
+            root.style.setProperty('--bg-sidebar', th.bgSidebar || 'rgba(255, 255, 255, 0.95)');
+            root.style.setProperty('--bg-card', th.bgCard || 'rgba(255, 255, 255, 0.95)');
+            root.style.setProperty('--bg-card-solid', th.bgCardSolid || '#ffffff');
+            root.style.setProperty('--bg-light-tint', th.bgLightTint || 'rgba(0,0,0,0.02)');
+            root.style.setProperty('--bg-border-tint', th.bgBorderTint || 'rgba(0,0,0,0.05)');
+            root.style.setProperty('--text-main', th.textMain || '#1e293b');
+            root.style.setProperty('--text-muted', th.textMuted || '#64748b');
+            root.style.setProperty('--sidebar-text-main', th.sidebarTextMain || th.textMain || '#1e293b');
+            root.style.setProperty('--sidebar-text-muted', th.sidebarTextMuted || th.textMuted || '#64748b');
             
             updateThemeButtonUI();
         }
@@ -716,14 +752,14 @@
             Object.keys(predefinedThemes).forEach(t => {
                 const btn = document.getElementById(`theme-btn-${t}`);
                 if(btn) {
-                    if(state.theme === t) btn.style.boxShadow = `0 0 0 3px var(--bg-card), 0 0 0 6px var(--theme-primary)`;
+                    if(state.theme === t) btn.style.boxShadow = `0 0 0 3px var(--bg-card-solid), 0 0 0 6px var(--theme-primary)`;
                     else btn.style.boxShadow = 'none';
                 }
             });
             const cp = document.getElementById('custom-color-picker');
             if (cp) {
-                if (state.theme === 'custom') cp.style.boxShadow = `0 0 0 3px var(--bg-card), 0 0 0 6px var(--theme-primary)`;
-                else cp.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
+                if (state.theme === 'custom') cp.style.boxShadow = `0 0 0 3px var(--bg-card-solid), 0 0 0 6px var(--theme-primary)`;
+                else cp.style.boxShadow = 'none';
             }
         }
 
@@ -744,7 +780,7 @@
             const grid = document.getElementById('icon-picker-grid');
             grid.innerHTML = iconLibrary.map(icon => `
                 <div onclick="selectIcon('${icon}')" class="aspect-square rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center justify-center cursor-pointer transition shadow-sm border border-slate-100 text-slate-600 hover:text-[var(--theme-primary)] group">
-                    <i class="${icon} text-xl group-hover:scale-110 transition-transform min-w-[20px] min-h-[20px] flex items-center justify-center"></i>
+                    <i class="${icon} text-xl group-hover:scale-110 transition-transform min-w-[16px] min-h-[16px] flex items-center justify-center"></i>
                 </div>
             `).join('');
 
@@ -1088,11 +1124,7 @@
             if (state.isSidebarCollapsed && window.innerWidth >= 768) toggleSidebarCollapse();
             state.collapsedMenus[id] = !state.collapsedMenus[id];
             
-            // Persist sidebar state securely
-            if (state.isEditMode) {
-                triggerSave();
-            }
-            
+            if (state.isEditMode) triggerSave();
             renderSidebarNav();
         }
 
@@ -1212,31 +1244,31 @@
             const bc = document.getElementById('breadcrumb-container');
             const firstName = state.profile.name.split(' ')[0] || 'Anaysha';
             const aboutMenuTitle = state.about.menuTitle || 'About Me';
-            let html = `<span class="cursor-pointer hover:text-slate-900 transition flex-shrink-0" onclick="switchView('about')"><i class="fa-solid fa-house text-[10px] mr-1"></i>${firstName}</span>`;
+            let html = `<span class="cursor-pointer hover:text-[var(--theme-primary)] transition flex-shrink-0" onclick="switchView('about')"><i class="fa-solid fa-house text-[10px] mr-1"></i>${firstName}</span>`;
             
             if (state.currentView === 'mainFolder') {
                 const mf = state.mainFolders.find(m => m.id === state.activeIds.mfId);
-                if (mf) html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="text-slate-900 font-bold flex-shrink-0">${mf.name}</span>`;
+                if (mf) html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="font-bold flex-shrink-0" style="color: var(--text-main);">${mf.name}</span>`;
             } else if (state.currentView === 'subFolder') {
                 const mf = state.mainFolders.find(m => m.id === state.activeIds.mfId);
                 const sf = mf?.subFolders.find(s => s.id === state.activeIds.sfId);
                 if (mf && sf) {
-                    html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="cursor-pointer hover:text-slate-900 transition flex-shrink-0" onclick="switchView('mainFolder', '${mf.id}')">${mf.name}</span>`;
-                    html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="text-slate-900 font-bold flex-shrink-0">${sf.name}</span>`;
+                    html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="cursor-pointer hover:text-[var(--theme-primary)] transition flex-shrink-0" onclick="switchView('mainFolder', '${mf.id}')">${mf.name}</span>`;
+                    html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="font-bold flex-shrink-0" style="color: var(--text-main);">${sf.name}</span>`;
                 }
             } else if (state.currentView === 'topic') {
                 const mf = state.mainFolders.find(m => m.id === state.activeIds.mfId);
                 const sf = mf?.subFolders.find(s => s.id === state.activeIds.sfId);
                 const top = sf?.topics.find(t => t.id === state.activeIds.topicId);
                 if (mf && sf && top) {
-                    html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="cursor-pointer hover:text-slate-900 transition flex-shrink-0" onclick="switchView('mainFolder', '${mf.id}')">${mf.name}</span>`;
-                    html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="cursor-pointer hover:text-slate-900 transition flex-shrink-0" onclick="switchView('subFolder', '${mf.id}', '${sf.id}')">${sf.name}</span>`;
-                    html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="text-slate-900 font-bold flex-shrink-0">${top.name}</span>`;
+                    html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="cursor-pointer hover:text-[var(--theme-primary)] transition flex-shrink-0" onclick="switchView('mainFolder', '${mf.id}')">${mf.name}</span>`;
+                    html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="cursor-pointer hover:text-[var(--theme-primary)] transition flex-shrink-0" onclick="switchView('subFolder', '${mf.id}', '${sf.id}')">${sf.name}</span>`;
+                    html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="font-bold flex-shrink-0" style="color: var(--text-main);">${top.name}</span>`;
                 }
             } else if (state.currentView === 'contact') {
-                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="text-slate-900 font-bold flex-shrink-0">${state.contact.title}</span>`;
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="font-bold flex-shrink-0" style="color: var(--text-main);">${state.contact.title}</span>`;
             } else {
-                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="text-slate-900 font-bold flex-shrink-0">${aboutMenuTitle}</span>`;
+                html += `<span class="mx-2 text-slate-300 flex-shrink-0">/</span><span class="font-bold flex-shrink-0" style="color: var(--text-main);">${aboutMenuTitle}</span>`;
             }
             bc.innerHTML = html;
         }
@@ -1245,9 +1277,9 @@
             const nav = document.getElementById('sidebar-nav');
             
             const activeStyle = 'bg-[var(--theme-primary)] text-white shadow-md font-bold';
-            const inactiveStyle = 'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold';
+            const inactiveStyle = 'bg-transparent text-[var(--sidebar-text-muted)] hover:bg-slate-50 hover:text-[var(--sidebar-text-main)] font-semibold';
             const iconActiveStyle = 'text-white';
-            const iconInactiveStyle = 'solid-card shadow-sm text-[var(--theme-primary)] hover:brightness-95';
+            const iconInactiveStyle = 'solid-card shadow-sm text-[var(--theme-primary)] hover:brightness-95 border-none';
 
             let html = `
                 <div class="menu-item mt-2 mb-1 group relative">
@@ -1278,7 +1310,7 @@
                                 <textarea rows="1" data-field="mf.name" data-ids="${mf.id}" class="w-full text-sm font-semibold bg-transparent editable-border p-0 resize-none overflow-hidden cursor-pointer truncate hide-on-collapse" onclick="event.stopPropagation()">${mf.name}</textarea>
                             </div>
                             <div class="flex items-center space-x-1 p-1 hide-on-collapse" onclick="handleIconClick(event, () => toggleMenuSection('mf', '${mf.id}'))">
-                                <i class="fa-solid fa-chevron-${isMfCollapsed ? 'down' : 'up'} text-[10px] ${isActiveMf ? 'text-white/80' : 'text-slate-400'} transition"></i>
+                                <i class="fa-solid fa-chevron-${isMfCollapsed ? 'down' : 'up'} text-[10px] ${isActiveMf ? 'text-white/80' : 'text-[var(--sidebar-text-muted)]'} transition"></i>
                                 <button onclick="toggleItemVisibility(event, state.mainFolders.find(m=>m.id==='${mf.id}'))" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1" title="Toggle Visibility"><i class="fa-solid ${isVisibleMf ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i></button>
                                 <button onclick="moveMainFolder(event, '${mf.id}', -1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1" title="Move Up"><i class="fa-solid fa-arrow-up text-[10px]"></i></button>
                                 <button onclick="moveMainFolder(event, '${mf.id}', 1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1" title="Move Down"><i class="fa-solid fa-arrow-down text-[10px]"></i></button>
@@ -1299,17 +1331,17 @@
 
                     html += `
                         <div class="tree-item min-w-0 mb-1 ${hiddenClassSf}">
-                            <div class="flex items-center justify-between py-1.5 pl-6 pr-2 cursor-pointer group hover:bg-slate-50 rounded-lg transition" onclick="handleIconClick(event, () => toggleMenuSection('sf', '${sf.id}'))">
+                            <div class="flex items-center justify-between py-1.5 pl-6 pr-2 cursor-pointer group hover:bg-[var(--theme-light)] rounded-lg transition" onclick="handleIconClick(event, () => toggleMenuSection('sf', '${sf.id}'))">
                                 <div class="flex items-center space-x-2 w-full min-w-0">
                                     <i class="${displayIconSf} text-[10px] min-w-[12px] text-center ${state.isEditMode ? 'cursor-pointer hover:scale-125 transition' : ''}" style="color: var(--theme-primary);" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('subFolder', '${sf.id}')"` : ''}></i>
-                                    <textarea rows="1" data-field="sf.name" data-ids="${mf.id},${sf.id}" class="w-full text-xs font-bold text-slate-700 bg-transparent editable-border p-0.5 resize-none overflow-hidden" onclick="event.stopPropagation()">${sf.name}</textarea>
+                                    <textarea rows="1" data-field="sf.name" data-ids="${mf.id},${sf.id}" class="w-full text-xs font-bold text-[var(--sidebar-text-main)] bg-transparent editable-border p-0.5 resize-none overflow-hidden" onclick="event.stopPropagation()">${sf.name}</textarea>
                                 </div>
                                 <div class="flex items-center space-x-1">
                                     <i class="fa-solid fa-chevron-${isSfCollapsed ? 'down' : 'up'} text-[8px] text-slate-400 transition"></i>
                                     <button onclick="toggleItemVisibility(event, state.mainFolders.find(m=>m.id==='${mf.id}').subFolders.find(s=>s.id==='${sf.id}'))" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1" title="Toggle Visibility"><i class="fa-solid ${isVisibleSf ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i></button>
                                     <button onclick="moveSubFolder(event, '${mf.id}', '${sf.id}', -1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1" title="Move Up"><i class="fa-solid fa-arrow-up text-[10px]"></i></button>
                                     <button onclick="moveSubFolder(event, '${mf.id}', '${sf.id}', 1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1" title="Move Down"><i class="fa-solid fa-arrow-down text-[10px]"></i></button>
-                                    <button onclick="transferSubFolder(event, '${mf.id}', '${sf.id}')" class="edit-controls-flex text-indigo-400 hover:text-indigo-600 p-1" title="Move to another Folder"><i class="fa-solid fa-right-left text-[10px]"></i></button>
+                                    <button onclick="transferSubFolder(event, '${mf.id}', '${sf.id}')" class="edit-controls-flex text-indigo-400 hover:text-[var(--theme-primary)] p-1" title="Move to another Folder"><i class="fa-solid fa-right-left text-[10px]"></i></button>
                                     <button onclick="removeSubFolder(event, '${mf.id}', '${sf.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-times text-[10px]"></i></button>
                                 </div>
                             </div>
@@ -1324,7 +1356,7 @@
                         const displayIconTop = getIconClass(state.customIcons?.[top.id] || top.icon, 'fa-solid');
                         
                         html += `
-                            <div onclick="switchView('topic', '${mf.id}', '${sf.id}', '${top.id}')" class="flex items-center justify-between py-1.5 px-2 rounded-lg cursor-pointer transition ${isActiveTop ? 'font-bold' : 'text-slate-500 hover:text-slate-800'} min-w-0 ${hiddenClassTop}" ${isActiveTop ? 'style="background-color: var(--theme-light); color: var(--theme-primary);"' : ''}>
+                            <div onclick="switchView('topic', '${mf.id}', '${sf.id}', '${top.id}')" class="flex items-center justify-between py-1.5 px-2 rounded-lg cursor-pointer transition ${isActiveTop ? 'font-bold' : 'text-[var(--sidebar-text-muted)] hover:text-[var(--theme-primary)]'} min-w-0 ${hiddenClassTop}" ${isActiveTop ? 'style="background-color: var(--theme-light); color: var(--theme-primary);"' : ''}>
                                 <div class="flex items-center space-x-2 min-w-0">
                                     <i class="${displayIconTop} text-[9px] flex-shrink-0 min-w-[10px] text-center ${isActiveTop ? 'text-[var(--theme-primary)]' : 'text-slate-400'} ${state.isEditMode ? 'hover:scale-125 transition' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('topic', '${top.id}')"` : ''}></i>
                                     <span class="text-xs truncate min-w-0" data-sync="top.name_${mf.id}_${sf.id}_${top.id}">${top.name}</span>
@@ -1333,7 +1365,7 @@
                                     <button onclick="toggleItemVisibility(event, state.mainFolders.find(m=>m.id==='${mf.id}').subFolders.find(s=>s.id==='${sf.id}').topics.find(t=>t.id==='${top.id}'))" class="edit-controls-flex text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid ${isVisibleTop ? 'fa-eye' : 'fa-eye-slash'} text-[9px]"></i></button>
                                     <button onclick="moveTopic(event, '${mf.id}', '${sf.id}', '${top.id}', -1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1"><i class="fa-solid fa-arrow-up text-[9px]"></i></button>
                                     <button onclick="moveTopic(event, '${mf.id}', '${sf.id}', '${top.id}', 1)" class="edit-controls-flex text-slate-400 hover:text-[var(--theme-primary)] p-1"><i class="fa-solid fa-arrow-down text-[9px]"></i></button>
-                                    <button onclick="transferTopic(event, '${mf.id}', '${sf.id}', '${top.id}')" class="edit-controls-flex text-indigo-400 hover:text-indigo-600 p-1" title="Move to another Subcategory"><i class="fa-solid fa-right-left text-[9px]"></i></button>
+                                    <button onclick="transferTopic(event, '${mf.id}', '${sf.id}', '${top.id}')" class="edit-controls-flex text-indigo-400 hover:text-[var(--theme-primary)] p-1" title="Move to another Subcategory"><i class="fa-solid fa-right-left text-[9px]"></i></button>
                                     <button onclick="removeTopic(event, '${mf.id}', '${sf.id}', '${top.id}')" class="edit-controls-flex text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-times text-[9px]"></i></button>
                                 </div>
                             </div>
@@ -1347,10 +1379,10 @@
                     </div></div>`;
                 });
                 
-                html += `<button onclick="addSubFolder('${mf.id}')" class="edit-controls-flex w-full items-center pl-6 py-2 space-x-2 text-[10px] font-bold text-emerald-600 hover:text-emerald-700 transition"><i class="fa-solid fa-plus"></i><span>Add Subcategory</span></button></div></div>`;
+                html += `<button onclick="addSubFolder('${mf.id}')" class="edit-controls-flex w-full items-center pl-6 py-2 space-x-2 text-[10px] font-bold text-[var(--theme-primary)] hover:underline transition"><i class="fa-solid fa-plus"></i><span>Add Subcategory</span></button></div></div>`;
             });
             
-            html += `<button onclick="addMainFolder()" class="edit-controls-flex w-full items-center justify-center space-x-2 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 py-3 mt-6 rounded-xl hide-on-collapse transition border border-indigo-100"><i class="fa-solid fa-plus"></i><span>New Main Folder</span></button>`;
+            html += `<button onclick="addMainFolder()" class="edit-controls-flex w-full items-center justify-center space-x-2 text-xs font-bold text-[var(--theme-primary)] solid-card hover:bg-slate-50 py-3 mt-6 rounded-xl hide-on-collapse transition"><i class="fa-solid fa-plus"></i><span>New Main Folder</span></button>`;
 
             // Contact Menu Link
             if (state.contact.isVisible || state.isEditMode) {
@@ -1465,26 +1497,26 @@
                     if (!state.contact.isVisible && !state.isEditMode) return;
                     
                     footerGridHtml += `
-                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden ${hiddenClass}">
+                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden ${hiddenClass}">
                             <div onclick="event.stopPropagation(); switchView('contact')" class="cursor-pointer p-4 md:p-5 flex flex-col items-center justify-center text-center aspect-square group relative hover:bg-slate-50 transition-colors">
                                 <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform shadow-inner flex-shrink-0" style="color: var(--theme-primary);">
                                     <i class="fa-solid fa-address-card text-2xl md:text-3xl"></i>
                                 </div>
                                 <div class="flex items-center justify-center space-x-1.5 w-full px-1">
-                                    <span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug break-words text-center">${state.contact.title}</span>
+                                    <span class="font-extrabold text-[var(--text-main)] text-xs md:text-sm leading-snug break-words text-center">${state.contact.title}</span>
                                 </div>
                             </div>
                         </div>
                     `;
                 } else if (linkId === 'about') {
                     footerGridHtml += `
-                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden">
+                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
                             <div onclick="event.stopPropagation(); switchView('about')" class="cursor-pointer p-4 md:p-5 flex flex-col items-center justify-center text-center aspect-square group relative hover:bg-slate-50 transition-colors">
                                 <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform shadow-inner flex-shrink-0" style="color: var(--theme-primary);">
                                     <i class="fa-solid fa-user text-2xl md:text-3xl"></i>
                                 </div>
                                 <div class="flex items-center justify-center space-x-1.5 w-full px-1">
-                                    <span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug break-words text-center">${state.about.menuTitle || 'About Me'}</span>
+                                    <span class="font-extrabold text-[var(--text-main)] text-xs md:text-sm leading-snug break-words text-center">${state.about.menuTitle || 'About Me'}</span>
                                 </div>
                             </div>
                         </div>
@@ -1499,13 +1531,13 @@
                     const displayIcon = getIconClass(state.customIcons?.[mf.id] || 'fa-folder', 'fa-solid');
 
                     footerGridHtml += `
-                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden ${hiddenClass}">
+                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden ${hiddenClass}">
                             <div onclick="event.stopPropagation(); switchView('mainFolder', '${mf.id}')" class="cursor-pointer p-4 md:p-5 flex flex-col items-center justify-center text-center aspect-square group relative hover:bg-slate-50 transition-colors">
                                 <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform shadow-inner flex-shrink-0" style="color: var(--theme-primary);">
                                     <i class="${displayIcon} text-2xl md:text-3xl"></i>
                                 </div>
                                 <div class="flex items-center justify-center space-x-1.5 w-full px-1">
-                                    <span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug break-words text-center">${mf.name}</span>
+                                    <span class="font-extrabold text-[var(--text-main)] text-xs md:text-sm leading-snug break-words text-center">${mf.name}</span>
                                 </div>
                             </div>
                         </div>
@@ -1525,14 +1557,14 @@
                     const displayIcon = getIconClass(state.customIcons?.[targetSf.id] || 'fa-layer-group', 'fa-solid');
 
                     footerGridHtml += `
-                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden ${hiddenClass}">
+                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden ${hiddenClass}">
                             <div onclick="event.stopPropagation(); switchView('subFolder', '${parentMf.id}', '${targetSf.id}')" class="cursor-pointer p-4 md:p-5 flex flex-col items-center justify-center text-center aspect-square group relative hover:bg-slate-50 transition-colors">
                                 <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 shadow-inner group-hover:scale-110 transition-transform flex-shrink-0" style="color: var(--theme-primary);">
                                     <i class="${displayIcon} text-2xl md:text-3xl"></i>
                                 </div>
                                 <div class="flex items-center justify-center space-x-1.5 w-full px-1 flex-col">
-                                    <span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug break-words text-center">${targetSf.name}</span>
-                                    <span class="text-[9px] font-bold text-slate-400 mt-0.5 truncate max-w-full uppercase">${parentMf.name}</span>
+                                    <span class="font-extrabold text-[var(--text-main)] text-xs md:text-sm leading-snug break-words text-center">${targetSf.name}</span>
+                                    <span class="text-[9px] font-bold text-[var(--text-muted)] mt-0.5 truncate max-w-full uppercase">${parentMf.name}</span>
                                 </div>
                             </div>
                         </div>
@@ -1555,14 +1587,14 @@
                     const displayIcon = getIconClass(state.customIcons?.[targetTop.id] || targetTop.icon, 'fa-solid');
 
                     footerGridHtml += `
-                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col bg-white overflow-hidden ${hiddenClass}">
+                        <div class="glass-card rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden ${hiddenClass}">
                             <div onclick="event.stopPropagation(); switchView('topic', '${parentMf.id}', '${parentSf.id}', '${targetTop.id}')" class="cursor-pointer p-4 md:p-5 flex flex-col items-center justify-center text-center aspect-square group relative hover:bg-slate-50 transition-colors">
                                 <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-slate-50 flex items-center justify-center mb-2 md:mb-3 shadow-inner group-hover:scale-110 transition-transform flex-shrink-0" style="color: var(--theme-primary);">
                                     <i class="${displayIcon} text-2xl md:text-3xl"></i>
                                 </div>
                                 <div class="flex items-center justify-center space-x-1.5 w-full px-1 flex-col">
-                                    <span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug break-words text-center">${targetTop.name}</span>
-                                    <span class="text-[9px] font-bold text-slate-400 mt-0.5 truncate max-w-full uppercase">${parentMf.name}</span>
+                                    <span class="font-extrabold text-[var(--text-main)] text-xs md:text-sm leading-snug break-words text-center">${targetTop.name}</span>
+                                    <span class="text-[9px] font-bold text-[var(--text-muted)] mt-0.5 truncate max-w-full uppercase">${parentMf.name}</span>
                                 </div>
                             </div>
                         </div>
@@ -1571,7 +1603,7 @@
             });
 
             let editFooterBtn = state.isEditMode ? `
-                <button onclick="event.stopPropagation(); openFooterPicker('${pageKey}')" class="edit-controls-flex items-center space-x-1.5 text-xs font-bold text-[var(--theme-primary)] hover:bg-[var(--theme-light)] px-3 py-1.5 rounded-lg transition border border-blue-200 shadow-sm bg-white ml-auto">
+                <button onclick="event.stopPropagation(); openFooterPicker('${pageKey}')" class="solid-card text-[var(--theme-primary)] px-4 py-2.5 rounded-2xl text-xs font-bold transition items-center space-x-1.5 shadow-sm hover:shadow-md">
                     <i class="fa-solid fa-link"></i><span class="hidden sm:inline">Edit Footer</span>
                 </button>
             ` : ``;
@@ -1581,8 +1613,8 @@
             return `
                 <div class="max-w-6xl mx-auto mt-12 mb-4 min-w-0 relative">
                     <div class="flex items-center space-x-4 px-2 mb-6">
-                        <h3 class="text-xl font-extrabold text-slate-800">${view === 'about' ? 'Explore My Portfolio' : 'Quick Links'}</h3>
-                        <div class="flex-1 h-px border-t border-slate-200"></div>
+                        <h3 class="text-xl font-extrabold text-[var(--text-main)]">${view === 'about' ? 'Explore My Portfolio' : 'Quick Links'}</h3>
+                        <div class="flex-1 h-px border-t border-[var(--border-color)]"></div>
                         ${editFooterBtn}
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 items-start">
@@ -1593,6 +1625,7 @@
             `;
         }
 
+        // ... (Render Contact HTML unchanged structurally)
         function renderContact() {
             return `
                 <div class="max-w-5xl mx-auto space-y-8 min-w-0 pb-10">
@@ -1601,7 +1634,7 @@
                             <textarea rows="1" data-field="contact.title" class="w-full text-4xl md:text-5xl font-extrabold bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight text-white placeholder-white/50">${state.contact.title}</textarea>
                             <textarea rows="1" data-field="contact.subtitle" class="w-full text-lg md:text-xl font-medium mt-2 bg-transparent editable-border py-1 resize-none overflow-hidden text-blue-100 placeholder-white/50">${state.contact.subtitle}</textarea>
                         </div>
-                        <button onclick="toggleContactVisibility()" class="edit-controls-flex text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-lg transition-all items-center space-x-2 flex-shrink-0 bg-black/20 hover:bg-black/30 backdrop-blur-md">
+                        <button onclick="toggleContactVisibility()" class="edit-controls-flex text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-lg transition-all items-center space-x-2 flex-shrink-0 bg-black/20 hover:bg-black/30 backdrop-blur-md border border-white/20">
                             <i class="fa-solid ${state.contact.isVisible ? 'fa-eye' : 'fa-eye-slash'}"></i>
                             <span>${state.contact.isVisible ? 'Page Visible' : 'Page Hidden'}</span>
                         </button>
@@ -1610,13 +1643,13 @@
                     <div class="space-y-4">
                         <div class="flex items-center justify-between px-2">
                             <h3 class="text-xl font-extrabold text-slate-800">Direct Contact</h3>
-                            <button onclick="addContactDetail()" class="edit-controls-flex items-center space-x-1.5 text-xs font-bold text-[var(--theme-primary)] hover:bg-[var(--theme-light)] px-3 py-1.5 rounded-lg transition border border-transparent hover:border-[var(--theme-border)]"><i class="fa-solid fa-plus"></i><span>Add Detail</span></button>
+                            <button onclick="addContactDetail()" class="edit-controls-flex items-center space-x-1.5 text-xs font-bold text-[var(--theme-primary)] solid-card hover:bg-slate-50 px-3 py-1.5 rounded-lg transition border border-transparent"><i class="fa-solid fa-plus"></i><span>Add Detail</span></button>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             ${state.contact.details.map((detail, idx) => {
                                 let linkHref = getContactLink(detail.value);
                                 return `
-                                <div class="glass-card rounded-[2rem] p-6 shadow-sm bg-white border border-slate-100 relative group ${!detail.isVisible ? 'edit-mode-hidden-item' : ''}" style="${!detail.isVisible && !state.isEditMode ? 'display:none;' : ''}">
+                                <div class="glass-card rounded-[2rem] p-6 shadow-sm relative group ${!detail.isVisible ? 'edit-mode-hidden-item' : ''}" style="${!detail.isVisible && !state.isEditMode ? 'display:none;' : ''}">
                                     <div class="edit-controls-flex absolute top-4 right-4 space-x-2 z-10">
                                         <button onclick="toggleContactItem('details', ${idx})" class="text-slate-400 hover:text-slate-600 bg-slate-50 p-2 rounded-xl transition" title="Toggle Visibility">
                                             <i class="fa-solid ${detail.isVisible ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i>
@@ -1627,16 +1660,16 @@
                                     </div>
                                     
                                     <div class="flex items-start space-x-4">
-                                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0 relative ${state.isEditMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}" style="color: var(--theme-primary);" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('contactDetail', ${idx})"` : ''}>
+                                        <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center flex-shrink-0 relative border border-[var(--border-color)] ${state.isEditMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}" style="color: var(--theme-primary);" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('contactDetail', ${idx})"` : ''}>
                                             <i class="${getIconClass(detail.icon, 'fa-solid')} text-xl"></i>
-                                            ${state.isEditMode ? `<div class="absolute -top-1 -right-1 bg-[var(--bg-card-solid)] text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[9px] shadow-sm border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
+                                            ${state.isEditMode ? `<div class="absolute -top-1 -right-1 bg-[var(--bg-card-solid)] text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[9px] shadow-sm border border-[var(--border-color)]"><i class="fa-solid fa-pen"></i></div>` : ''}
                                         </div>
                                         <div class="flex-1 min-w-0 pr-16">
                                             <textarea rows="1" data-field="contactDetail.label" data-ids="${idx}" class="w-full text-xs font-bold text-slate-400 uppercase tracking-wider bg-transparent editable-border p-0 resize-none overflow-hidden">${detail.label}</textarea>
                                             
                                             ${state.isEditMode ? 
-                                                `<textarea rows="2" data-field="contactDetail.value" data-ids="${idx}" class="w-full text-base font-semibold text-slate-800 bg-transparent editable-border py-1 mt-1 resize-none overflow-hidden leading-snug">${detail.value}</textarea>` : 
-                                                (linkHref ? `<a href="${linkHref}" target="_blank" class="block w-full text-base font-semibold text-[var(--theme-primary)] hover:underline py-1 mt-1 leading-snug break-words transition-colors">${detail.value}</a>` : `<div class="w-full text-base font-semibold text-slate-800 py-1 mt-1 leading-snug break-words">${detail.value}</div>`)
+                                                `<textarea rows="2" data-field="contactDetail.value" data-ids="${idx}" class="w-full text-base font-semibold text-[var(--text-main)] bg-transparent editable-border py-1 mt-1 resize-none overflow-hidden leading-snug">${detail.value}</textarea>` : 
+                                                (linkHref ? `<a href="${linkHref}" target="_blank" class="block w-full text-base font-semibold text-[var(--theme-primary)] hover:underline py-1 mt-1 leading-snug break-words transition-colors">${detail.value}</a>` : `<div class="w-full text-base font-semibold text-[var(--text-main)] py-1 mt-1 leading-snug break-words">${detail.value}</div>`)
                                             }
                                         </div>
                                     </div>
@@ -1648,24 +1681,24 @@
                     <div class="space-y-4 pt-6">
                         <div class="flex items-center justify-between px-2">
                             <h3 class="text-xl font-extrabold text-slate-800">Connect Online</h3>
-                            <button onclick="addContactSocial()" class="edit-controls-flex items-center space-x-1.5 text-xs font-bold text-[var(--theme-primary)] hover:bg-[var(--theme-light)] px-3 py-1.5 rounded-lg transition border border-transparent hover:border-[var(--theme-border)]"><i class="fa-solid fa-plus"></i><span>Add Social Link</span></button>
+                            <button onclick="addContactSocial()" class="edit-controls-flex items-center space-x-1.5 text-xs font-bold text-[var(--theme-primary)] solid-card hover:bg-slate-50 px-3 py-1.5 rounded-lg transition border border-transparent"><i class="fa-solid fa-plus"></i><span>Add Social Link</span></button>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             ${state.contact.socials.map((social, idx) => `
-                                <div class="glass-card rounded-[1.5rem] p-5 shadow-sm bg-white border border-slate-100 relative group flex flex-col items-center text-center ${!social.isVisible ? 'edit-mode-hidden-item' : ''}" style="${!social.isVisible && !state.isEditMode ? 'display:none;' : ''}">
+                                <div class="glass-card rounded-[1.5rem] p-5 shadow-sm relative group flex flex-col items-center text-center ${!social.isVisible ? 'edit-mode-hidden-item' : ''}" style="${!social.isVisible && !state.isEditMode ? 'display:none;' : ''}">
                                     <div class="edit-controls-flex absolute top-3 right-3 space-x-1 z-10">
-                                        <button onclick="toggleContactItem('socials', ${idx})" class="text-slate-400 hover:text-slate-600 bg-slate-50 p-2 rounded-xl transition" title="Toggle Visibility">
+                                        <button onclick="toggleContactItem('socials', ${idx})" class="text-slate-400 hover:text-slate-600 bg-slate-50 p-2 rounded-xl transition border border-[var(--border-color)]" title="Toggle Visibility">
                                             <i class="fa-solid ${social.isVisible ? 'fa-eye' : 'fa-eye-slash'} text-[10px]"></i>
                                         </button>
-                                        <button onclick="removeContactItem('socials', ${idx})" class="text-rose-400 hover:text-rose-600 bg-rose-50 p-2 rounded-xl transition" title="Delete Field">
+                                        <button onclick="removeContactItem('socials', ${idx})" class="text-rose-400 hover:text-rose-600 bg-rose-50 p-2 rounded-xl transition border border-[var(--border-color)]" title="Delete Field">
                                             <i class="fa-solid fa-trash text-[10px]"></i>
                                         </button>
                                     </div>
                                     <div class="relative group ${state.isEditMode ? 'cursor-pointer' : ''}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('contactSocial', ${idx})"` : ''}>
                                         <i class="${getIconClass(social.icon, 'fa-brands')} text-3xl ${social.color || 'text-slate-700'} mb-3 mt-2 group-hover:scale-110 transition-transform block"></i>
-                                        ${state.isEditMode ? `<div class="absolute top-0 -right-3 bg-[var(--bg-card-solid)] text-slate-500 rounded-full w-4 h-4 flex items-center justify-center text-[8px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
+                                        ${state.isEditMode ? `<div class="absolute top-0 -right-3 bg-[var(--bg-card-solid)] text-[var(--text-muted)] rounded-full w-4 h-4 flex items-center justify-center text-[8px] shadow border border-[var(--border-color)]"><i class="fa-solid fa-pen"></i></div>` : ''}
                                     </div>
-                                    <textarea rows="1" data-field="contactSocial.label" data-ids="${idx}" class="w-full text-sm font-extrabold text-slate-800 text-center bg-transparent editable-border p-0 resize-none overflow-hidden">${social.label}</textarea>
+                                    <textarea rows="1" data-field="contactSocial.label" data-ids="${idx}" class="w-full text-sm font-extrabold text-[var(--text-main)] text-center bg-transparent editable-border p-0 resize-none overflow-hidden">${social.label}</textarea>
                                     
                                     ${state.isEditMode ? `
                                         <input type="text" data-field="contactSocial.link" data-ids="${idx}" class="w-full text-[10px] text-slate-500 text-center bg-slate-50 editable-border py-1.5 px-2 rounded mt-2 border border-slate-200" placeholder="Paste URL here..." value="${social.link}">
@@ -1707,7 +1740,7 @@
         }
 
         function addContactSocial() {
-            state.contact.socials.push({ id: 'social_' + Date.now(), label: 'New Link', link: '', isVisible: true, icon: 'fa-solid fa-link', color: 'text-slate-600' });
+            state.contact.socials.push({ id: 'social_' + Date.now(), label: 'New Link', link: '', isVisible: true, icon: 'fa-solid fa-link', color: 'text-[var(--text-main)]' });
             triggerSave(); renderApp();
         }
 
@@ -1743,14 +1776,14 @@
             } else if (currentLayout === 'minimal' || currentLayout === 'instagram' || currentLayout === 'timeline') {
                 layoutHtml = `
                     <div class="max-w-4xl mx-auto space-y-8">
-                        <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-sm bg-white border border-slate-100 p-8 md:p-12 space-y-6">
+                        <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-sm p-8 md:p-12 space-y-6">
                             <div class="flex items-center space-x-3 border-b border-slate-100 pb-6">
                                 <textarea rows="2" data-field="about.title" class="w-full text-4xl md:text-5xl font-extrabold text-slate-900 bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0" placeholder="Main Title">${state.about.title}</textarea>
                                 <span class="text-4xl md:text-5xl wave-emoji pb-2">👋</span>
                             </div>
                             <textarea rows="2" data-field="about.subtitle" class="w-full text-xl md:text-2xl font-bold bg-transparent editable-border py-1 resize-none overflow-hidden min-w-0" style="color: var(--theme-primary);" placeholder="Subtitle">${state.about.subtitle}</textarea>
-                            <textarea rows="6" data-field="about.bio" class="w-full text-lg font-medium text-slate-600 bg-transparent editable-border py-1 resize-none min-w-0 leading-relaxed" placeholder="Write your biography here...">${state.about.bio}</textarea>
-                            <div class="relative hide-if-no-media bg-slate-50 w-full min-h-[300px] rounded-[1.5rem] overflow-hidden mt-6">
+                            <textarea rows="6" data-field="about.bio" class="w-full text-lg font-medium text-[var(--text-main)] bg-transparent editable-border py-1 resize-none min-w-0 leading-relaxed" placeholder="Write your biography here...">${state.about.bio}</textarea>
+                            <div class="relative hide-if-no-media bg-slate-50 w-full min-h-[300px] rounded-[1.5rem] overflow-hidden mt-6 border border-[var(--border-color)]">
                                 ${mediaHtml}
                                 <input type="file" id="about_media_input" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'about.media')">
                             </div>
@@ -1760,19 +1793,19 @@
             } else {
                 layoutHtml = `
                     <div class="flex flex-col md:flex-row glass-card rounded-[2.5rem] overflow-hidden shadow-[0_8px_30px_var(--shadow-color)] min-h-[450px]">
-                        <div class="w-full md:w-[45%] bg-slate-50 relative min-w-0 hide-if-no-media border-r border-slate-100">
+                        <div class="w-full md:w-[45%] bg-slate-50 relative min-w-0 hide-if-no-media border-r border-[var(--border-color)]">
                             ${mediaHtml}
                             <input type="file" id="about_media_input" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'about.media')">
                         </div>
                         
                         <div class="w-full md:flex-1 p-8 md:p-12 flex flex-col justify-center min-w-0 bg-transparent">
                             <div class="flex items-center space-x-3 mb-2">
-                                <textarea rows="2" data-field="about.title" class="w-full text-4xl md:text-5xl font-extrabold text-slate-900 bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0 placeholder-slate-300" placeholder="Main Title">${state.about.title}</textarea>
+                                <textarea rows="2" data-field="about.title" class="w-full text-4xl md:text-5xl font-extrabold text-[var(--text-main)] bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0 placeholder-slate-300" placeholder="Main Title">${state.about.title}</textarea>
                                 <span class="text-4xl md:text-5xl wave-emoji pb-2">👋</span>
                             </div>
                             <textarea rows="2" data-field="about.subtitle" class="w-full text-xl md:text-2xl font-bold bg-transparent editable-border py-1 mt-1 resize-none overflow-hidden min-w-0 placeholder-blue-200" style="color: var(--theme-primary);" placeholder="Subtitle">${state.about.subtitle}</textarea>
                             <div class="w-16 h-1.5 rounded-full my-8 shadow-sm" style="background: var(--theme-gradient);"></div>
-                            <textarea rows="6" data-field="about.bio" class="w-full text-base md:text-lg text-slate-600 leading-relaxed bg-transparent editable-border py-2 resize-none min-w-0 font-medium placeholder-slate-300" placeholder="Write your biography here...">${state.about.bio}</textarea>
+                            <textarea rows="6" data-field="about.bio" class="w-full text-base md:text-lg text-[var(--text-main)] leading-relaxed bg-transparent editable-border py-2 resize-none min-w-0 font-medium placeholder-slate-300" placeholder="Write your biography here...">${state.about.bio}</textarea>
                         </div>
                     </div>
                 `;
@@ -1782,7 +1815,7 @@
                 <div class="max-w-6xl mx-auto min-w-0 pb-2">
                     ${state.isEditMode ? `
                         <div class="edit-controls-flex justify-end mb-4 pr-2">
-                            <button onclick="openLayoutPicker('about')" class="solid-card text-[var(--theme-primary)] px-4 py-2.5 rounded-2xl text-xs font-bold transition items-center space-x-1.5 shadow-sm hover:shadow-md">
+                            <button onclick="openLayoutPicker('about')" class="solid-card text-[var(--theme-primary)] px-4 py-2.5 rounded-2xl text-xs font-bold transition items-center space-x-1.5 shadow-sm hover:shadow-md border border-[var(--border-color)]">
                                 <i class="fa-solid fa-border-all text-sm"></i><span>Change Layout</span>
                             </button>
                         </div>
@@ -1812,13 +1845,13 @@
                             <i id="shortcut-icon-landing_sf_${sf.id}" class="fa-solid fa-chevron-down text-slate-300 transition-transform duration-300"></i>
                         </div>
                         <div id="shortcut-content-landing_sf_${sf.id}" class="w-full mt-2 max-h-0 opacity-0 overflow-hidden transition-all duration-300">
-                            <div class="space-y-2 pt-3 border-t border-slate-100 mt-2">
+                            <div class="space-y-2 pt-3 border-t border-[var(--border-color)] mt-2">
                                 ${(sf.topics || []).map(top => {
                                     if (top.isVisible === false && !state.isEditMode) return '';
                                     const topHidden = top.isVisible === false ? 'opacity-50 grayscale' : '';
                                     const topIcon = getIconClass(state.customIcons?.[top.id] || top.icon, 'fa-solid');
                                     return `
-                                    <button onclick="event.stopPropagation(); switchView('topic', '${mf.id}', '${sf.id}', '${top.id}')" class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-[var(--theme-light)] text-slate-700 hover:text-[var(--theme-primary)] transition flex items-center shadow-sm font-bold text-sm ${topHidden}">
+                                    <button onclick="event.stopPropagation(); switchView('topic', '${mf.id}', '${sf.id}', '${top.id}')" class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-[var(--theme-light)] text-[var(--text-main)] hover:text-[var(--theme-primary)] transition flex items-center shadow-sm font-bold text-sm ${topHidden} border border-[var(--border-color)]">
                                         <i class="${topIcon} text-slate-400 mr-3 w-4 text-center"></i>
                                         <span class="truncate">${top.name}</span>
                                     </button>
@@ -1851,7 +1884,7 @@
                             </button>
                             <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center relative border border-white/30 ${state.isEditMode ? 'cursor-pointer hover:bg-white/30 transition' : ''}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('mainFolder', '${mf.id}')"` : ''}>
                                 <i class="${displayIcon} text-3xl"></i>
-                                ${state.isEditMode ? `<div class="absolute -top-1 -right-1 bg-[var(--bg-card-solid)] text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
+                                ${state.isEditMode ? `<div class="absolute -top-1 -right-1 bg-[var(--bg-card-solid)] text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow border border-[var(--border-color)]"><i class="fa-solid fa-pen"></i></div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -1876,7 +1909,7 @@
                     <div class="solid-card rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-center text-center cursor-pointer group ${hiddenClassTop}" onclick="switchView('topic', '${mf.id}', '${sf.id}', '${top.id}')">
                         <div class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-4 shadow-inner relative transition-transform border border-slate-100 ${state.isEditMode ? 'cursor-pointer ring-2 ring-transparent hover:ring-[var(--theme-border)] group-hover:scale-105' : 'group-hover:scale-110'}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('topic', '${top.id}')"` : ''}>
                             <i class="${displayIconTop} text-3xl" style="color: var(--theme-primary);"></i>
-                            ${state.isEditMode ? `<div class="absolute -top-1.5 -right-1.5 bg-[var(--bg-card-solid)] text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
+                            ${state.isEditMode ? `<div class="absolute -top-1.5 -right-1.5 bg-[var(--bg-card-solid)] text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow border border-[var(--border-color)]"><i class="fa-solid fa-pen"></i></div>` : ''}
                         </div>
                         <h3 class="font-extrabold text-lg text-slate-800 mb-1 group-hover:text-[var(--theme-primary)] transition-colors">${top.name}</h3>
                         <p class="text-xs font-semibold text-slate-400">${(top.items || []).length} Items</p>
@@ -1908,7 +1941,7 @@
                             </button>
                             <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center relative border border-white/30 ${state.isEditMode ? 'cursor-pointer hover:bg-white/30 transition' : ''}" title="${state.isEditMode ? 'Change Icon' : ''}" ${state.isEditMode ? `onclick="event.stopPropagation(); openIconPicker('subFolder', '${sf.id}')"` : ''}>
                                 <i class="${displayIcon} text-3xl"></i>
-                                ${state.isEditMode ? `<div class="absolute -top-1 -right-1 bg-[var(--bg-card-solid)] text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow border border-slate-100"><i class="fa-solid fa-pen"></i></div>` : ''}
+                                ${state.isEditMode ? `<div class="absolute -top-1 -right-1 bg-[var(--bg-card-solid)] text-[var(--theme-primary)] rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow border border-[var(--border-color)]"><i class="fa-solid fa-pen"></i></div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -1919,7 +1952,6 @@
             `;
         }
 
-        // UNIFIED TOPIC RENDERER
         function renderTopicView(mf, sf, top) {
             const items = top.items || [];
             const layoutKey = `top_${mf.id}_${sf.id}_${top.id}`;
@@ -1927,7 +1959,7 @@
 
             let headerHtml = `
                 <div class="glass-card rounded-[2rem] shadow-sm overflow-hidden mb-8">
-                    <div class="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100" style="background-color: var(--theme-light);">
+                    <div class="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border-color)]" style="background-color: var(--theme-light);">
                         <div class="flex-1 min-w-0">
                             <span class="text-[var(--theme-primary)] font-bold text-[10px] md:text-xs tracking-widest uppercase mb-1 block">${mf.name} / ${sf.name}</span>
                             <textarea rows="2" data-field="top.name" data-ids="${mf.id},${sf.id},${top.id}" class="w-full text-3xl md:text-4xl font-extrabold text-[var(--theme-primary)] bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0" placeholder="Topic Name">${top.name}</textarea>
@@ -1949,7 +1981,7 @@
                 return `
                     <div class="max-w-6xl mx-auto min-w-0 pb-2">
                         ${headerHtml}
-                        <div class="glass-card p-12 text-center rounded-[2.5rem] text-slate-400 font-bold border-2 border-dashed border-slate-200">No items added yet. Switch to Admin mode and click 'Add Item'.</div>
+                        <div class="glass-card p-12 text-center rounded-[2.5rem] text-slate-400 font-bold border-2 border-dashed border-[var(--border-color)]">No items added yet. Switch to Admin mode and click 'Add Item'.</div>
                     </div>
                 `;
             }
@@ -1964,8 +1996,8 @@
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         const reverseClass = idx % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row';
                         return `
-                        <div class="solid-card rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-md transition-shadow relative flex flex-col ${reverseClass} group min-w-0 border-slate-100">
-                            <div class="relative hide-if-no-media bg-slate-50 w-full md:w-[45%] min-h-[300px] flex-shrink-0 border-slate-100 ${idx % 2 !== 0 ? 'border-l' : 'border-r'}">
+                        <div class="solid-card rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-md transition-shadow relative flex flex-col ${reverseClass} group min-w-0">
+                            <div class="relative hide-if-no-media bg-slate-50 w-full md:w-[45%] min-h-[300px] flex-shrink-0 border-[var(--border-color)] ${idx % 2 !== 0 ? 'border-l' : 'border-r'}">
                                 ${mediaHtml}
                                 <input type="file" id="item_media_${cKey}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'item', '${mf.id}', '${sf.id}', '${top.id}', ${idx})">
                             </div>
@@ -1974,14 +2006,14 @@
                                     <textarea rows="2" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full font-extrabold text-slate-800 text-2xl md:text-3xl bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight min-w-0" placeholder="Title">${item.title}</textarea>
                                     <div class="flex items-center space-x-1.5 flex-wrap justify-end gap-y-2">
                                         ${state.isEditMode ? `
-                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-slate-100" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
-                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-slate-100" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-[var(--border-color)]" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-[var(--border-color)]" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
                                         ` : ''}
-                                        <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl transition items-center justify-center flex-shrink-0 shadow-sm border border-rose-100" title="Add YouTube Video"><i class="fa-brands fa-youtube"></i></button>
-                                        <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl flex-shrink-0 transition shadow-sm border border-rose-100"><i class="fa-solid fa-trash"></i></button>
+                                        <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl transition items-center justify-center flex-shrink-0 shadow-sm border border-[var(--border-color)]" title="Add YouTube Video"><i class="fa-brands fa-youtube"></i></button>
+                                        <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-3 rounded-xl flex-shrink-0 transition shadow-sm border border-[var(--border-color)]"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </div>
-                                <textarea rows="5" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-base font-medium text-slate-600 leading-relaxed bg-transparent editable-border py-1 mt-3 resize-none hide-if-empty min-w-0" placeholder="Description...">${item.desc || ''}</textarea>
+                                <textarea rows="5" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-base font-medium text-[var(--text-main)] leading-relaxed bg-transparent editable-border py-1 mt-3 resize-none hide-if-empty min-w-0" placeholder="Description...">${item.desc || ''}</textarea>
                             </div>
                         </div>`}).join('')}
                 </div>`;
@@ -1994,24 +2026,24 @@
                         const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         return `
-                        <div class="solid-card rounded-[2rem] overflow-hidden shadow-sm flex flex-col border-slate-100 group">
+                        <div class="solid-card rounded-[2rem] overflow-hidden shadow-sm flex flex-col group border-[var(--border-color)]">
                             <div class="relative hide-if-no-media bg-slate-50 w-full min-h-[220px]">
                                 ${mediaHtml}
                                 <input type="file" id="item_media_${cKey}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'item', '${mf.id}', '${sf.id}', '${top.id}', ${idx})">
                             </div>
-                            <div class="p-5 flex flex-col space-y-3 flex-1 border-t border-slate-100">
+                            <div class="p-5 flex flex-col space-y-3 flex-1 border-t border-[var(--border-color)]">
                                 <div class="flex items-start justify-between gap-2">
-                                    <textarea rows="2" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full font-extrabold text-slate-800 text-lg bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight" placeholder="Title">${item.title}</textarea>
+                                    <textarea rows="2" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full font-extrabold text-[var(--text-main)] text-lg bg-transparent editable-border py-1 resize-none overflow-hidden leading-tight" placeholder="Title">${item.title}</textarea>
                                     <div class="flex items-center space-x-1 flex-shrink-0">
                                         ${state.isEditMode ? `
-                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-slate-100" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
-                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-slate-100" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-[var(--border-color)]" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-[var(--border-color)]" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
                                         ` : ''}
-                                        <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100" title="Add Video"><i class="fa-brands fa-youtube text-xs"></i></button>
-                                        <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100"><i class="fa-solid fa-trash text-xs"></i></button>
+                                        <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-[var(--border-color)]" title="Add Video"><i class="fa-brands fa-youtube text-xs"></i></button>
+                                        <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-[var(--border-color)]"><i class="fa-solid fa-trash text-xs"></i></button>
                                     </div>
                                 </div>
-                                <textarea rows="3" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-xs font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty" placeholder="Description...">${item.desc || ''}</textarea>
+                                <textarea rows="3" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-xs font-medium text-[var(--text-muted)] bg-transparent editable-border resize-none hide-if-empty" placeholder="Description...">${item.desc || ''}</textarea>
                             </div>
                         </div>`}).join('')}
                 </div>`;
@@ -2024,19 +2056,19 @@
                         const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         return `
-                        <div class="solid-card rounded-[2.5rem] overflow-hidden shadow-sm border-slate-100">
-                            <div class="p-4 flex items-center justify-between border-b border-slate-100">
+                        <div class="solid-card rounded-[2.5rem] overflow-hidden shadow-sm border-[var(--border-color)]">
+                            <div class="p-4 flex items-center justify-between border-b border-[var(--border-color)]">
                                 <div class="flex items-center space-x-3">
-                                    <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=User'}" class="w-9 h-9 rounded-full object-cover shadow-sm protected-media border border-slate-200">
+                                    <img src="${state.profile.pic || 'https://ui-avatars.com/api/?name=Anaysha'}" class="w-9 h-9 rounded-full object-cover shadow-sm protected-media border border-[var(--border-color)]">
                                     <span class="font-extrabold text-sm text-slate-900">${state.profile.name}</span>
                                 </div>
                                 <div class="flex items-center space-x-1.5">
                                     ${state.isEditMode ? `
-                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-slate-100" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
-                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-slate-100" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-[var(--border-color)]" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-[var(--border-color)]" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
                                     ` : ''}
-                                    <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100" title="Add Video"><i class="fa-brands fa-youtube text-xs"></i></button>
-                                    <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100"><i class="fa-solid fa-trash text-xs"></i></button>
+                                    <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2" title="Add Video"><i class="fa-brands fa-youtube"></i></button>
+                                    <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                             <div class="relative bg-slate-50 min-h-[350px] flex items-center justify-center">
@@ -2046,12 +2078,12 @@
                             <div class="p-5 space-y-3">
                                 <div class="flex space-x-4 mb-2 text-xl text-slate-800">
                                     <i class="fa-regular fa-heart hover:text-rose-500 cursor-pointer transition transform hover:scale-110"></i>
-                                    <i class="fa-regular fa-comment hover:text-slate-600 cursor-pointer transition transform hover:scale-110"></i>
+                                    <i class="fa-regular fa-comment hover:text-[var(--text-muted)] cursor-pointer transition transform hover:scale-110"></i>
                                 </div>
                                 <textarea rows="1" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full font-extrabold text-slate-900 text-base bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
                                 <div class="flex items-start space-x-2">
                                     <span class="font-bold text-xs text-slate-900 pt-0.5">${state.profile.name.split(' ')[0]}</span>
-                                    <textarea rows="2" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-sm font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty" placeholder="Caption...">${item.desc || ''}</textarea>
+                                    <textarea rows="2" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-sm font-medium text-[var(--text-main)] bg-transparent editable-border resize-none hide-if-empty" placeholder="Caption...">${item.desc || ''}</textarea>
                                 </div>
                             </div>
                         </div>`}).join('')}
@@ -2066,24 +2098,24 @@
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         const spanClass = idx === 0 ? 'md:col-span-2 md:row-span-2' : '';
                         return `
-                        <div class="solid-card rounded-[2.5rem] overflow-hidden shadow-sm flex flex-col border-slate-100 ${spanClass}">
-                            <div class="relative hide-if-no-media bg-slate-50 w-full ${idx === 0 ? 'min-h-[350px]' : 'min-h-[200px]'} border-b border-slate-100">
+                        <div class="solid-card rounded-[2.5rem] overflow-hidden shadow-sm flex flex-col border-[var(--border-color)] ${spanClass}">
+                            <div class="relative hide-if-no-media bg-slate-50 w-full ${idx === 0 ? 'min-h-[350px]' : 'min-h-[200px]'} border-b border-[var(--border-color)]">
                                 ${mediaHtml}
                                 <input type="file" id="item_media_${cKey}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'item', '${mf.id}', '${sf.id}', '${top.id}', ${idx})">
                             </div>
                             <div class="p-6 flex flex-col space-y-3 flex-1">
                                 <div class="flex items-start justify-between">
-                                    <textarea rows="1" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full font-extrabold text-slate-900 text-xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
+                                    <textarea rows="1" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full font-extrabold text-[var(--text-main)] text-xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
                                     <div class="flex items-center space-x-1 flex-shrink-0">
                                         ${state.isEditMode ? `
-                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-slate-100" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
-                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-slate-100" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-[var(--border-color)]" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                            <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2 rounded-xl transition border border-[var(--border-color)]" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-xs"></i></button>
                                         ` : ''}
-                                        <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100"><i class="fa-brands fa-youtube text-xs"></i></button>
-                                        <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl border border-rose-100"><i class="fa-solid fa-trash text-xs"></i></button>
+                                        <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-brands fa-youtube text-xs"></i></button>
+                                        <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
                                     </div>
                                 </div>
-                                <textarea rows="3" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-sm font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty" placeholder="Description...">${item.desc || ''}</textarea>
+                                <textarea rows="3" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-sm font-medium text-[var(--text-muted)] bg-transparent editable-border resize-none hide-if-empty" placeholder="Description...">${item.desc || ''}</textarea>
                             </div>
                         </div>`}).join('')}
                 </div>`;
@@ -2091,31 +2123,31 @@
 
             // 5. TIMELINE
             else if (currentLayout === 'timeline') {
-                layoutHtml = `<div class="relative border-l-2 border-slate-300 ml-4 md:ml-32 space-y-12 pl-6 md:pl-10 pb-8">
+                layoutHtml = `<div class="relative border-l-2 border-[var(--border-color)] ml-4 md:ml-32 space-y-12 pl-6 md:pl-10 pb-8">
                     ${items.map((item, idx) => {
                         const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         return `
                         <div class="relative group">
                             <div class="absolute -left-[35px] md:-left-[53px] top-6 w-6 h-6 rounded-full border-4 border-[var(--bg-body)] shadow-sm" style="background: var(--theme-primary);"></div>
-                            <div class="solid-card rounded-[2.5rem] overflow-hidden shadow-sm border-slate-100 flex flex-col md:flex-row">
-                                <div class="relative hide-if-no-media bg-slate-50 w-full md:w-[40%] min-h-[220px] border-r border-slate-100">
+                            <div class="solid-card rounded-[2.5rem] overflow-hidden shadow-sm border-[var(--border-color)] flex flex-col md:flex-row">
+                                <div class="relative hide-if-no-media bg-slate-50 w-full md:w-[40%] min-h-[220px] border-r border-[var(--border-color)]">
                                     ${mediaHtml}
                                     <input type="file" id="item_media_${cKey}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'item', '${mf.id}', '${sf.id}', '${top.id}', ${idx})">
                                 </div>
                                 <div class="p-8 flex flex-col justify-center flex-1 space-y-3">
                                     <div class="flex justify-between items-start">
-                                        <textarea rows="1" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full font-extrabold text-slate-900 text-2xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
+                                        <textarea rows="1" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full font-extrabold text-[var(--text-main)] text-2xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
                                         <div class="flex items-center space-x-1.5 flex-wrap justify-end gap-y-2">
                                             ${state.isEditMode ? `
-                                                <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-slate-100" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
-                                                <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-slate-100" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                                <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-[var(--border-color)]" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                                <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-[var(--border-color)]" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
                                             ` : ''}
                                             <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl transition border border-rose-100"><i class="fa-brands fa-youtube"></i></button>
                                             <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 hover:bg-rose-100 p-2.5 rounded-xl transition border border-rose-100"><i class="fa-solid fa-trash"></i></button>
                                         </div>
                                     </div>
-                                    <textarea rows="4" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-sm font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty leading-relaxed" placeholder="Description...">${item.desc || ''}</textarea>
+                                    <textarea rows="4" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-sm font-medium text-[var(--text-muted)] bg-transparent editable-border resize-none hide-if-empty leading-relaxed" placeholder="Description...">${item.desc || ''}</textarea>
                                 </div>
                             </div>
                         </div>`}).join('')}
@@ -2164,20 +2196,20 @@
                         const cKey = `${mf.id}--${sf.id}--${top.id}--${idx}`;
                         const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
                         return `
-                        <div class="solid-card rounded-[2.5rem] overflow-hidden shadow-sm border-slate-100 p-8 md:p-12 space-y-6">
-                            <div class="flex justify-between items-start border-b border-slate-100 pb-6">
-                                <textarea rows="1" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full font-extrabold text-slate-900 text-3xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
+                        <div class="solid-card rounded-[2.5rem] overflow-hidden shadow-sm border-[var(--border-color)] p-8 md:p-12 space-y-6">
+                            <div class="flex justify-between items-start border-b border-[var(--border-color)] pb-6">
+                                <textarea rows="1" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full font-extrabold text-[var(--text-main)] text-3xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
                                 <div class="flex items-center space-x-1.5 flex-shrink-0 flex-wrap justify-end">
                                     ${state.isEditMode ? `
-                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-slate-100" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
-                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-slate-100" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-[var(--border-color)]" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${idx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-[var(--border-color)]" ${idx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
                                     ` : ''}
                                     <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl hover:bg-rose-100 transition border border-rose-100"><i class="fa-brands fa-youtube"></i></button>
                                     <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${idx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl hover:bg-rose-100 transition border border-rose-100"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
-                            <textarea rows="5" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-lg font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty leading-relaxed" placeholder="Description...">${item.desc || ''}</textarea>
-                            <div class="relative hide-if-no-media bg-slate-50 w-full min-h-[300px] rounded-[1.5rem] overflow-hidden mt-6">
+                            <textarea rows="5" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${idx}" class="w-full text-lg font-medium text-[var(--text-main)] bg-transparent editable-border resize-none hide-if-empty leading-relaxed" placeholder="Description...">${item.desc || ''}</textarea>
+                            <div class="relative hide-if-no-media bg-slate-50 w-full min-h-[300px] rounded-[1.5rem] overflow-hidden mt-6 border border-[var(--border-color)]">
                                 ${mediaHtml}
                                 <input type="file" id="item_media_${cKey}" class="hidden" accept="image/*" multiple onchange="handleMediaUpload(event, 'item', '${mf.id}', '${sf.id}', '${top.id}', ${idx})">
                             </div>
@@ -2195,12 +2227,12 @@
                 const mediaHtml = renderCarousel(item.media || [], `item.${cKey}`, `item_media_${cKey}`);
 
                 layoutHtml = `
-                    <div class="max-w-4xl mx-auto solid-card rounded-[2.5rem] overflow-hidden shadow-lg border-slate-100 p-6 md:p-10 space-y-6 relative">
+                    <div class="max-w-4xl mx-auto solid-card rounded-[2.5rem] overflow-hidden shadow-lg border-[var(--border-color)] p-6 md:p-10 space-y-6 relative">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                             <span class="text-xs font-extrabold uppercase tracking-widest text-[var(--theme-primary)] bg-[var(--theme-light)] px-3 py-1.5 rounded-full">Slide ${pIdx + 1} of ${items.length}</span>
                             <div class="flex space-x-2">
-                                <button onclick="changePresentationSlide('${presKey}', -1, ${items.length})" class="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition border border-slate-200"><i class="fa-solid fa-chevron-left"></i></button>
-                                <button onclick="changePresentationSlide('${presKey}', 1, ${items.length})" class="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition border border-slate-200"><i class="fa-solid fa-chevron-right"></i></button>
+                                <button onclick="changePresentationSlide('${presKey}', -1, ${items.length})" class="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition border border-[var(--border-color)]"><i class="fa-solid fa-chevron-left"></i></button>
+                                <button onclick="changePresentationSlide('${presKey}', 1, ${items.length})" class="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition border border-[var(--border-color)]"><i class="fa-solid fa-chevron-right"></i></button>
                             </div>
                         </div>
 
@@ -2211,17 +2243,17 @@
 
                         <div class="space-y-4 pt-4">
                             <div class="flex justify-between items-start">
-                                <textarea rows="1" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${pIdx}" class="w-full font-extrabold text-slate-900 text-2xl md:text-3xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
+                                <textarea rows="1" data-field="item.title" data-ids="${mf.id},${sf.id},${top.id},${pIdx}" class="w-full font-extrabold text-[var(--text-main)] text-2xl md:text-3xl bg-transparent editable-border resize-none" placeholder="Title">${item.title}</textarea>
                                 <div class="flex items-center space-x-1.5 flex-wrap justify-end gap-y-2">
                                     ${state.isEditMode ? `
-                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${pIdx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-slate-100" ${pIdx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
-                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${pIdx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-slate-100" ${pIdx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${pIdx}, -1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-[var(--border-color)]" ${pIdx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                                        <button onclick="moveItem('${mf.id}', '${sf.id}', '${top.id}', ${pIdx}, 1)" class="text-slate-400 hover:text-[var(--theme-primary)] bg-slate-50 hover:bg-[var(--theme-light)] p-2.5 rounded-xl transition shadow-sm border border-[var(--border-color)]" ${pIdx === items.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}><i class="fa-solid fa-arrow-down text-sm"></i></button>
                                     ` : ''}
                                     <button onclick="addItemVideo('${mf.id}', '${sf.id}', '${top.id}', ${pIdx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl hover:bg-rose-100 transition border border-rose-100"><i class="fa-brands fa-youtube"></i></button>
                                     <button onclick="removeItem('${mf.id}', '${sf.id}', '${top.id}', ${pIdx})" class="edit-controls-flex text-rose-500 bg-rose-50 p-2.5 rounded-xl hover:bg-rose-100 transition border border-rose-100"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
-                            <textarea rows="4" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${pIdx}" class="w-full text-base font-medium text-slate-600 bg-transparent editable-border resize-none hide-if-empty" placeholder="Description...">${item.desc || ''}</textarea>
+                            <textarea rows="4" data-field="item.desc" data-ids="${mf.id},${sf.id},${top.id},${pIdx}" class="w-full text-base font-medium text-[var(--text-main)] bg-transparent editable-border resize-none hide-if-empty" placeholder="Description...">${item.desc || ''}</textarea>
                         </div>
                     </div>
                 `;
@@ -2489,7 +2521,7 @@
 
             let optionsHtml = state.mainFolders
                 .filter(m => m.id !== mfId)
-                .map((m, index) => `<button onclick="executeTransfer('${mfId}', ${sfIndex}, '${m.id}')" class="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-[var(--theme-light)] hover:text-[var(--theme-primary)] text-slate-700 font-bold text-sm transition mb-2 border border-slate-100"><i class="fa-regular fa-folder mr-2"></i> Move to ${m.name}</button>`)
+                .map((m, index) => `<button onclick="executeTransfer('${mfId}', ${sfIndex}, '${m.id}')" class="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-[var(--theme-light)] hover:text-[var(--theme-primary)] text-[var(--text-main)] font-bold text-sm transition mb-2 border border-[var(--border-color)]"><i class="fa-regular fa-folder mr-2"></i> Move to ${m.name}</button>`)
                 .join('');
 
             if (optionsHtml === '') {
@@ -2557,7 +2589,7 @@
             state.mainFolders.forEach(m => {
                 (m.subFolders || []).forEach(s => {
                     if (s.id !== sfId) { // Prevent moving to itself
-                        optionsHtml += `<button onclick="executeTopicTransfer('${mfId}', '${sfId}', ${topIndex}, '${m.id}', '${s.id}')" class="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-[var(--theme-light)] hover:text-[var(--theme-primary)] text-slate-700 font-bold text-sm transition mb-2 border border-slate-100"><i class="fa-regular fa-folder-open mr-2"></i> Move to ${m.name} / ${s.name}</button>`;
+                        optionsHtml += `<button onclick="executeTopicTransfer('${mfId}', '${sfId}', ${topIndex}, '${m.id}', '${s.id}')" class="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-[var(--theme-light)] hover:text-[var(--theme-primary)] text-[var(--text-main)] font-bold text-sm transition mb-2 border border-[var(--border-color)]"><i class="fa-regular fa-folder-open mr-2"></i> Move to ${m.name} / ${s.name}</button>`;
                     }
                 });
             });
